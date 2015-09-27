@@ -1,6 +1,6 @@
 package org.rcgonzalezf.weather.common.models;
 
-public class WeatherData {
+public class ForecastData {
 
   public String mName;
   public double mSpeed;
@@ -10,7 +10,7 @@ public class WeatherData {
   public long mSunrise;
   public long mSunset;
 
-  public WeatherData(String name, double speed, double deg, double temp, long humidity,
+  public ForecastData(String name, double speed, double deg, double temp, long humidity,
       long sunrise, long sunset) {
     mName = name;
     mSpeed = speed;
@@ -22,7 +22,7 @@ public class WeatherData {
   }
 
   @Override public String toString() {
-    return "WeatherData [name=" + mName + ", speed=" + mSpeed + ", deg=" + mDeg + ", temp=" + mTemp
+    return "ForecastData [name=" + mName + ", speed=" + mSpeed + ", deg=" + mDeg + ", temp=" + mTemp
         + ", humidity=" + mHumidity + ", sunrise=" + mSunrise + ", sunset=" + mSunset + "]";
   }
 }

@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.rcgonzalezf.weather.BuildConfig;
-import org.rcgonzalezf.weather.common.models.WeatherData;
+import org.rcgonzalezf.weather.common.models.ForecastData;
 import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
 import org.rcgonzalezf.weather.tests.TestExecutor;
@@ -75,7 +75,7 @@ public class OpenWeatherApiRequestTest {
   }
 
   private void givenInvalidRequestReturningEmpty() throws IOException {
-    when(mModelConverter.getModel()).thenReturn(new ArrayList<WeatherData>());
+    when(mModelConverter.getModel()).thenReturn(new ArrayList<ForecastData>());
   }
 
   private void thenCallbackShouldBeError() {
@@ -95,8 +95,8 @@ public class OpenWeatherApiRequestTest {
   }
 
   private void givenValidRequestReturningModel() throws IOException {
-    when(mModelConverter.getModel()).thenReturn(new ArrayList<WeatherData>() {{
-      add(mock(WeatherData.class));
+    when(mModelConverter.getModel()).thenReturn(new ArrayList<ForecastData>() {{
+      add(mock(ForecastData.class));
     }});
   }
 }

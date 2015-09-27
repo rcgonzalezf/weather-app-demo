@@ -1,18 +1,18 @@
 package org.rcgonzalezf.weather.openweather.network;
 
 import java.util.List;
-import org.rcgonzalezf.weather.common.models.WeatherData;
+import org.rcgonzalezf.weather.common.models.ForecastData;
 import org.rcgonzalezf.weather.common.network.ApiResponse;
 
 public class OpenWeatherApiResponse implements ApiResponse {
 
-  private List<WeatherData> mWeatherData;
+  private List<ForecastData> mForecastData;
 
-  @Override public List<WeatherData> getData() {
-    return mWeatherData;
+  @Override public List<ForecastData> getData() {
+    return mForecastData;
   }
 
-  public void setData(List<WeatherData> data) {
-    mWeatherData = data;
+  public void setData(List<ForecastData> data) {
+    mForecastData = data;
   }
 }

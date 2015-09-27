@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.rcgonzalezf.weather.common.models.WeatherData;
+import org.rcgonzalezf.weather.common.models.ForecastData;
 import org.rcgonzalezf.weather.common.ServiceConfig;
 import org.rcgonzalezf.weather.common.WeatherProvider;
 import org.rcgonzalezf.weather.common.WeatherRepository;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
   private ServiceConfig mRealServiceConfig;
   private String mCityId;
   private OpenWeatherApiRequestParameters mRequestParameters;
-  private List<WeatherData> mWeatherData;
+  private List<ForecastData> mForecastData;
 
   @Before public void setUpServiceConfig() {
     mRealServiceConfig = ServiceConfig.getInstance();
@@ -45,11 +45,11 @@ import static org.mockito.Mockito.when;
   }
 
   private void thenWeatherDataListShouldHaveOneElement() {
-    assertEquals(1, mWeatherData.size());
+    assertEquals(1, mForecastData.size());
   }
 
   private void whenGettingWeather() {
-    mWeatherData = mWeatherRepository.findWeather(mRequestParameters);
+    mForecastData = mWeatherRepository.findWeather(mRequestParameters);
   }
 
   private void givenRequestParametersWithCityId(Integer someCityId) {

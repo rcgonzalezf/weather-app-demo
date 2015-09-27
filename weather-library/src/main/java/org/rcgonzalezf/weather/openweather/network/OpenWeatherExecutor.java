@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import org.rcgonzalezf.weather.R;
 import org.rcgonzalezf.weather.WeatherLibApp;
-import org.rcgonzalezf.weather.common.models.WeatherData;
+import org.rcgonzalezf.weather.common.models.ForecastData;
 import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
 import org.rcgonzalezf.weather.openweather.models.OpenWeatherApiRawData;
@@ -64,11 +64,11 @@ public class OpenWeatherExecutor {
 
   private void convertToModel(InputStream inputStream) throws IOException {
     mConverter.fromInputStream(inputStream);
-    List<WeatherData> weatherData = mConverter.getModel();
+    List<ForecastData> forecastData = mConverter.getModel();
 
-    if (weatherData != null && !weatherData.isEmpty()) {
+    if (forecastData != null && !forecastData.isEmpty()) {
       final OpenWeatherApiResponse response = new OpenWeatherApiResponse();
-      response.setData(weatherData);
+      response.setData(forecastData);
       mApiCallback.onSuccess(response);
     } else {
       notifyOnError();

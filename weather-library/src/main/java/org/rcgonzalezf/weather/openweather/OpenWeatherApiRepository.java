@@ -1,7 +1,7 @@
 package org.rcgonzalezf.weather.openweather;
 
 import java.util.List;
-import org.rcgonzalezf.weather.common.models.WeatherData;
+import org.rcgonzalezf.weather.common.models.ForecastData;
 import org.rcgonzalezf.weather.common.ServiceConfig;
 import org.rcgonzalezf.weather.common.WeatherRepository;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters;
@@ -16,7 +16,7 @@ public class OpenWeatherApiRepository
   }
 
   @Override
-  public List<WeatherData> findWeather(OpenWeatherApiRequestParameters requestParameters) {
+  public List<ForecastData> findWeather(OpenWeatherApiRequestParameters requestParameters) {
     return null;
   }
 }
