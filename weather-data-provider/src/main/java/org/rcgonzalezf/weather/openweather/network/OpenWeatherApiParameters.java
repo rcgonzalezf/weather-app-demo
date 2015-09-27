@@ -1,4 +1,4 @@
-package org.rcgonzalezf.weather.network;
+package org.rcgonzalezf.weather.openweather.network;
 
 import java.util.HashMap;
 import java.util.Map;

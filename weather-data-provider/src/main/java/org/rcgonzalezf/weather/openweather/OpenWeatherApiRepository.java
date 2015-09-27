@@ -1,8 +1,8 @@
-package org.rcgonzalezf.weather;
+package org.rcgonzalezf.weather.openweather;
 
 import org.rcgonzalezf.weather.common.ServiceConfig;
 import org.rcgonzalezf.weather.common.WeatherRepository;
-import org.rcgonzalezf.weather.network.OpenWeatherApiParameters;
+import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiParameters;
 
 public class OpenWeatherApiRepository implements WeatherRepository<OpenWeatherApiParameters> {
 

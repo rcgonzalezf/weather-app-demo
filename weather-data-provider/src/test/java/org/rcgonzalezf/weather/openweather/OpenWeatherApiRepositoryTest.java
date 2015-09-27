@@ -1,4 +1,4 @@
-package org.rcgonzalezf.weather;
+package org.rcgonzalezf.weather.openweather;
 
 import org.junit.After;
 import org.junit.Before;

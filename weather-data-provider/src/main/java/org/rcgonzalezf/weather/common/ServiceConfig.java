@@ -1,6 +1,6 @@
 package org.rcgonzalezf.weather.common;
 
-import org.rcgonzalezf.weather.OpenWeatherApiRepository;
+import org.rcgonzalezf.weather.openweather.OpenWeatherApiRepository;
 
 public class ServiceConfig {
   private static ServiceConfig sInstance = new ServiceConfig();

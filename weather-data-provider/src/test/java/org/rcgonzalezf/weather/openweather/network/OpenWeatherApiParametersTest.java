@@ -1,4 +1,4 @@
-package org.rcgonzalezf.weather.network;
+package org.rcgonzalezf.weather.openweather.network;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -6,11 +6,11 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyInt;
-import static org.rcgonzalezf.weather.network.OpenWeatherApiParameters.OpenWeatherApiRequestBuilder.CITY_ID;
-import static org.rcgonzalezf.weather.network.OpenWeatherApiParameters.OpenWeatherApiRequestBuilder.LAT;
-import static org.rcgonzalezf.weather.network.OpenWeatherApiParameters.OpenWeatherApiRequestBuilder.LON;
-import static org.rcgonzalezf.weather.network.OpenWeatherApiParameters.OpenWeatherApiRequestBuilder.CITY_NAME;
-import static org.rcgonzalezf.weather.network.OpenWeatherApiParameters.OpenWeatherApiRequestBuilder.TYPE;
+import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiParameters.OpenWeatherApiRequestBuilder.CITY_ID;
+import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiParameters.OpenWeatherApiRequestBuilder.LAT;
+import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiParameters.OpenWeatherApiRequestBuilder.LON;
+import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiParameters.OpenWeatherApiRequestBuilder.CITY_NAME;
+import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiParameters.OpenWeatherApiRequestBuilder.TYPE;
 
 public class OpenWeatherApiParametersTest {
 
