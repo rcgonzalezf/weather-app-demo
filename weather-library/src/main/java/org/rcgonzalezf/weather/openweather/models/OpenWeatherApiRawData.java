@@ -48,6 +48,9 @@ public class OpenWeatherApiRawData implements RawWeatherData<OpenWeatherApiRawDa
   private long mCod;
 
   public Sys getSys() {
+    if (mSys == null) {
+      mSys = new Sys();
+    }
     return mSys;
   }
 
@@ -64,6 +67,9 @@ public class OpenWeatherApiRawData implements RawWeatherData<OpenWeatherApiRawDa
   }
 
   public Main getMain() {
+    if (mMain == null) {
+      mMain = new Main();
+    }
     return mMain;
   }
 
@@ -80,6 +86,9 @@ public class OpenWeatherApiRawData implements RawWeatherData<OpenWeatherApiRawDa
   }
 
   public Wind getWind() {
+    if (mWind == null) {
+      mWind = new Wind();
+    }
     return mWind;
   }
 
