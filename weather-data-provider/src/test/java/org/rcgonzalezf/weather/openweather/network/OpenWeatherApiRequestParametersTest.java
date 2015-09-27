@@ -6,22 +6,22 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyInt;
-import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiParameters.OpenWeatherApiRequestBuilder.CITY_ID;
-import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiParameters.OpenWeatherApiRequestBuilder.LAT;
-import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiParameters.OpenWeatherApiRequestBuilder.LON;
-import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiParameters.OpenWeatherApiRequestBuilder.CITY_NAME;
-import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiParameters.OpenWeatherApiRequestBuilder.TYPE;
-import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiParameters.OpenWeatherApiRequestBuilder.UNITS;
+import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder.CITY_ID;
+import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder.CITY_NAME;
+import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder.LAT;
+import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder.LON;
+import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder.TYPE;
+import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder.UNITS;
 import static org.rcgonzalezf.weather.openweather.network.Units.IMPERIAL;
 import static org.rcgonzalezf.weather.openweather.network.Units.METRIC;
 
-public class OpenWeatherApiParametersTest {
+public class OpenWeatherApiRequestParametersTest {
 
-  public OpenWeatherApiParameters.OpenWeatherApiRequestBuilder mBuilder;
-  private OpenWeatherApiParameters mOpenWeatherApiParameters;
+  public OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder mBuilder;
+  private OpenWeatherApiRequestParameters mOpenWeatherApiRequestParameters;
 
   @Before public void createBaseBuilder() throws Exception {
-    mBuilder = new OpenWeatherApiParameters.OpenWeatherApiRequestBuilder();
+    mBuilder = new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder();
   }
 
   @Test(expected = IllegalStateException.class)
@@ -89,7 +89,7 @@ public class OpenWeatherApiParametersTest {
   }
 
   private void thenQueryStringShouldContain(String expected) {
-    assertTrue(mOpenWeatherApiParameters.getQueryString().contains(expected));
+    assertTrue(mOpenWeatherApiRequestParameters.getQueryString().contains(expected));
   }
 
   @Test(expected = UnsupportedOperationException.class)
@@ -100,11 +100,11 @@ public class OpenWeatherApiParametersTest {
   }
 
   private void thenKeyValueParametersShouldThrowException() {
-    mOpenWeatherApiParameters.getKeyValueParameters();
+    mOpenWeatherApiRequestParameters.getKeyValueParameters();
   }
 
   private void thenQueryStringShouldBe(String expectedQueryString) {
-    assertEquals(expectedQueryString, mOpenWeatherApiParameters.getQueryString());
+    assertEquals(expectedQueryString, mOpenWeatherApiRequestParameters.getQueryString());
   }
 
   private void givenCityId(Integer cityId) {
@@ -112,6 +112,6 @@ public class OpenWeatherApiParametersTest {
   }
 
   private void whenBuildApiParameters() {
-    mOpenWeatherApiParameters = mBuilder.build();
+    mOpenWeatherApiRequestParameters = mBuilder.build();
   }
 }

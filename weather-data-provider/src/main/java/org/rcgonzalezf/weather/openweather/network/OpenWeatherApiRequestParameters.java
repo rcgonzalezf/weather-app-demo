@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.rcgonzalezf.weather.common.network.RequestParameters;
 
-public class OpenWeatherApiParameters implements RequestParameters {
+public class OpenWeatherApiRequestParameters implements RequestParameters {
 
   String mQueryString;
 
@@ -37,11 +37,12 @@ public class OpenWeatherApiParameters implements RequestParameters {
       return this;
     }
 
-    public OpenWeatherApiParameters build() {
+    public OpenWeatherApiRequestParameters build() {
       if (mQueryParametersMap.isEmpty()) {
         throw new IllegalStateException("Can't prepare empty parameters");
       }
-      OpenWeatherApiParameters openWeatherApiParameters = new OpenWeatherApiParameters();
+      OpenWeatherApiRequestParameters
+          openWeatherApiRequestParameters = new OpenWeatherApiRequestParameters();
 
       StringBuilder queryBuilder = new StringBuilder();
 
@@ -57,8 +58,8 @@ public class OpenWeatherApiParameters implements RequestParameters {
         ++i;
       }
 
-      openWeatherApiParameters.mQueryString = queryBuilder.toString();
-      return openWeatherApiParameters;
+      openWeatherApiRequestParameters.mQueryString = queryBuilder.toString();
+      return openWeatherApiRequestParameters;
     }
 
     private OpenWeatherApiRequestBuilder withLat(Double lat) {

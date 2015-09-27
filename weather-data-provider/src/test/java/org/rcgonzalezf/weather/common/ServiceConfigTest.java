@@ -9,21 +9,18 @@ import org.junit.runners.JUnit4;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.anyString;
 
-@RunWith(JUnit4.class)
-public class ServiceConfigTest {
+@RunWith(JUnit4.class) public class ServiceConfigTest {
 
   private WeatherRepository mWeatherRepository;
   private ServiceConfig mRealServiceConfig;
   private ServiceConfig mServiceConfig;
   private WeatherProvider mDefaultProvider;
 
-  @After
-  public void rollbackServiceConfig() {
+  @After public void rollbackServiceConfig() {
     ServiceConfig.setInstance(mRealServiceConfig);
   }
 
-  @Before
-  public void createRepository() {
+  @Before public void createRepository() {
     mRealServiceConfig = ServiceConfig.getInstance();
     mServiceConfig = new ServiceConfig();
     ServiceConfig.setInstance(mServiceConfig);
@@ -31,8 +28,7 @@ public class ServiceConfigTest {
     mDefaultProvider = WeatherProvider.OpenWeather;
   }
 
-  @Test(expected = IllegalStateException.class)
-  public void shouldThrowExceptionIfNoApiKeyIsSet() {
+  @Test(expected = IllegalStateException.class) public void shouldThrowExceptionIfNoApiKeyIsSet() {
     givenNullApiKey();
     givenSomeProvider();
     whenRetrievingRepository();
@@ -44,8 +40,7 @@ public class ServiceConfigTest {
     whenRetrievingRepository();
   }
 
-  @Test
-  public void shouldGetRepositoryInstanceForValidConfig() {
+  @Test public void shouldGetRepositoryInstanceForValidConfig() {
     givenApiKey(anyString());
     givenSomeProvider();
     whenRetrievingRepository();
