@@ -9,6 +9,8 @@ import static org.mockito.Matchers.anyInt;
 import static org.rcgonzalezf.weather.network.OpenWeatherApiParameters.OpenWeatherApiRequestBuilder.CITY_ID;
 import static org.rcgonzalezf.weather.network.OpenWeatherApiParameters.OpenWeatherApiRequestBuilder.LAT;
 import static org.rcgonzalezf.weather.network.OpenWeatherApiParameters.OpenWeatherApiRequestBuilder.LON;
+import static org.rcgonzalezf.weather.network.OpenWeatherApiParameters.OpenWeatherApiRequestBuilder.CITY_NAME;
+import static org.rcgonzalezf.weather.network.OpenWeatherApiParameters.OpenWeatherApiRequestBuilder.TYPE;
 
 public class OpenWeatherApiParametersTest {
 
@@ -31,8 +33,7 @@ public class OpenWeatherApiParametersTest {
     thenQueryStringShouldBe(CITY_ID + "=" + someId);
   }
 
-  @Test
-  public void shouldBuildQueryWithLatLon() {
+  @Test public void shouldBuildQueryWithLatLon() {
     Double lat = 12.13;
     Double lon = 31.21;
     givenLatLon(lat, lon);
@@ -40,6 +41,19 @@ public class OpenWeatherApiParametersTest {
     thenQueryStringShouldContain(LAT + "=" + lat);
     thenQueryStringShouldContain("&");
     thenQueryStringShouldContain(LON + "=" + lon);
+  }
+
+  @Test public void shouldBuildQueryByCityName() {
+    String someCityName = "someCity";
+    givenCityName(someCityName);
+    whenBuildApiParameters();
+    thenQueryStringShouldContain(CITY_NAME + "=" + someCityName);
+    thenQueryStringShouldContain("&");
+    thenQueryStringShouldContain(TYPE + "=like");
+  }
+
+  private void givenCityName(String someCityName) {
+    mBuilder.withCityName(someCityName);
   }
 
   private void givenLatLon(Double lat, Double lon) {

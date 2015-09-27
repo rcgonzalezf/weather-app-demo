@@ -21,6 +21,10 @@ public class OpenWeatherApiParameters implements RequestParameters {
     public static final String LON = "lon";
     public static final String LAT = "lan";
     public static final String CITY_ID = "id";
+    public static final String CITY_NAME = "q";
+    public static final String TYPE = "type";
+    private static final String LIKE = "like";
+
     private Map<String, String> mQueryParametersMap;
 
     public OpenWeatherApiRequestBuilder() {
@@ -68,6 +72,12 @@ public class OpenWeatherApiParameters implements RequestParameters {
 
     public OpenWeatherApiRequestBuilder withLatLon(Double lat, Double lon) {
       return withLat(lat).withLon(lon);
+    }
+
+    public OpenWeatherApiRequestBuilder withCityName(String cityName) {
+      mQueryParametersMap.put(CITY_NAME, cityName);
+      mQueryParametersMap.put(TYPE, LIKE);
+      return this;
     }
   }
 }
