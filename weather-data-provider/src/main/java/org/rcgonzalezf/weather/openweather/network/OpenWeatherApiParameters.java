@@ -24,6 +24,7 @@ public class OpenWeatherApiParameters implements RequestParameters {
     public static final String CITY_NAME = "q";
     public static final String TYPE = "type";
     private static final String LIKE = "like";
+    public static final String UNITS = "units";
 
     private Map<String, String> mQueryParametersMap;
 
@@ -77,6 +78,11 @@ public class OpenWeatherApiParameters implements RequestParameters {
     public OpenWeatherApiRequestBuilder withCityName(String cityName) {
       mQueryParametersMap.put(CITY_NAME, cityName);
       mQueryParametersMap.put(TYPE, LIKE);
+      return this;
+    }
+
+    public OpenWeatherApiRequestBuilder withUnits(Units units) {
+      mQueryParametersMap.put(UNITS, units.getUnitName());
       return this;
     }
   }
