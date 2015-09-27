@@ -1,5 +1,7 @@
 package org.rcgonzalezf.weather.openweather.network;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
 import org.rcgonzalezf.weather.common.network.ApiRequest;
 
@@ -9,10 +11,16 @@ public class OpenWeatherApiRequest implements ApiRequest<OpenWeatherApiRequestPa
   private static final String FORECAST = "forecast";
   private static final String URL_FORMAT = "%1$s%2$s?%3$s&APPID=%4$s";
   private final String mApiKey;
+  private final Executor mExecutor;
   private OpenWeatherApiRequestParameters mRequestParameters;
 
   public OpenWeatherApiRequest(String apiKey) {
+    this(apiKey, Executors.newSingleThreadExecutor());
+  }
+
+  public OpenWeatherApiRequest(String apiKey, Executor executor) {
     mApiKey = apiKey;
+    mExecutor = executor;
   }
 
   @Override public String getBaseUrl() {
@@ -33,8 +41,8 @@ public class OpenWeatherApiRequest implements ApiRequest<OpenWeatherApiRequestPa
 
   protected String url() {
     return String.format(URL_FORMAT,
-        BASE_URL,
-        FORECAST,
+        getBaseUrl(),
+        getMethodName(),
         mRequestParameters.getQueryString(),
         mApiKey);
   }
