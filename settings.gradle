@@ -1,2 +1,2 @@
-include ':weather-data-provider'
+include ':weather-library'
 include ':weather-app'

@@ -1,0 +1,4 @@
+<resources>
+  <string name="empty_result">Empty List</string>
+  <string name="app_name">Weather Library</string>
+</resources>

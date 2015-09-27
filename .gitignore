@@ -22,3 +22,5 @@ local.properties
 *~
 build
 weather-app/src/main/res/values/configuration.xml
+
+weather-library/src/main/res/values/configuration.xml
