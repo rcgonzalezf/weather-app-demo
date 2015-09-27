@@ -1,18 +1,17 @@
 package org.rcgonzalezf.weather;
 
+import org.rcgonzalezf.weather.common.ServiceConfig;
 import org.rcgonzalezf.weather.common.WeatherRepository;
-import org.rcgonzalezf.weather.network.WeatherApiRequestBuilder;
+import org.rcgonzalezf.weather.network.OpenWeatherApiParameters;
 
-public class OpenWeatherApiRepository  implements WeatherRepository {
+public class OpenWeatherApiRepository implements WeatherRepository<OpenWeatherApiParameters> {
 
-  private static WeatherRepository instance;
+  private final ServiceConfig mServiceConfig;
 
-  public static WeatherRepository getInstance() {
-    return instance;
+  public OpenWeatherApiRepository(ServiceConfig serviceConfig) {
+    mServiceConfig = serviceConfig;
   }
 
-  @Override
-  public void findWeather(WeatherApiRequestBuilder mApiBuilder) {
-
+  @Override public void findWeather(OpenWeatherApiParameters requestParameters) {
   }
 }

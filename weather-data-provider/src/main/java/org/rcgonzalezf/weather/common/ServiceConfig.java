@@ -36,9 +36,17 @@ public class ServiceConfig {
     WeatherRepository repository = null;
     switch (mWeatherProvider) {
       case OpenWeather:
-        repository = new OpenWeatherApiRepository();
+        repository = new OpenWeatherApiRepository(this);
         break;
     }
     return repository;
+  }
+
+  public String getApiKey() {
+    return mApiKey;
+  }
+
+  public WeatherProvider getWeatherProvider() {
+    return mWeatherProvider;
   }
 }

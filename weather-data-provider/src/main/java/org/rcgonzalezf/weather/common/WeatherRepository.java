@@ -1,7 +1,7 @@
 package org.rcgonzalezf.weather.common;
 
-import org.rcgonzalezf.weather.network.WeatherApiRequestBuilder;
+import org.rcgonzalezf.weather.common.network.RequestParameters;
 
-public interface WeatherRepository {
-  void findWeather(WeatherApiRequestBuilder mApiBuilder);
+public interface WeatherRepository<T extends RequestParameters> {
+  void findWeather(T requestParameters);
 }
