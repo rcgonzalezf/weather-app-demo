@@ -1,27 +1,37 @@
 package org.rcgonzalezf.weather.openweather.network;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.rcgonzalezf.weather.BuildConfig;
+import org.rcgonzalezf.weather.common.models.WeatherData;
+import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
+import org.rcgonzalezf.weather.tests.TestExecutor;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
-@RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class)
+@RunWith(RobolectricGradleTestRunner.class) @Config(constants = BuildConfig.class, sdk = 21)
 public class OpenWeatherApiRequestTest {
 
   private OpenWeatherApiRequest mOpenWeatherApiRequest;
   private ApiCallback<OpenWeatherApiResponse, OpenWeatherApiError> mTestApiCallback;
   private boolean mIsSuccess;
   private boolean mIsError;
+  private ModelConverter mModelConverter;
 
   @Before public void createApiRequestBaseObject() {
-    mOpenWeatherApiRequest = new OpenWeatherApiRequest("someApiKey");
+    mModelConverter = mock(ModelConverter.class);
+    mOpenWeatherApiRequest = new OpenWeatherApiRequest("someApiKey", mModelConverter);
+    mOpenWeatherApiRequest = spy(mOpenWeatherApiRequest);
+
     mTestApiCallback = new ApiCallback<OpenWeatherApiResponse, OpenWeatherApiError>() {
 
       @Override public void onSuccess(OpenWeatherApiResponse apiResponse) {
@@ -32,26 +42,48 @@ public class OpenWeatherApiRequestTest {
         mIsError = true;
       }
     };
+    mOpenWeatherApiRequest.addRequestParameters(mock(OpenWeatherApiRequestParameters.class));
+    when(mOpenWeatherApiRequest.getExecutor()).thenReturn(new TestExecutor());
   }
 
   @Test public void shouldNotifySuccess() throws Exception {
-    givenValidRequestParameters();
+    givenValidRequestReturningModel();
     whenExecuting();
     thenCallbackShouldBeSuccess();
   }
 
   @Test public void shouldNotifyOnError() throws Exception {
-    givenInvalidRequestParameters();
+    givenInvalidRequestReturningNull();
     whenExecuting();
     thenCallbackShouldBeError();
+  }
+
+  @Test public void shouldNotifyOnErrorWhenEmptyResults() throws Exception {
+    givenInvalidRequestReturningEmpty();
+    whenExecuting();
+    thenCallbackShouldBeError();
+  }
+
+  @Test public void shouldNotifyOnErrorWhenIOException() throws Exception {
+    givenInvalidRequestReturningException();
+    whenExecuting();
+    thenCallbackShouldBeError();
+  }
+
+  private void givenInvalidRequestReturningException() throws IOException {
+    when(mModelConverter.getModel()).thenThrow(new IOException("someExec"));
+  }
+
+  private void givenInvalidRequestReturningEmpty() throws IOException {
+    when(mModelConverter.getModel()).thenReturn(new ArrayList<WeatherData>());
   }
 
   private void thenCallbackShouldBeError() {
     assertEquals(true, mIsError);
   }
 
-  private void givenInvalidRequestParameters() {
-    mOpenWeatherApiRequest.addRequestParameters(mock(OpenWeatherApiRequestParameters.class));
+  private void givenInvalidRequestReturningNull() throws IOException {
+    when(mModelConverter.getModel()).thenReturn(null);
   }
 
   private void whenExecuting() {
@@ -62,7 +94,9 @@ public class OpenWeatherApiRequestTest {
     assertEquals(true, mIsSuccess);
   }
 
-  private void givenValidRequestParameters() {
-    mOpenWeatherApiRequest.addRequestParameters(mock(OpenWeatherApiRequestParameters.class));
+  private void givenValidRequestReturningModel() throws IOException {
+    when(mModelConverter.getModel()).thenReturn(new ArrayList<WeatherData>() {{
+      add(mock(WeatherData.class));
+    }});
   }
 }

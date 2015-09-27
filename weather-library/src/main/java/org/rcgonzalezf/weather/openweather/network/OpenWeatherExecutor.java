@@ -1,5 +1,6 @@
 package org.rcgonzalezf.weather.openweather.network;
 
+import android.util.Log;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,7 +8,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import org.rcgonzalezf.weather.R;
 import org.rcgonzalezf.weather.WeatherLibApp;
 import org.rcgonzalezf.weather.common.models.WeatherData;
@@ -21,10 +21,7 @@ public class OpenWeatherExecutor {
   private ApiCallback<OpenWeatherApiResponse, OpenWeatherApiError> mApiCallback;
   private InputStream mInputStream;
   private ModelConverter<Void, OpenWeatherApiRawData> mConverter;
-
-  public OpenWeatherExecutor(ApiCallback apiCallback) {
-    this(apiCallback, Executors.newSingleThreadExecutor());
-  }
+  private static final String TAG = OpenWeatherExecutor.class.getSimpleName();
 
   public OpenWeatherExecutor(ApiCallback apiCallback, Executor executor) {
     mApiCallback = apiCallback;
@@ -51,25 +48,30 @@ public class OpenWeatherExecutor {
             }
           }
         } catch (IOException e) {
-          e.printStackTrace();
+          Log.e(TAG, "IOException while getting weather", e);
+          notifyOnError();
         }
       }
     });
+  }
+
+  private void notifyOnError() {
+    final OpenWeatherApiError error = new OpenWeatherApiError();
+    error.setMessage(WeatherLibApp.getInstance().getString(R.string.empty_result));
+    error.setCode(ErrorCode.EMPTY);
+    mApiCallback.onError(error);
   }
 
   private void convertToModel(InputStream inputStream) throws IOException {
     mConverter.fromInputStream(inputStream);
     List<WeatherData> weatherData = mConverter.getModel();
 
-    if(weatherData != null && !weatherData.isEmpty()) {
+    if (weatherData != null && !weatherData.isEmpty()) {
       final OpenWeatherApiResponse response = new OpenWeatherApiResponse();
       response.setData(weatherData);
       mApiCallback.onSuccess(response);
     } else {
-      final OpenWeatherApiError error = new OpenWeatherApiError();
-      error.setMessage(WeatherLibApp.getInstance().getString(R.string.empty_result));
-      error.setCode(ErrorCode.EMPTY);
-      mApiCallback.onError(error);
+      notifyOnError();
     }
   }
 
