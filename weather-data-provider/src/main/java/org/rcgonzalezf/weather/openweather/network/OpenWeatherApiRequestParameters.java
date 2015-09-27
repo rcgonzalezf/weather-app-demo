@@ -19,7 +19,7 @@ public class OpenWeatherApiRequestParameters implements RequestParameters {
   public static class OpenWeatherApiRequestBuilder {
 
     public static final String LON = "lon";
-    public static final String LAT = "lan";
+    public static final String LAT = "lat";
     public static final String CITY_ID = "id";
     public static final String CITY_NAME = "q";
     public static final String TYPE = "type";
