@@ -16,6 +16,10 @@ android {
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
   }
+
+  testOptions {
+    unitTests.returnDefaultValues = true
+  }
 }
 
 dependencies {
@@ -25,5 +29,5 @@ dependencies {
 
   testCompile 'junit:junit:4.12'
   testCompile 'org.mockito:mockito-core:1.10.9'
-
+  testCompile 'org.robolectric:robolectric:3.0'
 }

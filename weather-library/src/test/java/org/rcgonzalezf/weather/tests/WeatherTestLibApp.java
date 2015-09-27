@@ -1,5 +1,7 @@
-package org.rcgonzalezf.weather;
+package org.rcgonzalezf.weather.tests;
 
+import org.rcgonzalezf.weather.R;
+import org.rcgonzalezf.weather.WeatherLibApp;
 import org.rcgonzalezf.weather.common.ServiceConfig;
 import org.rcgonzalezf.weather.common.WeatherProvider;
 

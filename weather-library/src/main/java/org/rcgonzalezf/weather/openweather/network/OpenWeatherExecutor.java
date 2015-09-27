@@ -5,10 +5,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import org.rcgonzalezf.weather.R;
+import org.rcgonzalezf.weather.WeatherLibApp;
 import org.rcgonzalezf.weather.common.models.WeatherData;
 import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
@@ -58,37 +59,18 @@ public class OpenWeatherExecutor {
 
   private void convertToModel(InputStream inputStream) throws IOException {
     mConverter.fromInputStream(inputStream);
-    List<OpenWeatherApiRawData> rawModelList = mConverter.generateRawModel();
-    List<WeatherData> weatherData = new ArrayList<>(rawModelList.size());
+    List<WeatherData> weatherData = mConverter.getModel();
 
-    if (rawModelList != null && rawModelList.size() > 0) {
-
-      for(OpenWeatherApiRawData rawData : rawModelList) {
-
-
-        if(rawData.getCod() == HttpURLConnection.HTTP_OK) {
-
-          weatherData.add(new WeatherData(rawData.getName(),
-              rawData.getWind().getSpeed(),
-              rawData.getWind().getDeg(),
-              rawData.getMain().getTemp(),
-              rawData.getMain().getHumidity(),
-              rawData.getSys().getSunrise(),
-              rawData.getSys().getSunset()
-          ));
-        }
-      }
-      OpenWeatherApiResponse response = new OpenWeatherApiResponse();
+    if(weatherData != null && !weatherData.isEmpty()) {
+      final OpenWeatherApiResponse response = new OpenWeatherApiResponse();
       response.setData(weatherData);
       mApiCallback.onSuccess(response);
-
     } else {
       final OpenWeatherApiError error = new OpenWeatherApiError();
-      error.setMessage("Empty result");
+      error.setMessage(WeatherLibApp.getInstance().getString(R.string.empty_result));
       error.setCode(ErrorCode.EMPTY);
       mApiCallback.onError(error);
     }
-
   }
 
   public InputStream getInputStream() {

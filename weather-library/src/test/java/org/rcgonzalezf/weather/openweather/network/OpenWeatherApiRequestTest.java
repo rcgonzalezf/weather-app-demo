@@ -3,13 +3,17 @@ package org.rcgonzalezf.weather.openweather.network;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.rcgonzalezf.weather.BuildConfig;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
-@RunWith(JUnit4.class) public class OpenWeatherApiRequestTest {
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class)
+public class OpenWeatherApiRequestTest {
 
   private OpenWeatherApiRequest mOpenWeatherApiRequest;
   private ApiCallback<OpenWeatherApiResponse, OpenWeatherApiError> mTestApiCallback;
