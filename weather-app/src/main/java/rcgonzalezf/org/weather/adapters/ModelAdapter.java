@@ -1,7 +1,9 @@
 package rcgonzalezf.org.weather.adapters;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +15,7 @@ import android.widget.TextView;
 import java.util.List;
 import org.rcgonzalezf.weather.WeatherLibApp;
 import rcgonzalezf.org.weather.R;
+import rcgonzalezf.org.weather.SettingsActivity;
 import rcgonzalezf.org.weather.models.WeatherViewModel;
 
 import static rcgonzalezf.org.weather.utils.ForecastUtils.formatDate;
@@ -53,9 +56,17 @@ public class ModelAdapter<T extends WeatherViewModel>
     holder.windSpeedTextView.setText(
         getFormattedWind(mContext, mainModel.getSpeed(), mainModel.getDeg()));
 
-    holder.celsiusTextView.setText(
-        formatTemperature(mainModel.getTemperature(), false, "C"));
-    holder.fahrenheitTextView.setText(formatTemperature(mainModel.getTemperature(), true, "F"));
+    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+    boolean celsiusPreferred = prefs.getBoolean(SettingsActivity.PREF_TEMPERATURE_UNITS, true);
+    if (celsiusPreferred) {
+      holder.primaryTempTextView.setText(formatTemperature(mainModel.getTemperature(), false, "C"));
+      holder.secondaryTempTextView.setText(
+          formatTemperature(mainModel.getTemperature(), true, "F"));
+    } else {
+      holder.secondaryTempTextView.setText(
+          formatTemperature(mainModel.getTemperature(), false, "C"));
+      holder.primaryTempTextView.setText(formatTemperature(mainModel.getTemperature(), true, "F"));
+    }
 
     holder.descriptionTextView.setText(mainModel.getDescription());
     holder.itemView.setTag(mainModel);
@@ -92,8 +103,8 @@ public class ModelAdapter<T extends WeatherViewModel>
     public TextView detailLocationNameTextView;
     public TextView humidityTextView;
     public TextView windSpeedTextView;
-    public TextView fahrenheitTextView;
-    public TextView celsiusTextView;
+    public TextView secondaryTempTextView;
+    public TextView primaryTempTextView;
     public TextView dayTextView;
     public TextView descriptionTextView;
     public View itemView;
@@ -108,8 +119,9 @@ public class ModelAdapter<T extends WeatherViewModel>
       itemImage = (ImageView) itemView.findViewById(R.id.item_image);
       humidityTextView = (TextView) itemView.findViewById(R.id.humidity_text_view);
       windSpeedTextView = (TextView) itemView.findViewById(R.id.wind_speed_text_view);
-      fahrenheitTextView = (TextView) itemView.findViewById(R.id.fahrenheit_text_view);
-      celsiusTextView = (TextView) itemView.findViewById(R.id.celsius_text_view);
+      secondaryTempTextView =
+          (TextView) itemView.findViewById(R.id.secondary_temperature_text_view);
+      primaryTempTextView = (TextView) itemView.findViewById(R.id.preferred_temperature_text_view);
       descriptionTextView = (TextView) itemView.findViewById(R.id.description_text_view);
     }
   }

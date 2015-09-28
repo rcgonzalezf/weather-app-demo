@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
@@ -21,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -40,6 +42,8 @@ import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
 import rcgonzalezf.org.weather.models.Forecast;
 import rcgonzalezf.org.weather.utils.ForecastUtils;
+
+import static rcgonzalezf.org.weather.SettingsActivity.USER_NAME_TO_DISPLAY;
 
 public abstract class BaseActivity extends AppCompatActivity
     implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
@@ -152,6 +156,10 @@ public abstract class BaseActivity extends AppCompatActivity
         return true;
       }
     });
+
+    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    TextView textView = (TextView) findViewById(R.id.user_display_name);
+    textView.setText(prefs.getString(USER_NAME_TO_DISPLAY, getString(R.string.pref_default_display_name)));
   }
 
   private void setupFabButton() {

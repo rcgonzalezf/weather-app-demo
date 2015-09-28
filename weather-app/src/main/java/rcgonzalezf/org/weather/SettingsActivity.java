@@ -34,6 +34,8 @@ import java.util.List;
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
+  public static final String USER_NAME_TO_DISPLAY = "user_name_to_display";
+  public static final String PREF_TEMPERATURE_UNITS = "pref_temperature_units";
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -143,6 +145,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
    */
   @TargetApi(Build.VERSION_CODES.HONEYCOMB) public static class GeneralPreferenceFragment
       extends PreferenceFragment {
+
     @Override public void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       addPreferencesFromResource(R.xml.pref_general);
@@ -152,7 +155,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
       // to their values. When their values change, their summaries are
       // updated to reflect the new value, per the Android Design
       // guidelines.
-      bindPreferenceSummaryToValue(findPreference("user_name_to_display"));
+      bindPreferenceSummaryToValue(findPreference(USER_NAME_TO_DISPLAY));
     }
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
