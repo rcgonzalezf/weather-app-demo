@@ -14,6 +14,7 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 
 @RunWith(RobolectricGradleTestRunner.class) @Config(constants = BuildConfig.class, sdk = 21)
@@ -85,6 +86,21 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
     thenDegShouldBe(185.0);
     thenTempShouldBe(288.84);
     thenHumidityShouldBe(99L);
+  }
+
+  @Test public void shouldReturnEmptyModelForError()
+      throws IOException {
+    givenInputStreamCityNotFound();
+    whenGenerateModel();
+    thenModelShouldBeEmpty();
+  }
+
+  private void thenModelShouldBeEmpty() {
+    assertTrue(mModel.isEmpty());
+  }
+
+  private void givenInputStreamCityNotFound() {
+    givenJson(R.raw.error_no_city);
   }
 
   private void givenInputStreamByLatLon() {
