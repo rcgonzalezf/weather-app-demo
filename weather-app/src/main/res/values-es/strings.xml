@@ -11,5 +11,8 @@
   <string name="tomorrow">Mañana</string>
   <string name="humidity">Humedad</string>
   <string name="wind">Viento</string>
+  <string name="enter_city">Ingrese el nombre de la ciudad:</string>
+  <string name="city_name_hint">Hermosillo, MX</string>
+  <string name="searching">Buscando: </string>
 
 </resources>

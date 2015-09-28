@@ -1,5 +1,6 @@
 package rcgonzalezf.org.weather.common;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
@@ -9,13 +10,16 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
@@ -24,6 +28,8 @@ import com.google.android.gms.location.LocationServices;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import org.rcgonzalezf.weather.common.ServiceConfig;
@@ -55,6 +61,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
     initToolbar();
     setupDrawerLayout();
+    setupFabButton();
 
     mContent = findViewById(R.id.content);
   }
@@ -117,7 +124,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
   }
 
-  private void initToolbar() {
+  protected void initToolbar() {
     final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
     final ActionBar actionBar = getSupportActionBar();
@@ -128,7 +135,7 @@ public abstract class BaseActivity extends AppCompatActivity
     }
   }
 
-  private void setupDrawerLayout() {
+  protected void setupDrawerLayout() {
     mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
     NavigationView view = (NavigationView) findViewById(R.id.navigation_view);
@@ -138,13 +145,64 @@ public abstract class BaseActivity extends AppCompatActivity
           Intent intent = new Intent(BaseActivity.this, WeatherActivity.class);
           startActivity(intent);
         } else {
-          Snackbar.make(mContent, menuItem.getTitle() + " pressed", Snackbar.LENGTH_LONG).show();
+          Snackbar.make(mContent, menuItem.getTitle() + " pressed", Snackbar.LENGTH_SHORT).show();
           menuItem.setChecked(true);
           mDrawerLayout.closeDrawers();
         }
         return true;
       }
     });
+  }
+
+  private void setupFabButton() {
+    findViewById(R.id.main_fab).setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        performFabAction(v);
+      }
+    });
+  }
+
+  protected void performFabAction(View view) {
+    LayoutInflater li = LayoutInflater.from(this);
+    View promptsView = li.inflate(R.layout.dialog_city_query, null);
+
+    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+    alertDialogBuilder.setView(promptsView);
+
+    final EditText userInput = (EditText) promptsView.findViewById(R.id.city_input_edit_text);
+
+    alertDialogBuilder.setCancelable(false)
+        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int id) {
+
+            String query = null;
+            try {
+              query = URLEncoder.encode(userInput.getText().toString(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+              Log.e(TAG,"Can't encode URL", e);
+            }
+
+            WeatherRepository<OpenWeatherApiRequestParameters> weatherRepository =
+                ServiceConfig.getInstance().getWeatherRepository();
+
+            weatherRepository.findWeather(
+                new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withCityName(
+                    query).build(), BaseActivity.this);
+
+            Toast.makeText(BaseActivity.this,
+                getString(R.string.searching) + " " + userInput.getText() + "...", Toast.LENGTH_SHORT)
+                .show();
+          }
+        })
+        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int id) {
+            dialog.cancel();
+          }
+        });
+
+    AlertDialog alertDialog = alertDialogBuilder.create();
+    alertDialog.show();
   }
 
   public List<Forecast> getPreviousForecastList() {
