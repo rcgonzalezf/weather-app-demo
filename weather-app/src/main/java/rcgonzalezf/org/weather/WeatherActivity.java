@@ -39,8 +39,7 @@ public class WeatherActivity extends BaseActivity implements ModelAdapter.OnItem
   }
 
   @Override public void onSuccess(ApiResponse apiResponse) {
-    final List<Forecast> forecastList = new ForecastMapper().withData(apiResponse.getData())
-        .map();
+    final List<Forecast> forecastList = new ForecastMapper().withData(apiResponse.getData()).map();
     saveForecastList(forecastList);
 
     runOnUiThread(new Runnable() {
@@ -65,11 +64,11 @@ public class WeatherActivity extends BaseActivity implements ModelAdapter.OnItem
 
         SharedPreferences prefs = getSharedPreferences(OFFLINE_FILE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(FORECASTS, Base64.encodeToString(serializedData.toByteArray(), Base64.DEFAULT));
+        editor.putString(FORECASTS,
+            Base64.encodeToString(serializedData.toByteArray(), Base64.DEFAULT));
         editor.apply();
       }
     }).start();
-
   }
 
   @Override public void onError(ApiError apiError) {
@@ -86,11 +85,13 @@ public class WeatherActivity extends BaseActivity implements ModelAdapter.OnItem
   }
 
   @Override public void onItemClick(View view, WeatherViewModel viewModel) {
-    Toast.makeText(this, "clicked:" + viewModel.getId(), Toast.LENGTH_SHORT).show();
+    Toast.makeText(this,
+        String.format(getString(R.string.item_clicked_debug_format), viewModel.getId(),
+            viewModel.getDateTime(), viewModel.getDescription()), Toast.LENGTH_SHORT).show();
   }
 
   @Override public void loadOldData(final List<Forecast> forecastList) {
-    if(forecastList != null && !forecastList.isEmpty()) {
+    if (forecastList != null && !forecastList.isEmpty()) {
       runOnUiThread(new Runnable() {
         @Override public void run() {
           mAdapter.setItems(forecastList);

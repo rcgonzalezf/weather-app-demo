@@ -4,4 +4,6 @@
       translatable="false">%1$s, %2$s</string>
   <string name="key_value_display_format"
       translatable="false">%1$s: %2$s</string>
+  <string name="item_clicked_debug_format"
+      translatable="false">Item Clicked. CountryId: %1$s:,  %2$s, %1%s</string>
 </resources>
