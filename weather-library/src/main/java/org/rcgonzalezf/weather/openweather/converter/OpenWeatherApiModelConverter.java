@@ -47,7 +47,7 @@ public class OpenWeatherApiModelConverter implements ModelConverter<Void, OpenWe
           for (RawListItem rawData : rawDataList.getRawList()) {
             WeatherData weatherData = new WeatherData();
             weatherData.setDateTime(rawData.getDateTime());
-
+            weatherData.setWeatherId(rawData.getWeather().get(0).getId());
             weatherData.setSpeed(rawData.getWind().getSpeed());
             weatherData.setDeg(rawData.getWind().getDeg());
             weatherData.setTemp(rawData.getMain().getTemp());

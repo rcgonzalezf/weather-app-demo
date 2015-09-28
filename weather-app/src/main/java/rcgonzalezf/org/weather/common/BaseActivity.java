@@ -23,7 +23,7 @@ import org.rcgonzalezf.weather.common.WeatherRepository;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters;
 import rcgonzalezf.org.weather.R;
-import rcgonzalezf.org.weather.Utils;
+import rcgonzalezf.org.weather.utils.ForecastUtils;
 import rcgonzalezf.org.weather.WeatherActivity;
 
 public abstract class BaseActivity extends AppCompatActivity
@@ -80,7 +80,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
   @Override public void onConnected(Bundle bundle) {
     mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-    if(!Utils.hasInternetConnection(this)) {
+    if(!ForecastUtils.hasInternetConnection(this)) {
       Toast.makeText(this, getString(R.string.no_internet_msg), Toast.LENGTH_SHORT).show();
     }
     if (mLastLocation != null) {

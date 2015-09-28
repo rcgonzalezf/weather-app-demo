@@ -15,4 +15,6 @@ public interface WeatherViewModel extends Parcelable {
   String getTemperature();
 
   String getDateTime();
+
+  int getWeatherId();
 }

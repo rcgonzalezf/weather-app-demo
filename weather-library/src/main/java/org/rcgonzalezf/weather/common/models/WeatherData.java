@@ -7,6 +7,7 @@ public class WeatherData {
   private double mTemp;
   private long mHumidity;
   private String mDateTime;
+  private int mWeatherId;
 
   public double getSpeed() {
     return mSpeed;
@@ -46,5 +47,13 @@ public class WeatherData {
 
   public void setDateTime(String dateTime) {
     this.mDateTime = dateTime;
+  }
+
+  public int getWeatherId() {
+    return mWeatherId;
+  }
+
+  public void setWeatherId(int weatherId) {
+    mWeatherId = weatherId;
   }
 }

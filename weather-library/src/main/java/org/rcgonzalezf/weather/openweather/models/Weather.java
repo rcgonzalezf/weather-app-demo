@@ -6,16 +6,16 @@ public class Weather {
   public final static String description_JSON = "description";
   public final static String icon_JSON = "icon";
 
-  private long id;
+  private int id;
   private String main;
   private String description;
   private String icon;
 
-  public long getId() {
+  public int getId() {
     return id;
   }
 
-  public void setId(long id) {
+  public void setId(int id) {
     this.id = id;
   }
 

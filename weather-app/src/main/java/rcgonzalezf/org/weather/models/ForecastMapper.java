@@ -28,6 +28,7 @@ public class ForecastMapper {
         forecast.setTemperature(String.valueOf(weather.getTemp()));
         forecast.setHumidity(String.valueOf(weather.getHumidity()));
         forecast.setDateTime(weather.getDateTime());
+        forecast.setWeatherId(weather.getWeatherId());
         forecastList.add(forecast);
       }
     }

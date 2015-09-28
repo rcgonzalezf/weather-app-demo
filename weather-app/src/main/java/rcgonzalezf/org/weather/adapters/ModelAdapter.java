@@ -12,6 +12,7 @@ import android.widget.TextView;
 import java.util.List;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.models.WeatherViewModel;
+import rcgonzalezf.org.weather.utils.ForecastUtils;
 
 public class ModelAdapter<T extends WeatherViewModel>
     extends RecyclerView.Adapter<ModelAdapter.ModelViewHolder> implements View.OnClickListener {
@@ -34,6 +35,8 @@ public class ModelAdapter<T extends WeatherViewModel>
     T mainModel = mModels.get(position);
     holder.cityNameTextView.setText(mainModel.getCityName());
     holder.datetimeTextView.setText(mainModel.getDateTime());
+    holder.itemImage.setImageResource(
+        ForecastUtils.getArtResourceForWeatherCondition(mainModel.getWeatherId()));
     holder.itemView.setTag(mainModel);
   }
 
