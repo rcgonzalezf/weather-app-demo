@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import org.rcgonzalezf.weather.common.models.ForecastData;
+import org.rcgonzalezf.weather.common.models.ForecastDataBuilder;
 import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.openweather.models.OpenWeatherApiRawData;
 
@@ -35,11 +36,16 @@ public class OpenWeatherApiModelConverter implements ModelConverter<Void, OpenWe
       for (OpenWeatherApiRawData rawData : rawModelList) {
 
         if (rawData.getCod() == HttpURLConnection.HTTP_OK) {
-
-          forecastData.add(new ForecastData(rawData.getName(), rawData.getWind().getSpeed(),
-              rawData.getWind().getDeg(), rawData.getMain().getTemp(),
-              rawData.getMain().getHumidity(), rawData.getSys().getSunrise(),
-              rawData.getSys().getSunset()));
+          ForecastData forecastDatum = new ForecastDataBuilder()
+              .setCity(rawData.getCity())
+              .setSpeed(rawData.getWind().getSpeed())
+              .setDeg(rawData.getWind().getDeg())
+              .setTemp(rawData.getMain().getTemp())
+              .setHumidity(rawData.getMain().getHumidity())
+              .setSunrise(rawData.getSys().getSunrise())
+              .setSunset(rawData.getSys().getSunset())
+              .createForecastData();
+          forecastData.add(forecastDatum);
         }
       }
     }

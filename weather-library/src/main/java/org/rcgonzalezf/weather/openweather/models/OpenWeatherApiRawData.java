@@ -27,15 +27,16 @@ public class OpenWeatherApiRawData implements RawWeatherData<OpenWeatherApiRawDa
     return this;
   }
 
-  final public static String cod_JSON = "cod";
-  final public static String name_JSON = "name";
-  final public static String id_JSON = "id";
-  final public static String dt_JSON = "dt";
-  final public static String wind_JSON = "wind";
-  final public static String main_JSON = "main";
-  final public static String base_JSON = "base";
-  final public static String weather_JSON = "weather";
-  final public static String sys_JSON = "sys";
+  public final static String cod_JSON = "cod";
+  public final static String name_JSON = "name";
+  public final static String id_JSON = "id";
+  public final static String dt_JSON = "dt";
+  public final static String wind_JSON = "wind";
+  public final static String main_JSON = "main";
+  public final static String base_JSON = "base";
+  public final static String weather_JSON = "weather";
+  public final static String sys_JSON = "sys";
+  public final static String city_JSON = "city";
 
   private Sys mSys;
   private String mBase;
@@ -46,6 +47,7 @@ public class OpenWeatherApiRawData implements RawWeatherData<OpenWeatherApiRawDa
   private long mId;
   private String mName;
   private long mCod;
+  private City mCity;
 
   public Sys getSys() {
     if (mSys == null) {
@@ -126,5 +128,16 @@ public class OpenWeatherApiRawData implements RawWeatherData<OpenWeatherApiRawDa
 
   public void setCod(long cod) {
     mCod = cod;
+  }
+
+  public City getCity() {
+    if (mCity == null) {
+      mCity = new City();
+    }
+    return mCity;
+  }
+
+  public void setCity(City city) {
+    mCity = city;
   }
 }

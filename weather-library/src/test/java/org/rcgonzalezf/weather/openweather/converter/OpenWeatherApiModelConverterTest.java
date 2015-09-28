@@ -39,7 +39,7 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
     givenInputStreamByCityIdMoscow();
     whenGenerateModel();
     thenShouldHaveOneElement();
-    thenNameShouldBe("");
+    thenCityNameShouldBe("Moscow");
     thenSpeedShouldBe(0.0);
     thenDegShouldBe(0.0);
     thenTempShouldBe(0.0);
@@ -52,7 +52,8 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
       throws IOException {
     givenInputStreamByCityNameLondon();
     whenGenerateModel();
-    thenNameShouldBe("");
+    thenShouldHaveOneElement();
+    thenCityNameShouldBe("London");
     thenSpeedShouldBe(0.0);
     thenDegShouldBe(0.0);
     thenTempShouldBe(0.0);
@@ -67,7 +68,7 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
     givenInputStreamByLatLon();
     whenGenerateModel();
     thenShouldHaveOneElement();
-    thenNameShouldBe("");
+    thenCityNameShouldBe("Shuzenji");
     thenSpeedShouldBe(0.0);
     thenDegShouldBe(0.0);
     thenTempShouldBe(0.0);
@@ -81,35 +82,35 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
   }
 
   private void givenInputStreamByCityNameLondon() {
-    givenJson(R.raw.find_london_like);
+    givenJson(R.raw.london_forecast_by_name_type_like);
   }
 
   private void thenSunsetShouldBe(long expected) {
-    assertEquals(expected, mForecastData.mSunset);
+    assertEquals(expected, mForecastData.getSunset());
   }
 
   private void thenSunriseShouldBe(long expected) {
-    assertEquals(expected, mForecastData.mSunrise);
+    assertEquals(expected, mForecastData.getSunrise());
   }
 
   private void thenHumidityShouldBe(long expected) {
-    assertEquals(expected, mForecastData.mHumidity);
+    assertEquals(expected, mForecastData.getHumidity());
   }
 
   private void thenTempShouldBe(double expected) {
-    assertEquals(expected, mForecastData.mTemp, 0.1);
+    assertEquals(expected, mForecastData.getTemp(), 0.1);
   }
 
   private void thenDegShouldBe(double expected) {
-    assertEquals(expected, mForecastData.mDeg, 0.1);
+    assertEquals(expected, mForecastData.getDeg(), 0.1);
   }
 
   private void thenSpeedShouldBe(double expected) {
-    assertEquals(expected, mForecastData.mSpeed, 0.1);
+    assertEquals(expected, mForecastData.getSpeed(), 0.1);
   }
 
-  private void thenNameShouldBe(String expected) {
-    assertEquals(expected, mForecastData.mName);
+  private void thenCityNameShouldBe(String expected) {
+    assertEquals(expected, mForecastData.getCity().getName());
   }
 
   private void thenShouldHaveOneElement() {

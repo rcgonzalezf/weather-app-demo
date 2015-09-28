@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import org.rcgonzalezf.weather.openweather.models.City;
 import org.rcgonzalezf.weather.openweather.models.Main;
 import org.rcgonzalezf.weather.openweather.models.OpenWeatherApiRawData;
 import org.rcgonzalezf.weather.openweather.models.Sys;
@@ -44,6 +45,9 @@ public class OpenApiWeatherJsonParser {
 
         String name = reader.nextName();
         switch (name) {
+          case OpenWeatherApiRawData.city_JSON:
+            openWeatherApiRawData.setCity(parseCity(reader));
+            break;
           case OpenWeatherApiRawData.name_JSON:
             openWeatherApiRawData.setName(reader.nextString());
             break;
@@ -192,6 +196,36 @@ public class OpenApiWeatherJsonParser {
 
     return wind;
   }
+
+  public City parseCity(JsonReader reader) throws IOException {
+
+    City city = new City();
+    reader.beginObject();
+
+    try {
+      while (reader.hasNext()) {
+        String name = reader.nextName();
+        switch (name) {
+          case City.name_JSON:
+            city.setName(reader.nextString());
+            break;
+          case City.id_JSON:
+            city.setId(reader.nextInt());
+            break;
+          case City.country_JSON:
+            city.setCountry(reader.nextString());
+            break;
+          default:
+            reader.skipValue();
+        }
+      }
+    } finally {
+      reader.endObject();
+    }
+
+    return city;
+  }
+
 
   public Sys parseSys(JsonReader reader) throws IOException {
     Sys sys = new Sys();
