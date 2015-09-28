@@ -2,7 +2,7 @@
 <resources>
   <string name="img_item">Imagen</string>
   <string name="action_settings">Configuración</string>
-  <string name="app_name">Clima</string>
+  <string name="app_name">Pronóstico - Clima</string>
 
   <string name="home">Inicio</string>
   <string name="location_off_msg">Los servicios de ubicación estan desactivados.</string>

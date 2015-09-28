@@ -1,5 +1,5 @@
 <resources>
-  <string name="app_name">Weather</string>
+  <string name="app_name">Forecast - Weather</string>
   <string name="action_settings">Settings</string>
   <string name="img_item">Image Item</string>
 
