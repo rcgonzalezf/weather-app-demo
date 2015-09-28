@@ -15,6 +15,7 @@ public class Forecast implements WeatherViewModel {
   private String mTemp;
   private String mHumidity;
   private String mDateTime;
+  private String mCountry;
 
   @Override public int describeContents() {
     return 0;
@@ -28,6 +29,7 @@ public class Forecast implements WeatherViewModel {
     dest.writeString(mHumidity);
     dest.writeString(mDateTime);
     dest.writeInt(mWeatherId);
+    dest.writeString(getCountry());
   }
 
   public static final Parcelable.Creator<Forecast> CREATOR = new Parcelable.Creator<Forecast>() {
@@ -48,6 +50,7 @@ public class Forecast implements WeatherViewModel {
     mHumidity = in.readString();
     mDateTime = in.readString();
     mWeatherId = in.readInt();
+    setCountry(in.readString());
   }
 
   @Override public int getId() {
@@ -104,5 +107,13 @@ public class Forecast implements WeatherViewModel {
 
   public void setWeatherId(int weatherId) {
     mWeatherId = weatherId;
+  }
+
+  public String getCountry() {
+    return mCountry;
+  }
+
+  public void setCountry(String mCountry) {
+    this.mCountry = mCountry;
   }
 }
