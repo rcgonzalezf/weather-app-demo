@@ -76,6 +76,13 @@ public class OpenWeatherApiRequestParametersTest {
     thenQueryStringShouldContain(UNITS + "=" + METRIC.getUnitName());
   }
 
+  @Test(expected = UnsupportedOperationException.class)
+  public void shouldThrowExceptionIfTryingToGetParameterMap() {
+    givenCityId(anyInt());
+    whenBuildApiParameters();
+    thenKeyValueParametersShouldThrowException();
+  }
+
   private void givenUnits(Units imperial) {
     mBuilder.withUnits(imperial);
   }
@@ -90,13 +97,6 @@ public class OpenWeatherApiRequestParametersTest {
 
   private void thenQueryStringShouldContain(String expected) {
     assertTrue(mOpenWeatherApiRequestParameters.getQueryString().contains(expected));
-  }
-
-  @Test(expected = UnsupportedOperationException.class)
-  public void shouldThrowExceptionIfTryingToGetParameterMap() {
-    givenCityId(anyInt());
-    whenBuildApiParameters();
-    thenKeyValueParametersShouldThrowException();
   }
 
   private void thenKeyValueParametersShouldThrowException() {

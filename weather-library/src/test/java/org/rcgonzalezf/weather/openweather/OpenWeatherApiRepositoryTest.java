@@ -21,7 +21,6 @@ import static org.mockito.Mockito.when;
   private WeatherRepository<OpenWeatherApiRequestParameters> mWeatherRepository;
   private ServiceConfig mServiceConfig;
   private ServiceConfig mRealServiceConfig;
-  private String mCityId;
   private OpenWeatherApiRequestParameters mRequestParameters;
   private List<ForecastData> mForecastData;
 
@@ -38,7 +37,8 @@ import static org.mockito.Mockito.when;
     ServiceConfig.setInstance(mRealServiceConfig);
   }
 
-  @Test public void shouldReturnOneCityForFindWithCityId() {
+  @Test(expected = UnsupportedOperationException.class)
+  public void shouldReturnExceptionThisRepositoryDoesNotAcceptSyncCalls() {
     givenRequestParametersWithCityId(123456);
     whenGettingWeather();
     thenWeatherDataListShouldHaveOneElement();
@@ -56,9 +56,5 @@ import static org.mockito.Mockito.when;
     mRequestParameters =
         new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withCityId(someCityId)
             .build();
-  }
-
-  private void givenCityId(String cityId) {
-    mCityId = cityId;
   }
 }
