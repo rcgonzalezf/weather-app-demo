@@ -21,4 +21,6 @@ public interface WeatherViewModel extends Parcelable {
   String getCountry();
 
   double getDeg();
+
+  String getDescription();
 }

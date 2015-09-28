@@ -13,6 +13,7 @@ import org.rcgonzalezf.weather.common.models.WeatherData;
 import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.openweather.models.OpenWeatherApiRawData;
 import org.rcgonzalezf.weather.openweather.models.RawListItem;
+import org.rcgonzalezf.weather.openweather.models.Weather;
 
 public class OpenWeatherApiModelConverter implements ModelConverter<Void, OpenWeatherApiRawData> {
 
@@ -45,9 +46,11 @@ public class OpenWeatherApiModelConverter implements ModelConverter<Void, OpenWe
                   .createForecastData();
 
           for (RawListItem rawData : rawDataList.getRawList()) {
+            Weather weather = rawData.getWeather().get(0);
             WeatherData weatherData = new WeatherData();
             weatherData.setDateTime(rawData.getDateTime());
-            weatherData.setWeatherId(rawData.getWeather().get(0).getId());
+            weatherData.setWeatherId(weather.getId());
+            weatherData.setDescription(weather.getDescription());
             weatherData.setSpeed(rawData.getWind().getSpeed());
             weatherData.setDeg(rawData.getWind().getDeg());
             weatherData.setTemp(rawData.getMain().getTemp());

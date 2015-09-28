@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +58,7 @@ public class ModelAdapter<T extends WeatherViewModel>
         formatTemperature(mContext, mainModel.getTemperature(), false, "C"));
     holder.fahrenheitTextView.setText(formatTemperature(mContext, mainModel.getTemperature(), true, "F"));
 
+    holder.descriptionTextView.setText(mainModel.getDescription());
     holder.itemView.setTag(mainModel);
   }
 
@@ -94,6 +96,7 @@ public class ModelAdapter<T extends WeatherViewModel>
     public TextView fahrenheitTextView;
     public TextView celsiusTextView;
     public TextView dayTextView;
+    public TextView descriptionTextView;
     public View itemView;
 
     public ModelViewHolder(View itemView) {
@@ -108,6 +111,7 @@ public class ModelAdapter<T extends WeatherViewModel>
       windSpeedTextView = (TextView) itemView.findViewById(R.id.wind_speed_text_view);
       fahrenheitTextView = (TextView) itemView.findViewById(R.id.fahrenheit_text_view);
       celsiusTextView = (TextView) itemView.findViewById(R.id.celsius_text_view);
+      descriptionTextView = (TextView) itemView.findViewById(R.id.description_text_view);
     }
   }
 

@@ -41,6 +41,7 @@ public class ForecastMapper {
         forecast.setWeatherId(weather.getWeatherId());
         forecast.setCountry(forecastData.getCity().getCountry());
         forecast.setDeg(weather.getDeg());
+        forecast.setDescription(weather.getDescription());
 
         forecastList.add(forecast);
         ++counter;

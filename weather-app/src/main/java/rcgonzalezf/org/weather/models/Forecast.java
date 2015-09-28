@@ -5,7 +5,6 @@ import android.os.Parcelable;
 
 public class Forecast implements WeatherViewModel {
 
-
   public Forecast() {
   }
 
@@ -18,6 +17,7 @@ public class Forecast implements WeatherViewModel {
   private String mDateTime;
   private String mCountry;
   private double mDeg;
+  private String mDescription;
 
   @Override public int describeContents() {
     return 0;
@@ -33,6 +33,7 @@ public class Forecast implements WeatherViewModel {
     dest.writeInt(mWeatherId);
     dest.writeString(getCountry());
     dest.writeDouble(mDeg);
+    dest.writeString(mDescription);
   }
 
   public static final Parcelable.Creator<Forecast> CREATOR = new Parcelable.Creator<Forecast>() {
@@ -55,6 +56,7 @@ public class Forecast implements WeatherViewModel {
     mWeatherId = in.readInt();
     setCountry(in.readString());
     mDeg = in.readDouble();
+    mDescription = in.readString();
   }
 
   @Override public int getId() {
@@ -121,11 +123,19 @@ public class Forecast implements WeatherViewModel {
     return mDeg;
   }
 
+  @Override public String getDescription() {
+    return mDescription;
+  }
+
   public void setCountry(String mCountry) {
     this.mCountry = mCountry;
   }
 
   public void setDeg(double deg) {
     mDeg = deg;
+  }
+
+  public void setDescription(String description) {
+    this.mDescription = description;
   }
 }
