@@ -19,5 +19,6 @@
   <string name="pref_temperature_units">Centígrados como preferidos:</string>
   <string name="pref_title_display_name">Nombre de Usuario:</string>
   <string name="title_activity_settings">Configuración</string>
+  <string name="invalid_input">Datos Inválidos</string>
 
 </resources>

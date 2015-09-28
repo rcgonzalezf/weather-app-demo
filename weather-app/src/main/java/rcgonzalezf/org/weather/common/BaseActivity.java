@@ -21,7 +21,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
@@ -41,9 +40,9 @@ import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParamete
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
 import rcgonzalezf.org.weather.models.Forecast;
-import rcgonzalezf.org.weather.utils.ForecastUtils;
 
 import static rcgonzalezf.org.weather.SettingsActivity.USER_NAME_TO_DISPLAY;
+import static rcgonzalezf.org.weather.utils.ForecastUtils.hasInternetConnection;
 
 public abstract class BaseActivity extends AppCompatActivity
     implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
@@ -80,7 +79,6 @@ public abstract class BaseActivity extends AppCompatActivity
   @Override protected void onStart() {
     super.onStart();
     mGoogleApiClient.connect();
-    final ImageView avatar = (ImageView) findViewById(R.id.avatar);
   }
 
   @Override protected void onStop() {
@@ -98,16 +96,22 @@ public abstract class BaseActivity extends AppCompatActivity
       case android.R.id.home:
         mDrawerLayout.openDrawer(GravityCompat.START);
         return true;
+      case R.id.action_settings:
+        navigateToSettings();
+        return true;
     }
     return super.onOptionsItemSelected(item);
   }
 
+  private void navigateToSettings() {
+    Intent intent = new Intent(BaseActivity.this, SettingsActivity.class);
+    startActivity(intent);
+  }
+
   @Override public void onConnected(Bundle bundle) {
     mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-    if (!ForecastUtils.hasInternetConnection(this)) {
-      Toast.makeText(this, getString(R.string.no_internet_msg), Toast.LENGTH_SHORT).show();
-      final List<Forecast> forecastList = getPreviousForecastList();
-      loadOldData(forecastList);
+    if (!hasInternetConnection(this)) {
+      informNoInternet();
     } else if (mLastLocation != null) {
       WeatherRepository<OpenWeatherApiRequestParameters> weatherRepository =
           ServiceConfig.getInstance().getWeatherRepository();
@@ -121,11 +125,11 @@ public abstract class BaseActivity extends AppCompatActivity
   }
 
   @Override public void onConnectionSuspended(int i) {
-
+    Log.d(TAG, "Google Location onConnectionSuspended " + i);
   }
 
   @Override public void onConnectionFailed(ConnectionResult connectionResult) {
-
+    Log.d(TAG, "Google Location onConnectionFailed " + connectionResult.getErrorMessage());
   }
 
   protected void initToolbar() {
@@ -146,8 +150,7 @@ public abstract class BaseActivity extends AppCompatActivity
     view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
       @Override public boolean onNavigationItemSelected(MenuItem menuItem) {
         if (menuItem.getItemId() == R.id.drawer_settings) {
-          Intent intent = new Intent(BaseActivity.this, SettingsActivity.class);
-          startActivity(intent);
+          navigateToSettings();
         } else {
           Snackbar.make(mContent, menuItem.getTitle() + " pressed", Snackbar.LENGTH_SHORT).show();
           menuItem.setChecked(true);
@@ -159,7 +162,8 @@ public abstract class BaseActivity extends AppCompatActivity
 
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     TextView textView = (TextView) findViewById(R.id.user_display_name);
-    textView.setText(prefs.getString(USER_NAME_TO_DISPLAY, getString(R.string.pref_default_display_name)));
+    textView.setText(
+        prefs.getString(USER_NAME_TO_DISPLAY, getString(R.string.pref_default_display_name)));
   }
 
   private void setupFabButton() {
@@ -189,18 +193,17 @@ public abstract class BaseActivity extends AppCompatActivity
               query = URLEncoder.encode(userInput.getText().toString(), "UTF-8");
             } catch (UnsupportedEncodingException e) {
               Log.e(TAG, "Can't encode URL", e);
+              Toast.makeText(BaseActivity.this,
+                  getString(R.string.invalid_input) + ": " + userInput.getText() + "...",
+                  Toast.LENGTH_SHORT).show();
+              return;
             }
 
-            WeatherRepository<OpenWeatherApiRequestParameters> weatherRepository =
-                ServiceConfig.getInstance().getWeatherRepository();
-
-            weatherRepository.findWeather(
-                new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withCityName(
-                    query).build(), BaseActivity.this);
-
-            Toast.makeText(BaseActivity.this,
-                getString(R.string.searching) + " " + userInput.getText() + "...", Toast.LENGTH_SHORT)
-                .show();
+            if (!hasInternetConnection(BaseActivity.this)) {
+              informNoInternet();
+            } else {
+              searchByQuery(query, userInput);
+            }
           }
         })
         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -211,6 +214,24 @@ public abstract class BaseActivity extends AppCompatActivity
 
     AlertDialog alertDialog = alertDialogBuilder.create();
     alertDialog.show();
+  }
+
+  protected void searchByQuery(String query, EditText userInput) {
+    WeatherRepository<OpenWeatherApiRequestParameters> weatherRepository =
+        ServiceConfig.getInstance().getWeatherRepository();
+
+    weatherRepository.findWeather(
+        new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withCityName(
+            query).build(), BaseActivity.this);
+
+    Toast.makeText(BaseActivity.this,
+        getString(R.string.searching) + " " + userInput.getText() + "...", Toast.LENGTH_SHORT).show();
+  }
+
+  protected void informNoInternet() {
+    Toast.makeText(this, getString(R.string.no_internet_msg), Toast.LENGTH_SHORT).show();
+    final List<Forecast> forecastList = getPreviousForecastList();
+    loadOldData(forecastList);
   }
 
   public List<Forecast> getPreviousForecastList() {
