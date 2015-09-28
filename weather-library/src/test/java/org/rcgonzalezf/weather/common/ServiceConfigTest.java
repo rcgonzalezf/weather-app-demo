@@ -7,7 +7,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.anyString;
 
 @RunWith(JUnit4.class) public class ServiceConfigTest {
 
@@ -36,12 +35,10 @@ import static org.mockito.Matchers.anyString;
 
   @Test(expected = IllegalStateException.class)
   public void shouldThrowExceptionIfNoProviderIsSet() {
-    givenApiKey(anyString());
     whenRetrievingRepository();
   }
 
   @Test public void shouldGetRepositoryInstanceForValidConfig() {
-    givenApiKey(anyString());
     givenSomeProvider();
     whenRetrievingRepository();
     thenShouldHaveRepositoryInstance();
@@ -49,10 +46,6 @@ import static org.mockito.Matchers.anyString;
 
   private void thenShouldHaveRepositoryInstance() {
     assertNotNull(mWeatherRepository);
-  }
-
-  private void givenApiKey(String someApiKey) {
-    mServiceConfig.setApiKey(someApiKey);
   }
 
   private void whenRetrievingRepository() {

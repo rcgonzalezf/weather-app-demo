@@ -29,12 +29,12 @@ public class ServiceConfig {
   }
 
   public WeatherRepository getWeatherRepository() {
-    if (mApiKey == null || mWeatherProvider == null) {
+    if (getApiKey() == null || getWeatherProvider() == null) {
       throw new IllegalStateException("Should provide an apiKey and weatherProvider");
     }
 
     WeatherRepository repository = null;
-    switch (mWeatherProvider) {
+    switch (getWeatherProvider()) {
       case OpenWeather:
         repository = new OpenWeatherApiRepository(this);
         break;
