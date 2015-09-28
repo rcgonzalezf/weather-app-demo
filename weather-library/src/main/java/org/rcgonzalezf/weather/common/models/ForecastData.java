@@ -43,10 +43,6 @@ public class ForecastData {
     return mWeatherList;
   }
 
-  public void setWeatherList(List<WeatherData> weatherList) {
-    mWeatherList = weatherList;
-  }
-
   public void addWeatherItem(WeatherData weatherData) {
     mWeatherList.add(weatherData);
   }

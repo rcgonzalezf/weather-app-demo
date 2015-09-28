@@ -49,15 +49,7 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
     thenDegShouldBe(186.002);
     thenTempShouldBe(290.55);
     thenHumidityShouldBe(37L);
-  }
-
-  private void whenGettingTheFirstWeatherElement() {
-    mWeatherData = mForecastData.getWeatherList().get(0);
-  }
-
-  private void thenShouldHaveWeatherListCountOf(int expected) {
-    assertEquals(expected, mForecastData.getCount());
-    assertEquals(expected, mForecastData.getWeatherList().size());
+    thenDateTimeShouldBe("2015-09-26 18:00:00");
   }
 
   @Test public void shouldReturnModelWithValuesForCountriesInputStreamFoundByName()
@@ -72,6 +64,7 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
     thenDegShouldBe(84.0032);
     thenTempShouldBe(281.49);
     thenHumidityShouldBe(91L);
+    thenDateTimeShouldBe("2015-09-28 00:00:00");
   }
 
   @Test public void shouldReturnModelWithValuesForCountriesInputStreamFoundByLatLon()
@@ -86,13 +79,31 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
     thenDegShouldBe(185.0);
     thenTempShouldBe(288.84);
     thenHumidityShouldBe(99L);
+    thenDateTimeShouldBe("2015-09-27 21:00:00");
+    thenToStringShouldContain("Shuzenji");
   }
 
-  @Test public void shouldReturnEmptyModelForError()
-      throws IOException {
+  @Test public void shouldReturnEmptyModelForError() throws IOException {
     givenInputStreamCityNotFound();
     whenGenerateModel();
     thenModelShouldBeEmpty();
+  }
+
+  private void thenToStringShouldContain(String expected) {
+    assertTrue(mForecastData.toString().contains(expected));
+  }
+
+  private void thenDateTimeShouldBe(String dateTime) {
+    assertEquals(dateTime, mWeatherData.getDateTime());
+  }
+
+  private void whenGettingTheFirstWeatherElement() {
+    mWeatherData = mForecastData.getWeatherList().get(0);
+  }
+
+  private void thenShouldHaveWeatherListCountOf(int expected) {
+    assertEquals(expected, mForecastData.getCount());
+    assertEquals(expected, mForecastData.getWeatherList().size());
   }
 
   private void thenModelShouldBeEmpty() {

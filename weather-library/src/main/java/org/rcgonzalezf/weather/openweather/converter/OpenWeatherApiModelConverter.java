@@ -52,8 +52,6 @@ public class OpenWeatherApiModelConverter implements ModelConverter<Void, OpenWe
             weatherData.setDeg(rawData.getWind().getDeg());
             weatherData.setTemp(rawData.getMain().getTemp());
             weatherData.setHumidity(rawData.getMain().getHumidity());
-            weatherData.setSunrise(rawData.getSys().getSunrise());
-            weatherData.setSunset(rawData.getSys().getSunset());
 
             forecastDatum.addWeatherItem(weatherData);
           }

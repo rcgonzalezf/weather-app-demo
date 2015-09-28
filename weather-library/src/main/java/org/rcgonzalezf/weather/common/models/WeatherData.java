@@ -6,8 +6,6 @@ public class WeatherData {
   private double mDeg;
   private double mTemp;
   private long mHumidity;
-  private long mSunrise;
-  private long mSunset;
   private String mDateTime;
 
   public double getSpeed() {
@@ -40,22 +38,6 @@ public class WeatherData {
 
   public void setHumidity(long humidity) {
     mHumidity = humidity;
-  }
-
-  public long getSunrise() {
-    return mSunrise;
-  }
-
-  public void setSunrise(long sunrise) {
-    mSunrise = sunrise;
-  }
-
-  public long getSunset() {
-    return mSunset;
-  }
-
-  public void setSunset(long sunset) {
-    mSunset = sunset;
   }
 
   public String getDateTime() {
