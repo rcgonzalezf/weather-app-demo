@@ -37,7 +37,7 @@ import org.rcgonzalezf.weather.common.WeatherRepository;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters;
 import rcgonzalezf.org.weather.R;
-import rcgonzalezf.org.weather.WeatherActivity;
+import rcgonzalezf.org.weather.SettingsActivity;
 import rcgonzalezf.org.weather.models.Forecast;
 import rcgonzalezf.org.weather.utils.ForecastUtils;
 
@@ -142,7 +142,7 @@ public abstract class BaseActivity extends AppCompatActivity
     view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
       @Override public boolean onNavigationItemSelected(MenuItem menuItem) {
         if (menuItem.getItemId() == R.id.drawer_settings) {
-          Intent intent = new Intent(BaseActivity.this, WeatherActivity.class);
+          Intent intent = new Intent(BaseActivity.this, SettingsActivity.class);
           startActivity(intent);
         } else {
           Snackbar.make(mContent, menuItem.getTitle() + " pressed", Snackbar.LENGTH_SHORT).show();
@@ -180,7 +180,7 @@ public abstract class BaseActivity extends AppCompatActivity
             try {
               query = URLEncoder.encode(userInput.getText().toString(), "UTF-8");
             } catch (UnsupportedEncodingException e) {
-              Log.e(TAG,"Can't encode URL", e);
+              Log.e(TAG, "Can't encode URL", e);
             }
 
             WeatherRepository<OpenWeatherApiRequestParameters> weatherRepository =

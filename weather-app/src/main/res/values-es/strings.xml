@@ -14,5 +14,10 @@
   <string name="enter_city">Ingrese el nombre de la ciudad:</string>
   <string name="city_name_hint">Hermosillo, MX</string>
   <string name="searching">Buscando: </string>
+  <string name="pref_default_display_name">Juan Pérez</string>
+  <string name="pref_header_general">General</string>
+  <string name="pref_temperature_units">Centígrados como preferidos:</string>
+  <string name="pref_title_display_name">Nombre de Usuario:</string>
+  <string name="title_activity_settings">Configuración</string>
 
 </resources>
