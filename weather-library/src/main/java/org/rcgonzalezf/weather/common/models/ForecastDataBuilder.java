@@ -3,50 +3,20 @@ package org.rcgonzalezf.weather.common.models;
 import org.rcgonzalezf.weather.openweather.models.City;
 
 public class ForecastDataBuilder {
-  private City mCity;
-  private double speed;
-  private double deg;
-  private double temp;
-  private long humidity;
-  private long sunrise;
-  private long sunset;
+  private City city;
+  private int count;
 
   public ForecastDataBuilder setCity(City city) {
-    mCity = city;
+    this.city = city;
     return this;
   }
 
-  public ForecastDataBuilder setSpeed(double speed) {
-    this.speed = speed;
-    return this;
-  }
-
-  public ForecastDataBuilder setDeg(double deg) {
-    this.deg = deg;
-    return this;
-  }
-
-  public ForecastDataBuilder setTemp(double temp) {
-    this.temp = temp;
-    return this;
-  }
-
-  public ForecastDataBuilder setHumidity(long humidity) {
-    this.humidity = humidity;
-    return this;
-  }
-
-  public ForecastDataBuilder setSunrise(long sunrise) {
-    this.sunrise = sunrise;
-    return this;
-  }
-
-  public ForecastDataBuilder setSunset(long sunset) {
-    this.sunset = sunset;
+  public ForecastDataBuilder setCount(int count) {
+    this.count = count;
     return this;
   }
 
   public ForecastData createForecastData() {
-    return new ForecastData(mCity, speed, deg, temp, humidity, sunrise, sunset);
+    return new ForecastData(city, count);
   }
 }

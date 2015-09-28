@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.rcgonzalezf.weather.BuildConfig;
 import org.rcgonzalezf.weather.R;
 import org.rcgonzalezf.weather.common.models.ForecastData;
+import org.rcgonzalezf.weather.common.models.WeatherData;
 import org.rcgonzalezf.weather.tests.ConverterHelperTest;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
@@ -21,6 +22,7 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
   private OpenWeatherApiModelConverter mOpenWeatherApiModelConverter;
   private List<ForecastData> mModel;
   private ForecastData mForecastData;
+  private WeatherData mWeatherData;
 
   @Before public void initModelConverter() {
     mOpenWeatherApiModelConverter = new OpenWeatherApiModelConverter();
@@ -31,50 +33,58 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
       throws IOException {
     givenInputStreamByCityIdMoscow();
     whenGenerateModel();
-    thenShouldHaveOneElement();
+    thenShouldHaveOneForecastDataElement();
   }
 
   @Test public void shouldReturnModelWithValuesForGivenCountryInputStreamByCityIdMoscow()
       throws IOException {
     givenInputStreamByCityIdMoscow();
     whenGenerateModel();
-    thenShouldHaveOneElement();
+    thenShouldHaveOneForecastDataElement();
+    thenShouldHaveWeatherListCountOf(40);
     thenCityNameShouldBe("Moscow");
-    thenSpeedShouldBe(0.0);
-    thenDegShouldBe(0.0);
-    thenTempShouldBe(0.0);
-    thenHumidityShouldBe(0L);
-    thenSunriseShouldBe(0L);
-    thenSunsetShouldBe(0L);
+    whenGettingTheFirstWeatherElement();
+    thenSpeedShouldBe(3.69);
+    thenDegShouldBe(186.002);
+    thenTempShouldBe(290.55);
+    thenHumidityShouldBe(37L);
+  }
+
+  private void whenGettingTheFirstWeatherElement() {
+    mWeatherData = mForecastData.getWeatherList().get(0);
+  }
+
+  private void thenShouldHaveWeatherListCountOf(int expected) {
+    assertEquals(expected, mForecastData.getCount());
+    assertEquals(expected, mForecastData.getWeatherList().size());
   }
 
   @Test public void shouldReturnModelWithValuesForCountriesInputStreamFoundByName()
       throws IOException {
     givenInputStreamByCityNameLondon();
     whenGenerateModel();
-    thenShouldHaveOneElement();
+    thenShouldHaveOneForecastDataElement();
+    thenShouldHaveWeatherListCountOf(40);
     thenCityNameShouldBe("London");
-    thenSpeedShouldBe(0.0);
-    thenDegShouldBe(0.0);
-    thenTempShouldBe(0.0);
-    thenHumidityShouldBe(0L);
-    thenSunriseShouldBe(0L);
-    thenSunsetShouldBe(0L);
+    whenGettingTheFirstWeatherElement();
+    thenSpeedShouldBe(3.11);
+    thenDegShouldBe(84.0032);
+    thenTempShouldBe(281.49);
+    thenHumidityShouldBe(91L);
   }
-
 
   @Test public void shouldReturnModelWithValuesForCountriesInputStreamFoundByLatLon()
       throws IOException {
     givenInputStreamByLatLon();
     whenGenerateModel();
-    thenShouldHaveOneElement();
+    thenShouldHaveOneForecastDataElement();
+    thenShouldHaveWeatherListCountOf(40);
     thenCityNameShouldBe("Shuzenji");
-    thenSpeedShouldBe(0.0);
-    thenDegShouldBe(0.0);
-    thenTempShouldBe(0.0);
-    thenHumidityShouldBe(0L);
-    thenSunriseShouldBe(0L);
-    thenSunsetShouldBe(0L);
+    whenGettingTheFirstWeatherElement();
+    thenSpeedShouldBe(0.78);
+    thenDegShouldBe(185.0);
+    thenTempShouldBe(288.84);
+    thenHumidityShouldBe(99L);
   }
 
   private void givenInputStreamByLatLon() {
@@ -85,35 +95,27 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
     givenJson(R.raw.london_forecast_by_name_type_like);
   }
 
-  private void thenSunsetShouldBe(long expected) {
-    assertEquals(expected, mForecastData.getSunset());
-  }
-
-  private void thenSunriseShouldBe(long expected) {
-    assertEquals(expected, mForecastData.getSunrise());
-  }
-
   private void thenHumidityShouldBe(long expected) {
-    assertEquals(expected, mForecastData.getHumidity());
+    assertEquals(expected, mWeatherData.getHumidity());
   }
 
   private void thenTempShouldBe(double expected) {
-    assertEquals(expected, mForecastData.getTemp(), 0.1);
+    assertEquals(expected, mWeatherData.getTemp(), 0.1);
   }
 
   private void thenDegShouldBe(double expected) {
-    assertEquals(expected, mForecastData.getDeg(), 0.1);
+    assertEquals(expected, mWeatherData.getDeg(), 0.1);
   }
 
   private void thenSpeedShouldBe(double expected) {
-    assertEquals(expected, mForecastData.getSpeed(), 0.1);
+    assertEquals(expected, mWeatherData.getSpeed(), 0.1);
   }
 
   private void thenCityNameShouldBe(String expected) {
     assertEquals(expected, mForecastData.getCity().getName());
   }
 
-  private void thenShouldHaveOneElement() {
+  private void thenShouldHaveOneForecastDataElement() {
     assertEquals(1, mModel.size());
     mForecastData = mModel.get(0);
   }

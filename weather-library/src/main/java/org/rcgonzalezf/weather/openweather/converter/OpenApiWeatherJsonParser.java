@@ -9,6 +9,7 @@ import java.util.List;
 import org.rcgonzalezf.weather.openweather.models.City;
 import org.rcgonzalezf.weather.openweather.models.Main;
 import org.rcgonzalezf.weather.openweather.models.OpenWeatherApiRawData;
+import org.rcgonzalezf.weather.openweather.models.RawListItem;
 import org.rcgonzalezf.weather.openweather.models.Sys;
 import org.rcgonzalezf.weather.openweather.models.Weather;
 import org.rcgonzalezf.weather.openweather.models.Wind;
@@ -48,32 +49,14 @@ public class OpenApiWeatherJsonParser {
           case OpenWeatherApiRawData.city_JSON:
             openWeatherApiRawData.setCity(parseCity(reader));
             break;
-          case OpenWeatherApiRawData.name_JSON:
-            openWeatherApiRawData.setName(reader.nextString());
-            break;
-          case OpenWeatherApiRawData.wind_JSON:
-            openWeatherApiRawData.setWind(parseWind(reader));
-            break;
-          case OpenWeatherApiRawData.main_JSON:
-            openWeatherApiRawData.setMain(parseMain(reader));
-            break;
-          case OpenWeatherApiRawData.sys_JSON:
-            openWeatherApiRawData.setSys(parseSys(reader));
-            break;
-          case OpenWeatherApiRawData.weather_JSON:
-            openWeatherApiRawData.setWeather(parseWeathers(reader));
-            break;
-          case OpenWeatherApiRawData.id_JSON:
-            openWeatherApiRawData.setId(reader.nextLong());
-            break;
-          case OpenWeatherApiRawData.dt_JSON:
-            openWeatherApiRawData.setDt(reader.nextLong());
-            break;
-          case OpenWeatherApiRawData.base_JSON:
-            openWeatherApiRawData.setBase(reader.nextString());
-            break;
           case OpenWeatherApiRawData.cod_JSON:
             openWeatherApiRawData.setCod(reader.nextInt());
+            break;
+          case OpenWeatherApiRawData.cnt_JSON:
+            openWeatherApiRawData.setCount(reader.nextInt());
+            break;
+          case OpenWeatherApiRawData.list_JSON:
+            openWeatherApiRawData.setRawList(parseRawList(reader));
             break;
           default:
             reader.skipValue();
@@ -84,6 +67,57 @@ public class OpenApiWeatherJsonParser {
     }
 
     return openWeatherApiRawData;
+  }
+
+  private List<RawListItem> parseRawList(JsonReader reader) throws IOException {
+    List<RawListItem> rawListItems = new ArrayList<>();
+    reader.beginArray();
+    try {
+      while (reader.hasNext()) {
+        rawListItems.add(parseRawItem(reader));
+      }
+    } finally {
+      reader.endArray();
+    }
+    return rawListItems;
+
+  }
+
+  private RawListItem parseRawItem(JsonReader reader) throws IOException {
+
+    RawListItem rawListItem = new RawListItem();
+    reader.beginObject();
+    try {
+      while (reader.hasNext()) {
+        String name = reader.nextName();
+        switch (name) {
+          case RawListItem.dt_JSON:
+            rawListItem.setDt(reader.nextLong());
+            break;
+          case RawListItem.main_JSON:
+            rawListItem.setMain(parseMain(reader));
+            break;
+          case RawListItem.weather_JSON:
+            rawListItem.setWeather(parseWeathers(reader));
+            break;
+          case RawListItem.wind_JSON:
+            rawListItem.setWind(parseWind(reader));
+            break;
+          case RawListItem.sys_JSON:
+            rawListItem.setSys(parseSys(reader));
+            break;
+          case RawListItem.dt_txt_JSON:
+            rawListItem.setDateTime(reader.nextString());
+            break;
+          default:
+            reader.skipValue();
+        }
+      }
+    } finally {
+      reader.endObject();
+    }
+
+    return rawListItem;
   }
 
   public List<Weather> parseWeathers(JsonReader reader) throws IOException {
