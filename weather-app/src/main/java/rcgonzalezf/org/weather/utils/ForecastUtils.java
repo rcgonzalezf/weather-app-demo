@@ -3,9 +3,16 @@ package rcgonzalezf.org.weather.utils;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import rcgonzalezf.org.weather.R;
 
 public class ForecastUtils {
+
+  public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
   public static boolean hasInternetConnection(Context context) {
     ConnectivityManager cm =
@@ -43,5 +50,31 @@ public class ForecastUtils {
       return R.drawable.art_clouds;
 
     return -1;
+  }
+
+  public static String getDayName(Context context, String dateStr) {
+    SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+    try {
+      Date inputDate = dateFormat.parse(dateStr);
+      Date todayDate = new Date();
+
+      if (todayDate.equals(inputDate)) {
+        return context.getString(R.string.today);
+      } else {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(todayDate);
+        cal.add(Calendar.DATE, 1);
+        Date tomorrowDate = cal.getTime();
+        if (tomorrowDate.equals(
+            dateStr)) {
+          return context.getString(R.string.tomorrow);
+        } else {
+          SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
+          return dayFormat.format(inputDate);
+        }
+      }
+    } catch (ParseException e) {
+      return dateStr;
+    }
   }
 }

@@ -32,7 +32,7 @@ public class WeatherActivity extends BaseActivity implements ModelAdapter.OnItem
 
   @Override public void onSuccess(ApiResponse apiResponse) {
     final List<Forecast> forecastList = new ForecastMapper().withData(apiResponse.getData())
-        .map();
+        .map(10);
     runOnUiThread(new Runnable() {
       @Override public void run() {
         mAdapter.setItems(forecastList);

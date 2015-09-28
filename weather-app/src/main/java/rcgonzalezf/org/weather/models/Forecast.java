@@ -109,7 +109,7 @@ public class Forecast implements WeatherViewModel {
     mWeatherId = weatherId;
   }
 
-  public String getCountry() {
+  @Override public String getCountry() {
     return mCountry;
   }
 

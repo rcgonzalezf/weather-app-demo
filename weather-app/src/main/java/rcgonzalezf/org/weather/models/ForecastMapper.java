@@ -7,6 +7,7 @@ import org.rcgonzalezf.weather.common.models.WeatherData;
 
 public class ForecastMapper {
 
+  private static final int ALL = -1;
   private List<ForecastData> mData;
   // I've found that most cases the forecast consists of 40 items
   private static final int INITIAL_SIZE = 40;
@@ -17,7 +18,16 @@ public class ForecastMapper {
   }
 
   public List<Forecast> map() {
-    List<Forecast> forecastList = new ArrayList<>(INITIAL_SIZE * mData.size());
+    return map(ALL);
+  }
+
+  public List<Forecast> map(int howMany) {
+    int size = 10;
+    if(howMany == ALL) {
+      size = INITIAL_SIZE * mData.size();
+    }
+    int counter = 0;
+    List<Forecast> forecastList = new ArrayList<>(size);
     for (ForecastData forecastData : mData) {
 
       for (WeatherData weather : forecastData.getWeatherList()) {
@@ -32,6 +42,10 @@ public class ForecastMapper {
         forecast.setCountry(forecastData.getCity().getCountry());
 
         forecastList.add(forecast);
+        ++counter;
+        if(counter == howMany) {
+          return forecastList;
+        }
       }
     }
     return forecastList;
