@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_view"
     android:layout_gravity="center"
-    android:layout_width="160dp"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     card_view:cardCornerRadius="4dp"
     android:layout_margin="@dimen/list_item_vertical_margin"
@@ -13,16 +13,17 @@
 
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="@dimen/list_item_vertical_margin"
         android:paddingRight="@dimen/list_item_vertical_margin"
         >
 
         <ImageView
-            android:layout_width="168dp"
-            android:layout_height="252dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:id="@+id/item_image"
+            android:scaleType="centerCrop"
             android:src="@drawable/img_placeholder"
             android:contentDescription="@string/img_item"
             />
