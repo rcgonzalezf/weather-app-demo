@@ -40,14 +40,25 @@ public class WeatherActivity extends BaseActivity implements ModelAdapter.OnItem
 
   @Override public void onSuccess(ApiResponse apiResponse) {
     final List<Forecast> forecastList = new ForecastMapper().withData(apiResponse.getData()).map();
-    saveForecastList(forecastList);
+    notifyAdapter(forecastList);
+  }
 
-    runOnUiThread(new Runnable() {
-      @Override public void run() {
-        mAdapter.setItems(forecastList);
-        mAdapter.notifyDataSetChanged();
-      }
-    });
+  @Override public void onError(ApiError apiError) {
+    apiError.getError();
+  }
+
+  @Override public void onItemClick(View view, WeatherViewModel viewModel) {
+    Toast.makeText(this,
+        String.format(getString(R.string.item_clicked_debug_format), viewModel.getId(),
+            viewModel.getDateTime(), viewModel.getDescription()), Toast.LENGTH_SHORT).show();
+  }
+
+  @Override public void loadOldData(final List<Forecast> forecastList) {
+    if (forecastList != null && !forecastList.isEmpty()) {
+      notifyAdapter(forecastList);
+    } else {
+      Log.d(TAG, "No data even in offline mode :(");
+    }
   }
 
   private void saveForecastList(final List<Forecast> forecastList) {
@@ -71,10 +82,6 @@ public class WeatherActivity extends BaseActivity implements ModelAdapter.OnItem
     }).start();
   }
 
-  @Override public void onError(ApiError apiError) {
-    apiError.getError();
-  }
-
   private void setupRecyclerView() {
     mAdapter = new ModelAdapter<>(new ArrayList<Forecast>(), this);
     mAdapter.setOnItemClickListener(this);
@@ -84,22 +91,14 @@ public class WeatherActivity extends BaseActivity implements ModelAdapter.OnItem
     mRecyclerView.setAdapter(mAdapter);
   }
 
-  @Override public void onItemClick(View view, WeatherViewModel viewModel) {
-    Toast.makeText(this,
-        String.format(getString(R.string.item_clicked_debug_format), viewModel.getId(),
-            viewModel.getDateTime(), viewModel.getDescription()), Toast.LENGTH_SHORT).show();
-  }
+  private void notifyAdapter(final List<Forecast> forecastList) {
+    saveForecastList(forecastList);
 
-  @Override public void loadOldData(final List<Forecast> forecastList) {
-    if (forecastList != null && !forecastList.isEmpty()) {
-      runOnUiThread(new Runnable() {
-        @Override public void run() {
-          mAdapter.setItems(forecastList);
-          mAdapter.notifyDataSetChanged();
-        }
-      });
-    } else {
-      Log.d(TAG, "No data even in offline mode :(");
-    }
+    runOnUiThread(new Runnable() {
+      @Override public void run() {
+        mAdapter.setItems(forecastList);
+        mAdapter.notifyDataSetChanged();
+      }
+    });
   }
 }
