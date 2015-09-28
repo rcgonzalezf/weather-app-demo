@@ -34,12 +34,13 @@ public class ForecastMapper {
         Forecast forecast = new Forecast();
         forecast.setCityId(forecastData.getCity().getId());
         forecast.setCityName(forecastData.getCity().getName());
-        forecast.setSpeed(String.valueOf(weather.getSpeed()));
+        forecast.setSpeed(weather.getSpeed());
         forecast.setTemperature(String.valueOf(weather.getTemp()));
         forecast.setHumidity(String.valueOf(weather.getHumidity()));
         forecast.setDateTime(weather.getDateTime());
         forecast.setWeatherId(weather.getWeatherId());
         forecast.setCountry(forecastData.getCity().getCountry());
+        forecast.setDeg(weather.getDeg());
 
         forecastList.add(forecast);
         ++counter;

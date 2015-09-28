@@ -10,69 +10,118 @@
     card_view:cardCornerRadius="4dp"
     android:layout_margin="@dimen/list_item_vertical_margin"
     >
-
+  <LinearLayout
+      android:orientation="horizontal"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      >
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:paddingLeft="@dimen/list_item_vertical_margin"
         android:paddingRight="@dimen/list_item_vertical_margin"
         >
 
-        <TextView
-            android:fontFamily="sans-serif-condensed"
-            android:id="@+id/detail_location_name"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_marginBottom="25dp"
-            android:paddingTop="5dp"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:textColor="@color/blue"
-            android:textSize="34sp"
-            tools:text="Portland, US"
-            />
+      <TextView
+          android:fontFamily="sans-serif-condensed"
+          android:id="@+id/detail_location_name"
+          android:layout_height="wrap_content"
+          android:layout_width="wrap_content"
+          android:layout_marginBottom="12dp"
+          android:ellipsize="end"
+          android:singleLine="true"
+          android:textColor="@color/blue"
+          android:textSize="30sp"
+          tools:text="Portland, US"
+          />
 
-        <TextView
-            android:fontFamily="sans-serif"
-            android:id="@+id/day_textview"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="23sp" />
+      <TextView
+          android:fontFamily="sans-serif"
+          android:id="@+id/day_textview"
+          android:layout_height="wrap_content"
+          android:layout_width="wrap_content"
+          android:textColor="@color/black"
+          android:textSize="16sp"
+          tools:text="Wednesday"
+          />
 
-        <TextView
-            android:fontFamily="sans-serif-condensed"
-            android:id="@+id/detail_date_textview"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:textColor="@color/colorPrimaryDark"
-            android:textSize="16sp" />
+      <TextView
+          android:fontFamily="sans-serif-condensed"
+          android:id="@+id/datetime_text_view"
+          android:layout_height="wrap_content"
+          android:layout_width="wrap_content"
+          android:textColor="@color/colorPrimaryDark"
+          android:textSize="16sp"
+          android:layout_marginBottom="8dp"
+          tools:text="Dec 01, 15:00"
+          />
 
-        <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:id="@+id/item_image"
-            android:scaleType="centerCrop"
-            android:src="@drawable/img_placeholder"
-            android:contentDescription="@string/img_item"
-            />
+      <TextView
+          android:fontFamily="sans-serif-condensed"
+          android:id="@+id/humidity_text_view"
+          android:layout_height="wrap_content"
+          android:layout_width="wrap_content"
+          android:textColor="@color/black"
+          android:textSize="14sp"
+          tools:text="Humidity: 66%"
+          />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            tools:text="Element"
-            android:id="@+id/city_name_text_view"
-            />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            tools:text="Element"
-            android:id="@+id/datetime_text_view"
-            />
+      <TextView
+          android:fontFamily="sans-serif-condensed"
+          android:id="@+id/wind_speed_text_view"
+          android:layout_height="wrap_content"
+          android:layout_width="wrap_content"
+          android:textColor="@color/black"
+          android:textSize="14sp"
+          tools:text="Wind: 3 km/h NW"
+          />
+
     </LinearLayout>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        >
+      <TextView
+          android:fontFamily="sans-serif-condensed"
+          android:id="@+id/celsius_text_view"
+          android:layout_height="wrap_content"
+          android:layout_width="wrap_content"
+          android:textColor="@color/black"
+          android:textSize="64sp"
+          tools:text="12 C"
+          />
+
+      <TextView
+          android:fontFamily="sans-serif-condensed"
+          android:id="@+id/farenheit_text_view"
+          android:layout_height="wrap_content"
+          android:layout_width="wrap_content"
+          android:textColor="@color/gray"
+          android:textSize="48sp"
+          android:layout_gravity="center_horizontal"
+          tools:text="48 F"
+          />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        >
+      <ImageView
+          android:layout_width="50dp"
+          android:layout_height="50dp"
+          android:id="@+id/item_image"
+          android:scaleType="centerCrop"
+          android:src="@drawable/art_fog"
+          android:contentDescription="@string/img_item"
+          />
+    </LinearLayout>
+  </LinearLayout>
 
 </android.support.v7.widget.CardView>

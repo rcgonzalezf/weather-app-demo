@@ -5,17 +5,19 @@ import android.os.Parcelable;
 
 public class Forecast implements WeatherViewModel {
 
+
   public Forecast() {
   }
 
   private int mWeatherId;
   private int mCityId;
   private String mCityName;
-  private String mSpeed;
+  private double mSpeed;
   private String mTemp;
   private String mHumidity;
   private String mDateTime;
   private String mCountry;
+  private double mDeg;
 
   @Override public int describeContents() {
     return 0;
@@ -24,12 +26,13 @@ public class Forecast implements WeatherViewModel {
   @Override public void writeToParcel(Parcel dest, int flags) {
     dest.writeInt(mCityId);
     dest.writeString(mCityName);
-    dest.writeString(mSpeed);
+    dest.writeDouble(mSpeed);
     dest.writeString(mTemp);
     dest.writeString(mHumidity);
     dest.writeString(mDateTime);
     dest.writeInt(mWeatherId);
     dest.writeString(getCountry());
+    dest.writeDouble(mDeg);
   }
 
   public static final Parcelable.Creator<Forecast> CREATOR = new Parcelable.Creator<Forecast>() {
@@ -45,12 +48,13 @@ public class Forecast implements WeatherViewModel {
   private Forecast(Parcel in) {
     mCityId = in.readInt();
     mCityName = in.readString();
-    mSpeed = in.readString();
+    mSpeed = in.readDouble();
     mTemp = in.readString();
     mHumidity = in.readString();
     mDateTime = in.readString();
     mWeatherId = in.readInt();
     setCountry(in.readString());
+    mDeg = in.readDouble();
   }
 
   @Override public int getId() {
@@ -69,11 +73,11 @@ public class Forecast implements WeatherViewModel {
     this.mCityName = cityName;
   }
 
-  @Override public String getSpeed() {
+  @Override public double getSpeed() {
     return mSpeed;
   }
 
-  public void setSpeed(String speed) {
+  public void setSpeed(double speed) {
     this.mSpeed = speed;
   }
 
@@ -113,7 +117,15 @@ public class Forecast implements WeatherViewModel {
     return mCountry;
   }
 
+  @Override public double getDeg() {
+    return mDeg;
+  }
+
   public void setCountry(String mCountry) {
     this.mCountry = mCountry;
+  }
+
+  public void setDeg(double deg) {
+    mDeg = deg;
   }
 }

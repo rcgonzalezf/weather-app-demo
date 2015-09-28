@@ -8,5 +8,7 @@
   <string name="no_internet_msg">No network. Please check your internet connection.</string>
   <string name="today">Today</string>
   <string name="tomorrow">Tomorrow</string>
+  <string name="humidity">Humidity</string>
+  <string name="wind">Wind</string>
 
 </resources>

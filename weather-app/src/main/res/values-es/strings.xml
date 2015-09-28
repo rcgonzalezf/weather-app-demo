@@ -9,5 +9,7 @@
   <string name="no_internet_msg">Favor de revisar su conección a Internet.</string>
   <string name="today">Hoy</string>
   <string name="tomorrow">Mañana</string>
+  <string name="humidity">Humedad</string>
+  <string name="wind">Viento</string>
 
 </resources>

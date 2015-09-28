@@ -2,4 +2,6 @@
 <resources>
   <string name="location_display_format"
       translatable="false">%1$s, %2$s</string>
+  <string name="key_value_display_format"
+      translatable="false">%1$s: %2$s</string>
 </resources>

@@ -8,7 +8,7 @@ public interface WeatherViewModel extends Parcelable {
 
   String getCityName();
 
-  String getSpeed();
+  double getSpeed();
 
   String getHumidity();
 
@@ -19,4 +19,6 @@ public interface WeatherViewModel extends Parcelable {
   int getWeatherId();
 
   String getCountry();
+
+  double getDeg();
 }

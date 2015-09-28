@@ -14,7 +14,11 @@ import java.util.List;
 import org.rcgonzalezf.weather.WeatherLibApp;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.models.WeatherViewModel;
-import rcgonzalezf.org.weather.utils.ForecastUtils;
+
+import static rcgonzalezf.org.weather.utils.ForecastUtils.formatDate;
+import static rcgonzalezf.org.weather.utils.ForecastUtils.getArtResourceForWeatherCondition;
+import static rcgonzalezf.org.weather.utils.ForecastUtils.getDayName;
+import static rcgonzalezf.org.weather.utils.ForecastUtils.getFormattedWind;
 
 public class ModelAdapter<T extends WeatherViewModel>
     extends RecyclerView.Adapter<ModelAdapter.ModelViewHolder> implements View.OnClickListener {
@@ -35,15 +39,18 @@ public class ModelAdapter<T extends WeatherViewModel>
 
   @Override public void onBindViewHolder(ModelAdapter.ModelViewHolder holder, int position) {
     T mainModel = mModels.get(position);
-    holder.cityNameTextView.setText(mainModel.getCityName());
-    holder.datetimeTextView.setText(mainModel.getDateTime());
-    holder.itemImage.setImageResource(
-        ForecastUtils.getArtResourceForWeatherCondition(mainModel.getWeatherId()));
+    holder.datetimeTextView.setText(formatDate(mainModel.getDateTime()));
+    holder.itemImage.setImageResource(getArtResourceForWeatherCondition(mainModel.getWeatherId()));
     holder.detailLocationNameTextView.setText(
         String.format(getString(R.string.location_display_format), mainModel.getCityName(),
             mainModel.getCountry()));
 
-    holder.dayTextView.setText(ForecastUtils.getDayName(mContext, mainModel.getDateTime()));
+    holder.dayTextView.setText(getDayName(mContext, mainModel.getDateTime()));
+    holder.humidityTextView.setText(
+        String.format(getString(R.string.key_value_display_format), getString(R.string.humidity),
+            mainModel.getHumidity() + " %"));
+    holder.windSpeedTextView.setText(
+        getFormattedWind(mContext, mainModel.getSpeed(), mainModel.getDeg()));
 
     holder.itemView.setTag(mainModel);
   }
@@ -73,10 +80,12 @@ public class ModelAdapter<T extends WeatherViewModel>
   }
 
   public class ModelViewHolder extends RecyclerView.ViewHolder {
-    public TextView cityNameTextView;
+
     public TextView datetimeTextView;
     public ImageView itemImage;
     public TextView detailLocationNameTextView;
+    public TextView humidityTextView;
+    public TextView windSpeedTextView;
     public TextView dayTextView;
     public View itemView;
 
@@ -84,11 +93,12 @@ public class ModelAdapter<T extends WeatherViewModel>
       super(itemView);
       this.itemView = itemView;
       this.itemView.setOnClickListener(ModelAdapter.this);
-      cityNameTextView = (TextView) itemView.findViewById(R.id.city_name_text_view);
       datetimeTextView = (TextView) itemView.findViewById(R.id.datetime_text_view);
       detailLocationNameTextView = (TextView) itemView.findViewById(R.id.detail_location_name);
-      dayTextView =  (TextView) itemView.findViewById(R.id.day_textview);
+      dayTextView = (TextView) itemView.findViewById(R.id.day_textview);
       itemImage = (ImageView) itemView.findViewById(R.id.item_image);
+      humidityTextView = (TextView) itemView.findViewById(R.id.humidity_text_view);
+      windSpeedTextView = (TextView) itemView.findViewById(R.id.wind_speed_text_view);
     }
   }
 
