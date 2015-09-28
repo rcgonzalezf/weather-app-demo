@@ -1,10 +1,12 @@
 package org.rcgonzalezf.weather.openweather;
 
+import android.support.annotation.NonNull;
 import java.util.List;
 import org.rcgonzalezf.weather.common.ServiceConfig;
 import org.rcgonzalezf.weather.common.WeatherRepository;
 import org.rcgonzalezf.weather.common.models.ForecastData;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
+import org.rcgonzalezf.weather.common.network.ApiRequest;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequest;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters;
 
@@ -24,8 +26,16 @@ public class OpenWeatherApiRepository
 
   @Override public void findWeather(OpenWeatherApiRequestParameters requestParameters,
       ApiCallback apiCallback) {
-    OpenWeatherApiRequest request = new OpenWeatherApiRequest(mServiceConfig.getApiKey());
+    ApiRequest<OpenWeatherApiRequestParameters> request = getApiRequest();
     request.addRequestParameters(requestParameters);
     request.execute(apiCallback);
+  }
+
+  @Override public ApiRequest<OpenWeatherApiRequestParameters> getApiRequest() {
+    return getOpenWeatherApiRequest();
+  }
+
+  @NonNull private OpenWeatherApiRequest getOpenWeatherApiRequest() {
+    return new OpenWeatherApiRequest(mServiceConfig.getApiKey());
   }
 }
