@@ -13,7 +13,7 @@ public class Forecast implements WeatherViewModel {
   private int mCityId;
   private String mCityName;
   private double mSpeed;
-  private String mTemp;
+  private double mTemp;
   private String mHumidity;
   private String mDateTime;
   private String mCountry;
@@ -27,7 +27,7 @@ public class Forecast implements WeatherViewModel {
     dest.writeInt(mCityId);
     dest.writeString(mCityName);
     dest.writeDouble(mSpeed);
-    dest.writeString(mTemp);
+    dest.writeDouble(mTemp);
     dest.writeString(mHumidity);
     dest.writeString(mDateTime);
     dest.writeInt(mWeatherId);
@@ -49,7 +49,7 @@ public class Forecast implements WeatherViewModel {
     mCityId = in.readInt();
     mCityName = in.readString();
     mSpeed = in.readDouble();
-    mTemp = in.readString();
+    mTemp = in.readDouble();
     mHumidity = in.readString();
     mDateTime = in.readString();
     mWeatherId = in.readInt();
@@ -81,11 +81,11 @@ public class Forecast implements WeatherViewModel {
     this.mSpeed = speed;
   }
 
-  @Override public String getTemperature() {
+  @Override public double getTemperature() {
     return mTemp;
   }
 
-  public void setTemperature(String temp) {
+  public void setTemperature(double temp) {
     this.mTemp = temp;
   }
 

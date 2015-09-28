@@ -12,7 +12,7 @@ public interface WeatherViewModel extends Parcelable {
 
   String getHumidity();
 
-  String getTemperature();
+  double getTemperature();
 
   String getDateTime();
 

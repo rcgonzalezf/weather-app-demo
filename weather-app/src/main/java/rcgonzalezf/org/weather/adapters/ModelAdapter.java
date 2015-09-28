@@ -16,6 +16,7 @@ import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.models.WeatherViewModel;
 
 import static rcgonzalezf.org.weather.utils.ForecastUtils.formatDate;
+import static rcgonzalezf.org.weather.utils.ForecastUtils.formatTemperature;
 import static rcgonzalezf.org.weather.utils.ForecastUtils.getArtResourceForWeatherCondition;
 import static rcgonzalezf.org.weather.utils.ForecastUtils.getDayName;
 import static rcgonzalezf.org.weather.utils.ForecastUtils.getFormattedWind;
@@ -52,6 +53,10 @@ public class ModelAdapter<T extends WeatherViewModel>
     holder.windSpeedTextView.setText(
         getFormattedWind(mContext, mainModel.getSpeed(), mainModel.getDeg()));
 
+    holder.celsiusTextView.setText(
+        formatTemperature(mContext, mainModel.getTemperature(), false, "C"));
+    holder.fahrenheitTextView.setText(formatTemperature(mContext, mainModel.getTemperature(), true, "F"));
+
     holder.itemView.setTag(mainModel);
   }
 
@@ -86,6 +91,8 @@ public class ModelAdapter<T extends WeatherViewModel>
     public TextView detailLocationNameTextView;
     public TextView humidityTextView;
     public TextView windSpeedTextView;
+    public TextView fahrenheitTextView;
+    public TextView celsiusTextView;
     public TextView dayTextView;
     public View itemView;
 
@@ -99,6 +106,8 @@ public class ModelAdapter<T extends WeatherViewModel>
       itemImage = (ImageView) itemView.findViewById(R.id.item_image);
       humidityTextView = (TextView) itemView.findViewById(R.id.humidity_text_view);
       windSpeedTextView = (TextView) itemView.findViewById(R.id.wind_speed_text_view);
+      fahrenheitTextView = (TextView) itemView.findViewById(R.id.fahrenheit_text_view);
+      celsiusTextView = (TextView) itemView.findViewById(R.id.celsius_text_view);
     }
   }
 

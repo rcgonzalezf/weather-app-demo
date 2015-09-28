@@ -21,6 +21,8 @@
         android:layout_height="match_parent"
         android:paddingLeft="@dimen/list_item_vertical_margin"
         android:paddingRight="@dimen/list_item_vertical_margin"
+        android:layout_gravity="left"
+        android:layout_marginRight="8dp"
         >
 
       <TextView
@@ -83,6 +85,7 @@
         android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal|top"
         >
       <TextView
           android:fontFamily="sans-serif-condensed"
@@ -90,19 +93,20 @@
           android:layout_height="wrap_content"
           android:layout_width="wrap_content"
           android:textColor="@color/black"
-          android:textSize="64sp"
+          android:textSize="60sp"
           tools:text="12 C"
+          android:layout_gravity="center_horizontal|top"
           />
 
       <TextView
           android:fontFamily="sans-serif-condensed"
-          android:id="@+id/farenheit_text_view"
+          android:id="@+id/fahrenheit_text_view"
           android:layout_height="wrap_content"
           android:layout_width="wrap_content"
           android:textColor="@color/gray"
-          android:textSize="48sp"
-          android:layout_gravity="center_horizontal"
-          tools:text="48 F"
+          android:textSize="44sp"
+          android:layout_gravity="center_horizontal|top"
+          tools:text="53 F"
           />
 
 
@@ -110,8 +114,9 @@
 
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_gravity="right"
         >
       <ImageView
           android:layout_width="50dp"
@@ -120,6 +125,7 @@
           android:scaleType="centerCrop"
           android:src="@drawable/art_fog"
           android:contentDescription="@string/img_item"
+          android:layout_gravity="right"
           />
     </LinearLayout>
   </LinearLayout>

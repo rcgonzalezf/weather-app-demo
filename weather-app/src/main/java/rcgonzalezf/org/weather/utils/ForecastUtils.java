@@ -117,4 +117,18 @@ public class ForecastUtils {
     return String.format(windFormat, context.getString(R.string.wind), windSpeedStr,
         direction);
   }
+
+  public static String formatTemperature(Context context, double temperature,
+      boolean isFahrenheit, String symbol) {
+    if (isFahrenheit)
+      // Conversion of Kelvin to Fahrenheit temperature.
+      temperature = 1.8 * (temperature - 273) + 32;
+    else
+      // Conversion of Kelvin to Celsius temperature.
+      temperature = temperature - 273;
+
+    return String.format("%1.0f\u00B0 %2$s",
+        temperature, symbol);
+  }
+
 }
