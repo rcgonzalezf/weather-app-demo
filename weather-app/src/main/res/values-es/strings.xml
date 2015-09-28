@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="img_item">Imagen</string>
+  <string name="action_settings">Configuración</string>
+  <string name="app_name">Clima</string>
+
+  <string name="home">Inicio</string>
+  <string name="favourite">Favoritos</string>
+  <string name="downloaded">Descargas</string>
+  <string name="login">Inicia Sesión</string>
+
+</resources>
