@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -22,6 +23,7 @@ import org.rcgonzalezf.weather.common.WeatherRepository;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters;
 import rcgonzalezf.org.weather.R;
+import rcgonzalezf.org.weather.Utils;
 import rcgonzalezf.org.weather.WeatherActivity;
 
 public abstract class BaseActivity extends AppCompatActivity
@@ -78,17 +80,18 @@ public abstract class BaseActivity extends AppCompatActivity
 
   @Override public void onConnected(Bundle bundle) {
     mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+    if(!Utils.hasInternetConnection(this)) {
+      Toast.makeText(this, getString(R.string.no_internet_msg), Toast.LENGTH_SHORT).show();
+    }
     if (mLastLocation != null) {
-      mLastLocation.getLatitude();
-      mLastLocation.getLongitude();
-
       WeatherRepository<OpenWeatherApiRequestParameters> weatherRepository =
           ServiceConfig.getInstance().getWeatherRepository();
 
       weatherRepository.findWeather(
           new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withLatLon(
               mLastLocation.getLatitude(), mLastLocation.getLongitude()).build(), this);
-
+    } else {
+      Snackbar.make(mContent, getString(R.string.location_off_msg), Snackbar.LENGTH_SHORT).show();
     }
   }
 
@@ -118,7 +121,7 @@ public abstract class BaseActivity extends AppCompatActivity
     NavigationView view = (NavigationView) findViewById(R.id.navigation_view);
     view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
       @Override public boolean onNavigationItemSelected(MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.drawer_login) {
+        if (menuItem.getItemId() == R.id.drawer_settings) {
           Intent intent = new Intent(BaseActivity.this, WeatherActivity.class);
           startActivity(intent);
         } else {

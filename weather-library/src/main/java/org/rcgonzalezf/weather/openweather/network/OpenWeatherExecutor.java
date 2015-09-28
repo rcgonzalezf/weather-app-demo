@@ -35,6 +35,7 @@ public class OpenWeatherExecutor {
         try {
           final URL url = new URL(stringUrl);
           HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+          urlConnection.setUseCaches(true);
           mInputStream = urlConnection.getInputStream();
           InputStream inputStream = null;
 
