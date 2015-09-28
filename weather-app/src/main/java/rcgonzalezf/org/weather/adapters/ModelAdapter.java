@@ -5,7 +5,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,8 +54,8 @@ public class ModelAdapter<T extends WeatherViewModel>
         getFormattedWind(mContext, mainModel.getSpeed(), mainModel.getDeg()));
 
     holder.celsiusTextView.setText(
-        formatTemperature(mContext, mainModel.getTemperature(), false, "C"));
-    holder.fahrenheitTextView.setText(formatTemperature(mContext, mainModel.getTemperature(), true, "F"));
+        formatTemperature(mainModel.getTemperature(), false, "C"));
+    holder.fahrenheitTextView.setText(formatTemperature(mainModel.getTemperature(), true, "F"));
 
     holder.descriptionTextView.setText(mainModel.getDescription());
     holder.itemView.setTag(mainModel);

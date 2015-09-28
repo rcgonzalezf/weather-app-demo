@@ -1,6 +1,7 @@
 package rcgonzalezf.org.weather.common;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -10,6 +11,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,17 +21,27 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.List;
 import org.rcgonzalezf.weather.common.ServiceConfig;
 import org.rcgonzalezf.weather.common.WeatherRepository;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters;
 import rcgonzalezf.org.weather.R;
-import rcgonzalezf.org.weather.utils.ForecastUtils;
 import rcgonzalezf.org.weather.WeatherActivity;
+import rcgonzalezf.org.weather.models.Forecast;
+import rcgonzalezf.org.weather.utils.ForecastUtils;
 
 public abstract class BaseActivity extends AppCompatActivity
     implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-    ApiCallback {
+    ApiCallback, OnOfflineLoader {
+
+  protected static final String OFFLINE_FILE = "OFFLINE_WEATHER";
+  public static final String FORECASTS = "FORECASTS";
+  private static final String TAG = BaseActivity.class.getSimpleName();
 
   protected Location mLastLocation;
   private GoogleApiClient mGoogleApiClient;
@@ -80,10 +93,11 @@ public abstract class BaseActivity extends AppCompatActivity
 
   @Override public void onConnected(Bundle bundle) {
     mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-    if(!ForecastUtils.hasInternetConnection(this)) {
+    if (!ForecastUtils.hasInternetConnection(this)) {
       Toast.makeText(this, getString(R.string.no_internet_msg), Toast.LENGTH_SHORT).show();
-    }
-    if (mLastLocation != null) {
+      final List<Forecast> forecastList = getPreviousForecastList();
+      loadOldData(forecastList);
+    } else if (mLastLocation != null) {
       WeatherRepository<OpenWeatherApiRequestParameters> weatherRepository =
           ServiceConfig.getInstance().getWeatherRepository();
 
@@ -102,7 +116,6 @@ public abstract class BaseActivity extends AppCompatActivity
   @Override public void onConnectionFailed(ConnectionResult connectionResult) {
 
   }
-
 
   private void initToolbar() {
     final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -132,5 +145,23 @@ public abstract class BaseActivity extends AppCompatActivity
         return true;
       }
     });
+  }
+
+  public List<Forecast> getPreviousForecastList() {
+    SharedPreferences sharedPreferences = getSharedPreferences(OFFLINE_FILE, 0);
+    String serializedData = sharedPreferences.getString(FORECASTS, null);
+    List<Forecast> storedData = null;
+    if (serializedData != null) {
+      try {
+        ByteArrayInputStream input =
+            new ByteArrayInputStream(Base64.decode(serializedData, Base64.DEFAULT));
+        ObjectInputStream inputStream = new ObjectInputStream(input);
+        storedData = (ArrayList<Forecast>) inputStream.readObject();
+      } catch (IOException | ClassNotFoundException | java.lang.IllegalArgumentException e) {
+        Log.e(TAG, "Can't retrive previous offline data", e);
+      }
+    }
+
+    return storedData;
   }
 }

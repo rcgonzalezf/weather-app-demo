@@ -1,8 +1,9 @@
 package rcgonzalezf.org.weather.models;
 
 import android.os.Parcelable;
+import java.io.Serializable;
 
-public interface WeatherViewModel extends Parcelable {
+public interface WeatherViewModel extends Parcelable, Serializable {
 
   int getId();
 

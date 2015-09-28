@@ -1,10 +1,17 @@
 package rcgonzalezf.org.weather;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import org.rcgonzalezf.weather.common.network.ApiError;
@@ -17,6 +24,7 @@ import rcgonzalezf.org.weather.models.WeatherViewModel;
 
 public class WeatherActivity extends BaseActivity implements ModelAdapter.OnItemClickListener {
 
+  private static final String TAG = WeatherActivity.class.getSimpleName();
   private RecyclerView mRecyclerView;
   private ModelAdapter<Forecast> mAdapter;
 
@@ -32,13 +40,36 @@ public class WeatherActivity extends BaseActivity implements ModelAdapter.OnItem
 
   @Override public void onSuccess(ApiResponse apiResponse) {
     final List<Forecast> forecastList = new ForecastMapper().withData(apiResponse.getData())
-        .map(10);
+        .map();
+    saveForecastList(forecastList);
+
     runOnUiThread(new Runnable() {
       @Override public void run() {
         mAdapter.setItems(forecastList);
         mAdapter.notifyDataSetChanged();
       }
     });
+  }
+
+  private void saveForecastList(final List<Forecast> forecastList) {
+    final List<Forecast> forecasts = forecastList;
+    new Thread(new Runnable() {
+      @Override public void run() {
+        ByteArrayOutputStream serializedData = new ByteArrayOutputStream();
+        try {
+          ObjectOutputStream serializer = new ObjectOutputStream(serializedData);
+          serializer.writeObject(forecasts);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+
+        SharedPreferences prefs = getSharedPreferences(OFFLINE_FILE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(FORECASTS, Base64.encodeToString(serializedData.toByteArray(), Base64.DEFAULT));
+        editor.apply();
+      }
+    }).start();
+
   }
 
   @Override public void onError(ApiError apiError) {
@@ -56,5 +87,18 @@ public class WeatherActivity extends BaseActivity implements ModelAdapter.OnItem
 
   @Override public void onItemClick(View view, WeatherViewModel viewModel) {
     Toast.makeText(this, "clicked:" + viewModel.getId(), Toast.LENGTH_SHORT).show();
+  }
+
+  @Override public void loadOldData(final List<Forecast> forecastList) {
+    if(forecastList != null && !forecastList.isEmpty()) {
+      runOnUiThread(new Runnable() {
+        @Override public void run() {
+          mAdapter.setItems(forecastList);
+          mAdapter.notifyDataSetChanged();
+        }
+      });
+    } else {
+      Log.d(TAG, "No data even in offline mode :(");
+    }
   }
 }
