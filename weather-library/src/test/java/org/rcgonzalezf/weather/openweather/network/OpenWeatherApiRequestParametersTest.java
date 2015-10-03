@@ -2,10 +2,13 @@ package org.rcgonzalezf.weather.openweather.network;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.rcgonzalezf.weather.BuildConfig;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyInt;
 import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder.CITY_ID;
 import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder.CITY_NAME;
 import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder.LAT;
@@ -15,6 +18,7 @@ import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestP
 import static org.rcgonzalezf.weather.openweather.network.Units.IMPERIAL;
 import static org.rcgonzalezf.weather.openweather.network.Units.METRIC;
 
+@RunWith(RobolectricGradleTestRunner.class) @Config(constants = BuildConfig.class, sdk = 21)
 public class OpenWeatherApiRequestParametersTest {
 
   public OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder mBuilder;
@@ -78,7 +82,7 @@ public class OpenWeatherApiRequestParametersTest {
 
   @Test(expected = UnsupportedOperationException.class)
   public void shouldThrowExceptionIfTryingToGetParameterMap() {
-    givenCityId(anyInt());
+    givenCityId(123456);
     whenBuildApiParameters();
     thenKeyValueParametersShouldThrowException();
   }

@@ -5,11 +5,15 @@ import java.util.Collection;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.rcgonzalezf.weather.BuildConfig;
+import org.robolectric.ParameterizedRobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertEquals;
 
-@RunWith(Parameterized.class) public class OpenWeatherApiRequestUrlsTest {
+@RunWith(ParameterizedRobolectricTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 21)
+public class OpenWeatherApiRequestUrlsTest {
 
   private final String mExpectedUrl;
   private final OpenWeatherApiRequestParameters mOpenWeatherApiRequestParameters;
@@ -28,7 +32,8 @@ import static org.junit.Assert.assertEquals;
     mOpenWeatherApiRequestParameters = openWeatherApiRequestParameters;
   }
 
-  @Parameterized.Parameters public static Collection data() {
+  @ParameterizedRobolectricTestRunner.Parameters
+  public static Collection data() {
 
     return Arrays.asList(new Object[][] {
         {

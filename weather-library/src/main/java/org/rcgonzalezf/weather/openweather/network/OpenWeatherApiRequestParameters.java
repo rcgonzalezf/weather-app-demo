@@ -1,5 +1,6 @@
 package org.rcgonzalezf.weather.openweather.network;
 
+import android.net.Uri;
 import java.util.HashMap;
 import java.util.Map;
 import org.rcgonzalezf.weather.common.network.RequestParameters;
@@ -44,21 +45,12 @@ public class OpenWeatherApiRequestParameters implements RequestParameters {
       OpenWeatherApiRequestParameters
           openWeatherApiRequestParameters = new OpenWeatherApiRequestParameters();
 
-      StringBuilder queryBuilder = new StringBuilder();
-
-      int i = 0, size = mQueryParametersMap.size();
-
+      Uri.Builder queryBuilder = new Uri.Builder();
       for (String key : mQueryParametersMap.keySet()) {
-        queryBuilder.append(key).append("=").append(mQueryParametersMap.get(key));
-
-        boolean hasMore = i + 1 < size;
-        if (hasMore) {
-          queryBuilder.append("&");
-        }
-        ++i;
+        queryBuilder.appendQueryParameter(key,mQueryParametersMap.get(key));
       }
 
-      openWeatherApiRequestParameters.mQueryString = queryBuilder.toString();
+      openWeatherApiRequestParameters.mQueryString = queryBuilder.build().getQuery();
       return openWeatherApiRequestParameters;
     }
 
