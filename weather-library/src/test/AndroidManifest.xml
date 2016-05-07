@@ -6,7 +6,7 @@
   <application android:allowBackup="true"
       android:label="@string/app_name"
       android:supportsRtl="true"
-      android:name=".tests.WeatherTestLibApp"
+      android:name="org.rcgonzalezf.weather.tests.WeatherTestLibApp"
       tools:replace="android:name"
       >
 
