@@ -162,8 +162,10 @@ public abstract class BaseActivity extends AppCompatActivity
 
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     TextView textView = (TextView) findViewById(R.id.user_display_name);
-    textView.setText(
-        prefs.getString(USER_NAME_TO_DISPLAY, getString(R.string.pref_default_display_name)));
+    if (textView != null) {
+      textView.setText(
+          prefs.getString(USER_NAME_TO_DISPLAY, getString(R.string.pref_default_display_name)));
+    }
   }
 
   private void setupFabButton() {
