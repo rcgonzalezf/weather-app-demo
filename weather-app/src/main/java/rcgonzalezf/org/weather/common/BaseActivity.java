@@ -222,12 +222,13 @@ public abstract class BaseActivity extends AppCompatActivity
     WeatherRepository<OpenWeatherApiRequestParameters> weatherRepository =
         ServiceConfig.getInstance().getWeatherRepository();
 
-    weatherRepository.findWeather(
-        new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withCityName(
-            query).build(), BaseActivity.this);
+    weatherRepository.findWeather(new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder()
+        .withCityName(query)
+        .build(), BaseActivity.this);
 
     Toast.makeText(BaseActivity.this,
-        getString(R.string.searching) + " " + userInput.getText() + "...", Toast.LENGTH_SHORT).show();
+        getString(R.string.searching) + " " + userInput.getText() + "...", Toast.LENGTH_SHORT)
+        .show();
   }
 
   protected void informNoInternet() {
