@@ -6,14 +6,67 @@ import org.rcgonzalezf.weather.common.network.RequestParameters;
 
 public class OpenWeatherApiRequestParameters implements RequestParameters {
 
-  String mQueryString;
+  private String mQueryString;
+  private String lat;
+  private String lon;
+  private String cityName;
+  private Integer cityId;
+  private Units units;
 
   @Override public String getQueryString() {
-    return mQueryString;
+    return getmQueryString();
   }
 
   @Override public Map<String, String> getKeyValueParameters() {
     throw new UnsupportedOperationException("This service doesn't provides this method");
+  }
+
+  public String getmQueryString() {
+    return mQueryString;
+  }
+
+  public void setmQueryString(String mQueryString) {
+    this.mQueryString = mQueryString;
+  }
+
+  public String getLat() {
+    return lat;
+  }
+
+  public void setLat(String lat) {
+    this.lat = lat;
+  }
+
+  public String getLon() {
+    return lon;
+  }
+
+  public void setLon(String lon) {
+    this.lon = lon;
+  }
+
+  public String getCityName() {
+    return cityName;
+  }
+
+  public void setCityName(String cityName) {
+    this.cityName = cityName;
+  }
+
+  public Integer getCityId() {
+    return cityId;
+  }
+
+  public void setCityId(Integer cityId) {
+    this.cityId = cityId;
+  }
+
+  public Units getUnits() {
+    return units;
+  }
+
+  public void setUnits(Units units) {
+    this.units = units;
   }
 
   public static class OpenWeatherApiRequestBuilder {
@@ -23,17 +76,20 @@ public class OpenWeatherApiRequestParameters implements RequestParameters {
     public static final String CITY_ID = "id";
     public static final String CITY_NAME = "q";
     public static final String TYPE = "type";
-    private static final String LIKE = "like";
+    public static final String LIKE = "like";
     public static final String UNITS = "units";
+    private final OpenWeatherApiRequestParameters mOpenWeatherApiRequestParameters;
 
     private Map<String, String> mQueryParametersMap;
 
     public OpenWeatherApiRequestBuilder() {
       mQueryParametersMap = new HashMap<>();
+          mOpenWeatherApiRequestParameters = new OpenWeatherApiRequestParameters();
     }
 
     public OpenWeatherApiRequestBuilder withCityId(Integer cityId) {
       mQueryParametersMap.put(CITY_ID, String.valueOf(cityId));
+      mOpenWeatherApiRequestParameters.setCityId(cityId);
       return this;
     }
 
@@ -41,9 +97,6 @@ public class OpenWeatherApiRequestParameters implements RequestParameters {
       if (mQueryParametersMap.isEmpty()) {
         throw new IllegalStateException("Can't prepare empty parameters");
       }
-      OpenWeatherApiRequestParameters
-          openWeatherApiRequestParameters = new OpenWeatherApiRequestParameters();
-
       StringBuilder queryBuilder = new StringBuilder();
 
       int i = 0, size = mQueryParametersMap.size();
@@ -58,17 +111,19 @@ public class OpenWeatherApiRequestParameters implements RequestParameters {
         ++i;
       }
 
-      openWeatherApiRequestParameters.mQueryString = queryBuilder.toString();
-      return openWeatherApiRequestParameters;
+      mOpenWeatherApiRequestParameters.setmQueryString(queryBuilder.toString());
+      return mOpenWeatherApiRequestParameters;
     }
 
     private OpenWeatherApiRequestBuilder withLat(Double lat) {
       mQueryParametersMap.put(LAT, String.valueOf(lat));
+      mOpenWeatherApiRequestParameters.setLat(String.valueOf(lat));
       return this;
     }
 
     private OpenWeatherApiRequestBuilder withLon(Double lon) {
       mQueryParametersMap.put(LON, String.valueOf(lon));
+      mOpenWeatherApiRequestParameters.setLon(String.valueOf(lon));
       return this;
     }
 
@@ -79,11 +134,13 @@ public class OpenWeatherApiRequestParameters implements RequestParameters {
     public OpenWeatherApiRequestBuilder withCityName(String cityName) {
       mQueryParametersMap.put(CITY_NAME, cityName);
       mQueryParametersMap.put(TYPE, LIKE);
+      mOpenWeatherApiRequestParameters.setCityName(cityName);
       return this;
     }
 
     public OpenWeatherApiRequestBuilder withUnits(Units units) {
       mQueryParametersMap.put(UNITS, units.getUnitName());
+      mOpenWeatherApiRequestParameters.setUnits(units);
       return this;
     }
   }

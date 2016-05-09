@@ -11,50 +11,63 @@ import org.rcgonzalezf.weather.common.models.ForecastData;
 import org.rcgonzalezf.weather.common.models.ForecastDataBuilder;
 import org.rcgonzalezf.weather.common.models.WeatherData;
 import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
+import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;
+import org.rcgonzalezf.weather.openweather.model.Weather;
+import org.rcgonzalezf.weather.openweather.model.WeatherList;
 import org.rcgonzalezf.weather.openweather.models.OpenWeatherApiRawData;
-import org.rcgonzalezf.weather.openweather.models.RawListItem;
-import org.rcgonzalezf.weather.openweather.models.Weather;
 
-public class OpenWeatherApiModelConverter implements ModelConverter<Void, OpenWeatherApiRawData> {
+public class OpenWeatherApiModelConverter
+    implements ModelConverter<Void, OpenWeatherApiRawData, OpenWeatherForecastData> {
 
-  private InputStream mInputStream;
+  private OpenWeatherForecastData mOpenWeatherForecastData;
 
-  @Override public Void fromInputStream(@NonNull InputStream inputStream) {
-    mInputStream = inputStream;
+  @Override public Void fromPojo(OpenWeatherForecastData pojo) {
+    mOpenWeatherForecastData = pojo;
     return null;
   }
 
+  @Override public Void fromInputStream(@NonNull InputStream inputStream) {
+    throw new UnsupportedOperationException("not supported");
+  }
+
   @Override public @Nullable List<OpenWeatherApiRawData> generateRawModel() throws IOException {
-    final OpenApiWeatherJsonParser parser = new OpenApiWeatherJsonParser();
-    return parser.parseJsonStream(mInputStream);
+    throw new UnsupportedOperationException("not supported");
   }
 
   @Override public List<ForecastData> getModel() throws IOException {
 
-    List<OpenWeatherApiRawData> rawModelList = generateRawModel();
     List<ForecastData> forecastData = null;
+    if (mOpenWeatherForecastData != null) {
+      forecastData = populateFromPojo(forecastData);
+    }
 
-    if (rawModelList != null && rawModelList.size() > 0) {
-      forecastData = new ArrayList<>(rawModelList.size());
-      for (OpenWeatherApiRawData rawDataList : rawModelList) {
+    return forecastData;
+  }
 
-        if (rawDataList.getCod() == HttpURLConnection.HTTP_OK) {
+  protected List<ForecastData> populateFromPojo(List<ForecastData> forecastData) {
+
+    if (mOpenWeatherForecastData.getWeatherList() != null
+        && mOpenWeatherForecastData.getWeatherList().size() > 0) {
+      forecastData = new ArrayList<>(mOpenWeatherForecastData.getWeatherList().size());
+
+      for (WeatherList weatherList : mOpenWeatherForecastData.getWeatherList()) {
+
+        if (String.valueOf(HttpURLConnection.HTTP_OK)
+            .equalsIgnoreCase(mOpenWeatherForecastData.getCod())) {
           ForecastData forecastDatum =
-              new ForecastDataBuilder()
-                  .setCity(rawDataList.getCity())
-                  .setCount(rawDataList.getCount())
+              new ForecastDataBuilder().setCity(mOpenWeatherForecastData.getCity())
+                  .setCount(Integer.valueOf(mOpenWeatherForecastData.getCnt()))
                   .createForecastData();
 
-          for (RawListItem rawData : rawDataList.getRawList()) {
-            Weather weather = rawData.getWeather().get(0);
+          for (Weather weather : weatherList.getWeather()) {
             WeatherData weatherData = new WeatherData();
-            weatherData.setDateTime(rawData.getDateTime());
+            weatherData.setDateTime(weatherList.getDt_txt());
             weatherData.setWeatherId(weather.getId());
             weatherData.setDescription(weather.getDescription());
-            weatherData.setSpeed(rawData.getWind().getSpeed());
-            weatherData.setDeg(rawData.getWind().getDeg());
-            weatherData.setTemp(rawData.getMain().getTemp());
-            weatherData.setHumidity(rawData.getMain().getHumidity());
+            weatherData.setSpeed(weatherList.getWind().getSpeed());
+            weatherData.setDeg(weatherList.getWind().getDeg());
+            weatherData.setTemp(weatherList.getMain().getTemp());
+            weatherData.setHumidity(weatherList.getMain().getHumidity());
 
             forecastDatum.addWeatherItem(weatherData);
           }
@@ -62,6 +75,7 @@ public class OpenWeatherApiModelConverter implements ModelConverter<Void, OpenWe
           forecastData.add(forecastDatum);
         }
       }
-    } return forecastData;
+    }
+    return forecastData;
   }
 }
