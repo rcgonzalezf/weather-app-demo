@@ -6,6 +6,7 @@ import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
 import org.rcgonzalezf.weather.common.network.ApiRequest;
 import org.rcgonzalezf.weather.openweather.converter.OpenWeatherApiModelConverter;
+import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;
 import org.rcgonzalezf.weather.openweather.models.OpenWeatherApiRawData;
 
 public class OpenWeatherApiRequest implements ApiRequest<OpenWeatherApiRequestParameters> {
@@ -14,7 +15,7 @@ public class OpenWeatherApiRequest implements ApiRequest<OpenWeatherApiRequestPa
   private static final String FORECAST = "forecast";
   private static final String URL_FORMAT = "%1$s%2$s?%3$s&APPID=%4$s";
   private final String mApiKey;
-  private final ModelConverter<Void, OpenWeatherApiRawData> mModelConverter;
+  private final ModelConverter<Void, OpenWeatherApiRawData, OpenWeatherForecastData> mModelConverter;
   private OpenWeatherApiRequestParameters mRequestParameters;
   private OpenWeatherExecutor mOpenWeatherExecutor;
 
@@ -23,7 +24,7 @@ public class OpenWeatherApiRequest implements ApiRequest<OpenWeatherApiRequestPa
   }
 
   public OpenWeatherApiRequest(String apiKey,
-      ModelConverter<Void, OpenWeatherApiRawData> modelConverter) {
+      ModelConverter<Void, OpenWeatherApiRawData, OpenWeatherForecastData> modelConverter) {
     mApiKey = apiKey;
     mModelConverter = modelConverter;
   }
@@ -37,9 +38,9 @@ public class OpenWeatherApiRequest implements ApiRequest<OpenWeatherApiRequestPa
   }
 
   @Override public void execute(ApiCallback apiCallback) {
-    mOpenWeatherExecutor = new OpenWeatherExecutor(apiCallback, getExecutor());
+    mOpenWeatherExecutor = new OpenWeatherExecutor(apiCallback, getExecutor(), mApiKey);
     mOpenWeatherExecutor.setModelConverter(mModelConverter);
-    mOpenWeatherExecutor.performNetworkCall(url());
+    mOpenWeatherExecutor.performRetrofitCall(mRequestParameters);
   }
 
   @Override public void addRequestParameters(OpenWeatherApiRequestParameters requestParameters) {

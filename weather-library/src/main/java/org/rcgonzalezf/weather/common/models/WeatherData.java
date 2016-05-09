@@ -1,11 +1,14 @@
 package org.rcgonzalezf.weather.common.models;
 
+import com.google.gson.annotations.SerializedName;
+
 public class WeatherData {
 
   private double mSpeed;
   private double mDeg;
   private double mTemp;
   private long mHumidity;
+  @SerializedName("dt_txt")
   private String mDateTime;
   private int mWeatherId;
   private String mDescription;
