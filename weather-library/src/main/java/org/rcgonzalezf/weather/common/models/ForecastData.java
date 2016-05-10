@@ -1,13 +1,17 @@
 package org.rcgonzalezf.weather.common.models;
 
+import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
-import org.rcgonzalezf.weather.openweather.models.City;
+import org.rcgonzalezf.weather.openweather.model.City;
 
 public class ForecastData {
 
+  @SerializedName("city")
   private City mCity;
+  @SerializedName("cnt")
   private int mCount;
+  @SerializedName("list")
   private List<WeatherData> mWeatherList;
 
 

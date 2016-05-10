@@ -2,6 +2,7 @@ package org.rcgonzalezf.weather;
 
 import android.app.Application;
 import android.util.Log;
+import com.facebook.stetho.Stetho;
 import java.io.File;
 import org.rcgonzalezf.weather.common.ServiceConfig;
 import org.rcgonzalezf.weather.common.WeatherProvider;
@@ -20,6 +21,7 @@ public class WeatherLibApp extends Application {
     mServiceConfig.setWeatherProvider(WeatherProvider.OpenWeather);
 
     enableHttpResponseCache();
+    Stetho.initializeWithDefaults(this);
   }
 
   public static WeatherLibApp getInstance() {

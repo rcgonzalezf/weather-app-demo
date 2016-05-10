@@ -151,7 +151,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
       addPreferencesFromResource(R.xml.pref_general);
       setHasOptionsMenu(true);
 
-      // Bind the summaries of EditText/List/Dialog/Ringtone preferences
+      // Bind the summaries of EditText/WeatherList/Dialog/Ringtone preferences
       // to their values. When their values change, their summaries are
       // updated to reflect the new value, per the Android Design
       // guidelines.
