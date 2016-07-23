@@ -5,6 +5,8 @@
 
   <string name="home">Home</string>
   <string name="location_off_msg">Unable to retrieve the location. Please check your settings.</string>
+  <string name="permissions_location_not_granted">This app doesn\'t have permissions to access the location services, please type the desired location.</string>
+
   <string name="no_internet_msg">No network. Please check your internet connection.</string>
   <string name="today">Today</string>
   <string name="tomorrow">Tomorrow</string>
@@ -25,5 +27,8 @@
   <string name="pref_title_display_name">Display name</string>
   <string name="pref_default_display_name">John Smith</string>
   <string name="invalid_input">Invalid input</string>
+  <string name="ok">ok</string>
+  <string name="permissions_location_granted">Location permission has been granted, retrieving location.</string>
+  <string name="permissions_location_rationale">Location permission is needed to retrieve the weather of the current location.</string>
 
 </resources>

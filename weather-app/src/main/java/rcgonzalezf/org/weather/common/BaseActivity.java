@@ -4,13 +4,11 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -112,6 +110,20 @@ public abstract class BaseActivity extends AppCompatActivity
   }
 
   @Override public void onConnected(Bundle bundle) {
+    PermissionChecker permissionChecker =
+        new PermissionChecker(Manifest.permission.ACCESS_COARSE_LOCATION, this,
+            PermissionChecker.LOCATION, mContent, R.string.permissions_location_granted,
+            R.string.permissions_location_not_granted, R.string.permissions_location_rationale);
+
+    if (permissionChecker.hasPermission()) {
+      useLastKnownLocation();
+    } else {
+      permissionChecker.requestLocationPermission();
+    }
+  }
+
+  // We are handling the potential missing permission
+  @SuppressWarnings("MissingPermission") void useLastKnownLocation() {
     mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
     if (!hasInternetConnection(this)) {
       informNoInternet();
