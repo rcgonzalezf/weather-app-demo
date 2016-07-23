@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/moxi/weather-app-demo.svg?branch=feature%2Ftravis-ci)](https://travis-ci.org/moxi/weather-app-demo) 
+
 # weather-app-demo
 
 

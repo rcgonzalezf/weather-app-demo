@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 21, application = WeatherTestLibApp.class)
+@Config(constants = BuildConfig.class, sdk = 23, application = WeatherTestLibApp.class)
 public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
 
   private OpenWeatherApiModelConverter mOpenWeatherApiModelConverter;

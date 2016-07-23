@@ -19,7 +19,7 @@ import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestP
 import static org.rcgonzalezf.weather.openweather.network.Units.IMPERIAL;
 import static org.rcgonzalezf.weather.openweather.network.Units.METRIC;
 
-@RunWith(RobolectricTestRunner.class) @Config(constants = BuildConfig.class, sdk = 21, application = WeatherTestLibApp.class)
+@RunWith(RobolectricTestRunner.class) @Config(constants = BuildConfig.class, sdk = 23, application = WeatherTestLibApp.class)
 public class OpenWeatherApiRequestParametersTest {
 
   public OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder mBuilder;

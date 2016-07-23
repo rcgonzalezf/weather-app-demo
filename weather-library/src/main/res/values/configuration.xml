@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="open_weather_map_api_key">test</string>
+  <!-- Use example
+  http://api.openweathermap.org/data/2.5/forecast/city?id=524901&APPID=test
+  -->
+
+</resources>
