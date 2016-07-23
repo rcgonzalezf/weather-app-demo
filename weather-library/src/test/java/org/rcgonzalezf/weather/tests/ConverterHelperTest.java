@@ -7,12 +7,12 @@ import org.junit.After;
 import org.junit.runner.RunWith;
 import org.rcgonzalezf.weather.BuildConfig;
 import org.rcgonzalezf.weather.WeatherLibApp;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertNotNull;
 
-@RunWith(RobolectricGradleTestRunner.class) @Config(constants = BuildConfig.class, sdk = 21)
+@RunWith(RobolectricTestRunner.class) @Config(constants = BuildConfig.class, sdk = 21)
 public abstract class ConverterHelperTest {
 
   protected InputStream mInputStream;
