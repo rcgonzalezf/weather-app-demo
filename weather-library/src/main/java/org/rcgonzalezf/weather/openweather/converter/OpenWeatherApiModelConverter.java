@@ -5,7 +5,7 @@ import android.support.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import org.rcgonzalezf.weather.common.models.ForecastData;
 import org.rcgonzalezf.weather.common.models.ForecastDataBuilder;
@@ -36,19 +36,17 @@ public class OpenWeatherApiModelConverter
 
   @Override public List<ForecastData> getModel() throws IOException {
 
-    List<ForecastData> forecastData = null;
+    List<ForecastData> forecastData = new LinkedList<>();
     if (mOpenWeatherForecastData != null) {
       forecastData = populateFromPojo(forecastData);
     }
-
     return forecastData;
   }
 
-  protected List<ForecastData> populateFromPojo(List<ForecastData> forecastData) {
+  protected @Nullable List<ForecastData> populateFromPojo(List<ForecastData> forecastData) {
 
     if (mOpenWeatherForecastData.getWeatherList() != null
         && mOpenWeatherForecastData.getWeatherList().size() > 0) {
-      forecastData = new ArrayList<>(mOpenWeatherForecastData.getWeatherList().size());
 
       for (WeatherList weatherList : mOpenWeatherForecastData.getWeatherList()) {
 

@@ -1,6 +1,10 @@
 package org.rcgonzalezf.weather.openweather.converter;
 
+import com.google.gson.Gson;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,19 +13,22 @@ import org.rcgonzalezf.weather.BuildConfig;
 import org.rcgonzalezf.weather.R;
 import org.rcgonzalezf.weather.common.models.ForecastData;
 import org.rcgonzalezf.weather.common.models.WeatherData;
+import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;
 import org.rcgonzalezf.weather.tests.ConverterHelperTest;
 import org.rcgonzalezf.weather.tests.WeatherTestLibApp;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 
-@RunWith(RobolectricGradleTestRunner.class) @Config(constants = BuildConfig.class, sdk = 21, application = WeatherTestLibApp.class)
+@RunWith(RobolectricTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 21, application = WeatherTestLibApp.class)
 public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
 
   private OpenWeatherApiModelConverter mOpenWeatherApiModelConverter;
+  private OpenWeatherForecastData openWeatherForecastData;
   private List<ForecastData> mModel;
   private ForecastData mForecastData;
   private WeatherData mWeatherData;
@@ -34,15 +41,21 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
   @Test public void shouldReturnModelWithOneCountryGivenInputStreamByCityIdMoscow()
       throws IOException {
     givenInputStreamByCityIdMoscow();
+    givenPojo();
+
     whenGenerateModel();
-    thenShouldHaveOneForecastDataElement();
+
+    thenShouldHaveFortyForecastDataElements();
   }
 
   @Test public void shouldReturnModelWithValuesForGivenCountryInputStreamByCityIdMoscow()
       throws IOException {
     givenInputStreamByCityIdMoscow();
+    givenPojo();
+
     whenGenerateModel();
-    thenShouldHaveOneForecastDataElement();
+
+    thenShouldHaveFortyForecastDataElements();
     thenShouldHaveWeatherListCountOf(40);
     thenCityNameShouldBe("Moscow");
     whenGettingTheFirstWeatherElement();
@@ -56,8 +69,11 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
   @Test public void shouldReturnModelWithValuesForCountriesInputStreamFoundByName()
       throws IOException {
     givenInputStreamByCityNameLondon();
+    givenPojo();
+
     whenGenerateModel();
-    thenShouldHaveOneForecastDataElement();
+
+    thenShouldHaveFortyForecastDataElements();
     thenShouldHaveWeatherListCountOf(40);
     thenCityNameShouldBe("London");
     whenGettingTheFirstWeatherElement();
@@ -71,8 +87,11 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
   @Test public void shouldReturnModelWithValuesForCountriesInputStreamFoundByLatLon()
       throws IOException {
     givenInputStreamByLatLon();
+    givenPojo();
+
     whenGenerateModel();
-    thenShouldHaveOneForecastDataElement();
+
+    thenShouldHaveFortyForecastDataElements();
     thenShouldHaveWeatherListCountOf(40);
     thenCityNameShouldBe("Shuzenji");
     whenGettingTheFirstWeatherElement();
@@ -86,7 +105,10 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
 
   @Test public void shouldReturnEmptyModelForError() throws IOException {
     givenInputStreamCityNotFound();
+    givenPojo();
+
     whenGenerateModel();
+
     thenModelShouldBeEmpty();
   }
 
@@ -104,7 +126,7 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
 
   private void thenShouldHaveWeatherListCountOf(int expected) {
     assertEquals(expected, mForecastData.getCount());
-    assertEquals(expected, mForecastData.getWeatherList().size());
+    assertEquals(1, mForecastData.getWeatherList().size());
   }
 
   private void thenModelShouldBeEmpty() {
@@ -143,17 +165,24 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
     assertEquals(expected, mForecastData.getCity().getName());
   }
 
-  private void thenShouldHaveOneForecastDataElement() {
-    assertEquals(1, mModel.size());
+  private void thenShouldHaveFortyForecastDataElements() {
+    assertEquals(40, mModel.size());
     mForecastData = mModel.get(0);
   }
 
   private void whenGenerateModel() throws IOException {
-    mOpenWeatherApiModelConverter.fromInputStream(mInputStream);
+    mOpenWeatherApiModelConverter.fromPojo(openWeatherForecastData);
     mModel = mOpenWeatherApiModelConverter.getModel();
   }
 
   private void givenInputStreamByCityIdMoscow() throws IOException {
     givenJson(R.raw.moscow_forecast);
   }
+
+  private void givenPojo() throws UnsupportedEncodingException {
+    Reader reader = new InputStreamReader(mInputStream,"UTF-8");
+    openWeatherForecastData = new Gson().fromJson(reader,
+        OpenWeatherForecastData.class);
+  }
+
 }

@@ -46,7 +46,7 @@ public class OpenWeatherApiRequestUrlsTest {
         "http://api.openweathermap.org/data/2.5/forecast?id=524901&APPID=someApiKey",
         createRequestParameterForCityId(524901)
     }, {
-        "http://api.openweathermap.org/data/2.5/forecast?id=524901&units=metric&APPID=someApiKey",
+        "http://api.openweathermap.org/data/2.5/forecast?units=metric&id=524901&APPID=someApiKey",
         createRequestParameterForCityIdAndMetricUnits(524901)
     },
     });

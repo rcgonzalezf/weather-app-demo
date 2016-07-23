@@ -1,5 +1,6 @@
 package org.rcgonzalezf.weather.tests;
 
+import okhttp3.OkHttpClient;
 import org.rcgonzalezf.weather.R;
 import org.rcgonzalezf.weather.WeatherLibApp;
 import org.rcgonzalezf.weather.common.ServiceConfig;
@@ -17,4 +18,7 @@ public class WeatherTestLibApp extends WeatherLibApp {
     mServiceConfig.setWeatherProvider(WeatherProvider.OpenWeather);
   }
 
+  @Override public OkHttpClient createOkHttpClient() {
+    return null;
+  }
 }

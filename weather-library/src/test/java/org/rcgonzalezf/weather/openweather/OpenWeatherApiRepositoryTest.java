@@ -10,7 +10,8 @@ import org.rcgonzalezf.weather.common.network.ApiCallback;
 import org.rcgonzalezf.weather.common.network.ApiRequest;
 import org.rcgonzalezf.weather.common.network.RequestParameters;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.rcgonzalezf.weather.tests.WeatherTestLibApp;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertTrue;
@@ -18,7 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-@RunWith(RobolectricGradleTestRunner.class) @Config(constants = BuildConfig.class, sdk = 21)
+@RunWith(RobolectricTestRunner.class) @Config(constants = BuildConfig.class, sdk = 21, application = WeatherTestLibApp.class)
 public class OpenWeatherApiRepositoryTest {
 
   private WeatherRepository<OpenWeatherApiRequestParameters> mWeatherRepository;

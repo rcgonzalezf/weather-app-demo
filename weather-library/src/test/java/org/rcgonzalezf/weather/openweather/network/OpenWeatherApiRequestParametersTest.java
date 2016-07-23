@@ -4,7 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.rcgonzalezf.weather.BuildConfig;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.rcgonzalezf.weather.tests.WeatherTestLibApp;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertEquals;
@@ -18,7 +19,7 @@ import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestP
 import static org.rcgonzalezf.weather.openweather.network.Units.IMPERIAL;
 import static org.rcgonzalezf.weather.openweather.network.Units.METRIC;
 
-@RunWith(RobolectricGradleTestRunner.class) @Config(constants = BuildConfig.class, sdk = 21)
+@RunWith(RobolectricTestRunner.class) @Config(constants = BuildConfig.class, sdk = 21, application = WeatherTestLibApp.class)
 public class OpenWeatherApiRequestParametersTest {
 
   public OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder mBuilder;

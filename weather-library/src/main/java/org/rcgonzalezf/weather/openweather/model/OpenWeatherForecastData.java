@@ -1,9 +1,9 @@
 package org.rcgonzalezf.weather.openweather.model;
 
 import com.google.gson.annotations.SerializedName;
-import org.rcgonzalezf.weather.openweather.converter.IData;
+import org.rcgonzalezf.weather.openweather.converter.Data;
 
-public class OpenWeatherForecastData implements IData {
+public class OpenWeatherForecastData implements Data {
   private String message;
 
   private String cnt;
