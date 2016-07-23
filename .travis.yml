@@ -14,21 +14,21 @@ android:
     - tools
 
     # The BuildTools version used by the project
-    - build-tools-24.0.1
+    # build-tools-24.0.1
 
     # The SDK version used to compile the project
     - android-24
 
     # Additional components
-    - extra-google-google_play_services
-    - extra-google-m2repository
+    #- extra-google-google_play_services
+    #- extra-google-m2repository
     - extra-android-m2repository
-    - addon-google_apis-google-23
+    #- addon-google_apis-google-23
     - extra-android-support
 
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
-    - sys-img-armeabi-v7a-android-23
+    # - sys-img-armeabi-v7a-android-23
     #- sys-img-x86-android-17
 
 script:
