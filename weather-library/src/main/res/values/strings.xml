@@ -1,4 +1,7 @@
 <resources>
   <string name="empty_result">Empty List</string>
   <string name="app_name">Weather Library</string>
+
+
+  <string name="open_weather_map_api_key">test</string>
 </resources>
