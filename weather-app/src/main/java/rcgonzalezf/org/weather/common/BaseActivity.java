@@ -112,18 +112,22 @@ public abstract class BaseActivity extends AppCompatActivity
   }
 
   @Override public void onConnected(Bundle bundle) {
-    mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-    if (!hasInternetConnection(this)) {
-      informNoInternet();
-    } else if (mLastLocation != null) {
-      WeatherRepository<OpenWeatherApiRequestParameters> weatherRepository =
-          ServiceConfig.getInstance().getWeatherRepository();
+    PermissionChecker permissionChecker = new PermissionChecker(Manifest.permission.ACCESS_COARSE_LOCATION, this);
+    if (permissionChecker.hasPermission()) {
+      mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+      if (!hasInternetConnection(this)) {
+        informNoInternet();
+      } else if (mLastLocation != null) {
+        WeatherRepository<OpenWeatherApiRequestParameters> weatherRepository =
+            ServiceConfig.getInstance().getWeatherRepository();
 
-      weatherRepository.findWeather(
-          new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withLatLon(
-              mLastLocation.getLatitude(), mLastLocation.getLongitude()).build(), this);
+        weatherRepository.findWeather(new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withLatLon(
+            mLastLocation.getLatitude(), mLastLocation.getLongitude()).build(), this);
+      } else {
+        Snackbar.make(mContent, getString(R.string.location_off_msg), Snackbar.LENGTH_SHORT).show();
+      }
     } else {
-      Snackbar.make(mContent, getString(R.string.location_off_msg), Snackbar.LENGTH_SHORT).show();
+      Snackbar.make(mContent, getString(R.string.permissions_location_off), Snackbar.LENGTH_SHORT).show();
     }
   }
 
