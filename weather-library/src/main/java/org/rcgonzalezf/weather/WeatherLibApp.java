@@ -4,10 +4,11 @@ import android.app.Application;
 import android.util.Log;
 import com.facebook.stetho.Stetho;
 import java.io.File;
+import okhttp3.OkHttpClient;
 import org.rcgonzalezf.weather.common.ServiceConfig;
 import org.rcgonzalezf.weather.common.WeatherProvider;
 
-public class WeatherLibApp extends Application {
+public abstract class WeatherLibApp extends Application {
 
   private static final String TAG = WeatherLibApp.class.getSimpleName();
 
@@ -44,5 +45,5 @@ public class WeatherLibApp extends Application {
     }
   }
 
-
+  public abstract OkHttpClient createOkHttpClient();
 }
