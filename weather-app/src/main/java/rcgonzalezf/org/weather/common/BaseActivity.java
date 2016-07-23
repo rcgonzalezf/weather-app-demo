@@ -111,11 +111,14 @@ public abstract class BaseActivity extends AppCompatActivity
 
   @Override public void onConnected(Bundle bundle) {
     PermissionChecker permissionChecker =
-        new PermissionChecker(Manifest.permission.ACCESS_COARSE_LOCATION, this);
+        new PermissionChecker(Manifest.permission.ACCESS_COARSE_LOCATION, this,
+            PermissionChecker.LOCATION, mContent, R.string.permissions_location_granted,
+            R.string.permissions_location_not_granted, R.string.permissions_location_rationale);
+
     if (permissionChecker.hasPermission()) {
       useLastKnownLocation();
     } else {
-      permissionChecker.requestLocationPermission(mContent);
+      permissionChecker.requestLocationPermission();
     }
   }
 

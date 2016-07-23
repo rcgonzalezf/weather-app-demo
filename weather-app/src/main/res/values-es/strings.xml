@@ -6,7 +6,7 @@
 
   <string name="home">Inicio</string>
   <string name="location_off_msg">Los servicios de ubicación están desactivados.</string>
-  <string name="permissions_location_off">Esta app no tiene permisos para los servicios de ubicación, favor de escribir la ubicación deseada.</string>
+  <string name="permissions_location_not_granted">Esta app no tiene permisos para los servicios de ubicación, favor de escribir la ubicación deseada.</string>
   
   <string name="no_internet_msg">Favor de revisar su conexión a Internet.</string>
   <string name="today">Hoy</string>
@@ -22,5 +22,8 @@
   <string name="pref_title_display_name">Nombre de Usuario:</string>
   <string name="title_activity_settings">Configuración</string>
   <string name="invalid_input">Datos Inválidos</string>
+  <string name="ok">ok</string>
+  <string name="permissions_location_granted">Permisos de ubicación obtenidos, obteniendo ubicación.</string>
+  <string name="permissions_location_rationale">El permiso de ubicación es necesario para obtener el clima de la ubicación actual.</string>
 
 </resources>
