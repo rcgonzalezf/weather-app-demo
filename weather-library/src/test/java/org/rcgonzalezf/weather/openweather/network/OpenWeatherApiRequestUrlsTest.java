@@ -13,7 +13,7 @@ import org.robolectric.annotation.Config;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(ParameterizedRobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 21, application = WeatherTestLibApp.class)
+@Config(constants = BuildConfig.class, sdk = 23, application = WeatherTestLibApp.class)
 public class OpenWeatherApiRequestUrlsTest {
 
   private final String mExpectedUrl;
