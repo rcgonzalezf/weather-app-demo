@@ -1,15 +1,20 @@
 apply plugin: 'com.android.application'
 
 android {
-  compileSdkVersion 23
-  buildToolsVersion "23.0.3"
+  compileSdkVersion 24
+  buildToolsVersion "24.0.1"
 
   defaultConfig {
     applicationId "rcgonzalezf.org.weather"
     minSdkVersion 14
-    targetSdkVersion 23
-    versionCode 2
-    versionName "0.1.1"
+    targetSdkVersion 24
+    versionCode 3
+    versionName "0.1.2"
+
+    testApplicationId "org.rcgonzalezf.weather.test"
+    testHandleProfiling true
+    testFunctionalTest true
+    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
     release {
@@ -17,22 +22,31 @@ android {
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
   }
+
+  lintOptions {
+    abortOnError false
+    lintConfig file("lint.xml")
+  }
 }
 
 dependencies {
   compile project(':weather-library')
   compile fileTree(dir: 'libs', include: ['*.jar'])
 
-
+  compile 'com.android.support:appcompat-v7:24.1.1'
+  compile 'com.android.support:support-v4:24.1.1'
+  compile 'com.android.support:recyclerview-v7:24.1.1'
+  compile 'com.android.support:cardview-v7:24.1.1'
+  compile 'com.android.support:design:24.1.1'
+  compile 'com.android.support:palette-v7:24.1.1'
+  compile 'com.google.android.gms:play-services-location:9.2.1'
 
   testCompile 'junit:junit:4.12'
-  testCompile 'com.squareup.okhttp3:mockwebserver:3.2.0'
-  
-  compile 'com.android.support:appcompat-v7:23.3.0'
-  compile 'com.android.support:support-v4:23.3.0'
-  compile 'com.android.support:recyclerview-v7:23.3.0'
-  compile 'com.android.support:cardview-v7:23.3.0'
-  compile 'com.android.support:design:23.3.0'
-  compile 'com.android.support:palette-v7:23.3.0'
-  compile 'com.google.android.gms:play-services-location:8.4.0'
+  testCompile 'com.squareup.okhttp3:mockwebserver:3.4.1'
+
+  androidTestCompile 'junit:junit:4.12'
+  androidTestCompile 'com.android.support:support-annotations:24.1.1'
+  androidTestCompile 'com.android.support.test:runner:0.5'
+  androidTestCompile 'com.android.support.test:rules:0.5'
+
 }
