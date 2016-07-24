@@ -40,7 +40,8 @@ android:
     #- sys-img-x86-android-17
 
 script:
-  - ./gradlew clean build test
+  - ./gradlew build jacocoTestReport assembleAndroidTest
+  - ./gradlew test
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
