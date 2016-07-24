@@ -21,11 +21,11 @@ public class OpenWeatherApiRequestParameters implements RequestParameters {
     throw new UnsupportedOperationException("This service doesn't provides this method");
   }
 
-  public String getmQueryString() {
+  private String getmQueryString() {
     return mQueryString;
   }
 
-  public void setmQueryString(String mQueryString) {
+  private void setmQueryString(String mQueryString) {
     this.mQueryString = mQueryString;
   }
 
@@ -45,11 +45,11 @@ public class OpenWeatherApiRequestParameters implements RequestParameters {
     this.lon = lon;
   }
 
-  public String getCityName() {
+  String getCityName() {
     return cityName;
   }
 
-  public void setCityName(String cityName) {
+  private void setCityName(String cityName) {
     this.cityName = cityName;
   }
 
@@ -57,7 +57,7 @@ public class OpenWeatherApiRequestParameters implements RequestParameters {
     return cityId;
   }
 
-  public void setCityId(Integer cityId) {
+  private void setCityId(Integer cityId) {
     this.cityId = cityId;
   }
 
@@ -73,18 +73,18 @@ public class OpenWeatherApiRequestParameters implements RequestParameters {
 
     public static final String LON = "lon";
     public static final String LAT = "lat";
-    public static final String CITY_ID = "id";
-    public static final String CITY_NAME = "q";
+    static final String CITY_ID = "id";
+    static final String CITY_NAME = "q";
     public static final String TYPE = "type";
-    public static final String LIKE = "like";
-    public static final String UNITS = "units";
+    static final String LIKE = "like";
+    static final String UNITS = "units";
     private final OpenWeatherApiRequestParameters mOpenWeatherApiRequestParameters;
 
     private Map<String, String> mQueryParametersMap;
 
     public OpenWeatherApiRequestBuilder() {
       mQueryParametersMap = new HashMap<>();
-          mOpenWeatherApiRequestParameters = new OpenWeatherApiRequestParameters();
+      mOpenWeatherApiRequestParameters = new OpenWeatherApiRequestParameters();
     }
 
     public OpenWeatherApiRequestBuilder withCityId(Integer cityId) {
@@ -138,7 +138,7 @@ public class OpenWeatherApiRequestParameters implements RequestParameters {
       return this;
     }
 
-    public OpenWeatherApiRequestBuilder withUnits(Units units) {
+    OpenWeatherApiRequestBuilder withUnits(Units units) {
       mQueryParametersMap.put(UNITS, units.getUnitName());
       mOpenWeatherApiRequestParameters.setUnits(units);
       return this;

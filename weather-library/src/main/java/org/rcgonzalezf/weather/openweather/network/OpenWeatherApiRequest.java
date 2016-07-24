@@ -1,5 +1,6 @@
 package org.rcgonzalezf.weather.openweather.network;
 
+import android.support.annotation.VisibleForTesting;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
@@ -7,7 +8,6 @@ import org.rcgonzalezf.weather.common.network.ApiCallback;
 import org.rcgonzalezf.weather.common.network.ApiRequest;
 import org.rcgonzalezf.weather.openweather.converter.OpenWeatherApiModelConverter;
 import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;
-import org.rcgonzalezf.weather.openweather.models.OpenWeatherApiRawData;
 
 public class OpenWeatherApiRequest implements ApiRequest<OpenWeatherApiRequestParameters> {
 
@@ -15,16 +15,16 @@ public class OpenWeatherApiRequest implements ApiRequest<OpenWeatherApiRequestPa
   private static final String FORECAST = "forecast";
   private static final String URL_FORMAT = "%1$s%2$s?%3$s&APPID=%4$s";
   private final String mApiKey;
-  private final ModelConverter<Void, OpenWeatherApiRawData, OpenWeatherForecastData> mModelConverter;
+  private final ModelConverter<Void, OpenWeatherForecastData> mModelConverter;
   private OpenWeatherApiRequestParameters mRequestParameters;
-  private OpenWeatherExecutor mOpenWeatherExecutor;
 
   public OpenWeatherApiRequest(String apiKey) {
     this(apiKey, new OpenWeatherApiModelConverter());
   }
 
-  public OpenWeatherApiRequest(String apiKey,
-      ModelConverter<Void, OpenWeatherApiRawData, OpenWeatherForecastData> modelConverter) {
+  @VisibleForTesting
+  OpenWeatherApiRequest(String apiKey,
+      ModelConverter<Void, OpenWeatherForecastData> modelConverter) {
     mApiKey = apiKey;
     mModelConverter = modelConverter;
   }
@@ -38,7 +38,8 @@ public class OpenWeatherApiRequest implements ApiRequest<OpenWeatherApiRequestPa
   }
 
   @Override public void execute(ApiCallback apiCallback) {
-    mOpenWeatherExecutor = new OpenWeatherExecutor(apiCallback, getExecutor(), mApiKey);
+    OpenWeatherExecutor mOpenWeatherExecutor =
+        new OpenWeatherExecutor(apiCallback, getExecutor(), mApiKey);
     mOpenWeatherExecutor.setModelConverter(mModelConverter);
     mOpenWeatherExecutor.performRetrofitCall(mRequestParameters);
   }
@@ -47,12 +48,14 @@ public class OpenWeatherApiRequest implements ApiRequest<OpenWeatherApiRequestPa
     mRequestParameters = requestParameters;
   }
 
-  protected String url() {
+  @VisibleForTesting
+  String url() {
     return String.format(URL_FORMAT, getBaseUrl(), getMethodName(),
         mRequestParameters.getQueryString(), mApiKey);
   }
 
-  protected Executor getExecutor() {
+  @VisibleForTesting
+  Executor getExecutor() {
     return Executors.newSingleThreadExecutor();
   }
 }

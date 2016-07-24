@@ -1,9 +1,7 @@
 package org.rcgonzalezf.weather.openweather.converter;
 
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,24 +12,15 @@ import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;
 import org.rcgonzalezf.weather.openweather.model.Weather;
 import org.rcgonzalezf.weather.openweather.model.WeatherList;
-import org.rcgonzalezf.weather.openweather.models.OpenWeatherApiRawData;
 
 public class OpenWeatherApiModelConverter
-    implements ModelConverter<Void, OpenWeatherApiRawData, OpenWeatherForecastData> {
+    implements ModelConverter<Void, OpenWeatherForecastData> {
 
   private OpenWeatherForecastData mOpenWeatherForecastData;
 
   @Override public Void fromPojo(OpenWeatherForecastData pojo) {
     mOpenWeatherForecastData = pojo;
     return null;
-  }
-
-  @Override public Void fromInputStream(@NonNull InputStream inputStream) {
-    throw new UnsupportedOperationException("not supported");
-  }
-
-  @Override public @Nullable List<OpenWeatherApiRawData> generateRawModel() throws IOException {
-    throw new UnsupportedOperationException("not supported");
   }
 
   @Override public List<ForecastData> getModel() throws IOException {
