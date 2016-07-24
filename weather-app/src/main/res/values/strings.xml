@@ -30,5 +30,6 @@
   <string name="ok">ok</string>
   <string name="permissions_location_granted">Location permission has been granted, retrieving location.</string>
   <string name="permissions_location_rationale">Location permission is needed to retrieve the weather of the current location.</string>
+  <string name="profile_image">Avatar</string>
 
 </resources>

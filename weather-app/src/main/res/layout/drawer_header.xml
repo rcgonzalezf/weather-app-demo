@@ -30,6 +30,7 @@
       android:layout_width="64dp"
       android:layout_height="64dp"
       android:layout_margin="@dimen/spacing_large"
+      android:contentDescription="@string/profile_image"
       android:elevation="4dp"
       android:src="@drawable/img_placeholder"
       tools:src="@drawable/ic_launcher"
@@ -43,7 +44,7 @@
       android:layout_marginLeft="@dimen/spacing_large"
       android:layout_marginStart="@dimen/spacing_large"
       android:layout_marginBottom="@dimen/spacing_large"
-      android:text="Username"
+      tools:text="Username"
       android:textAppearance="@style/TextAppearance.AppCompat.Body1"
       />
 
