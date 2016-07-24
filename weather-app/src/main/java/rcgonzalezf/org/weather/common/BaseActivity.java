@@ -31,7 +31,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.RoundingMode;
 import java.net.URLEncoder;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import org.rcgonzalezf.weather.common.ServiceConfig;
@@ -116,26 +118,9 @@ public abstract class BaseActivity extends AppCompatActivity
             R.string.permissions_location_not_granted, R.string.permissions_location_rationale);
 
     if (permissionChecker.hasPermission()) {
-      useLastKnownLocation();
+      tryToUseLastKnownLocation();
     } else {
       permissionChecker.requestLocationPermission();
-    }
-  }
-
-  // We are handling the potential missing permission
-  @SuppressWarnings("MissingPermission") void useLastKnownLocation() {
-    mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-    if (!hasInternetConnection(this)) {
-      informNoInternet();
-    } else if (mLastLocation != null) {
-      WeatherRepository<OpenWeatherApiRequestParameters> weatherRepository =
-          ServiceConfig.getInstance().getWeatherRepository();
-
-      weatherRepository.findWeather(
-          new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withLatLon(
-              mLastLocation.getLatitude(), mLastLocation.getLongitude()).build(), this);
-    } else {
-      Snackbar.make(mContent, getString(R.string.location_off_msg), Snackbar.LENGTH_SHORT).show();
     }
   }
 
@@ -268,5 +253,32 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     return storedData;
+  }
+
+  // We are handling the potential missing permission
+  @SuppressWarnings("MissingPermission") void tryToUseLastKnownLocation() {
+    mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+    if (!hasInternetConnection(this)) {
+      informNoInternet();
+    } else if (mLastLocation != null) {
+      WeatherRepository<OpenWeatherApiRequestParameters> weatherRepository =
+          ServiceConfig.getInstance().getWeatherRepository();
+
+      double lat = mLastLocation.getLatitude();
+      double lon = mLastLocation.getLongitude();
+
+      weatherRepository.findWeather(
+          new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withLatLon(lat, lon)
+              .build(), this);
+    } else {
+      Snackbar.make(mContent, getString(R.string.location_off_msg), Snackbar.LENGTH_SHORT).show();
+    }
+  }
+
+  private double truncateCoordinates(double coordinate) {
+    DecimalFormat decimalFormatter = new DecimalFormat("#.###");
+    decimalFormatter.setRoundingMode(RoundingMode.DOWN);
+    coordinate = Double.parseDouble(decimalFormatter.format(coordinate));
+    return coordinate;
   }
 }
