@@ -7,5 +7,4 @@ public interface RequestParameters<T> {
   String getQueryString();
 
   Map<String, String> getKeyValueParameters();
-
 }
