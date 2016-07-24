@@ -13,14 +13,13 @@ import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
 import org.rcgonzalezf.weather.openweather.api.ForecastService;
 import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;
-import org.rcgonzalezf.weather.openweather.models.OpenWeatherApiRawData;
 import retrofit2.Call;
 import retrofit2.GsonConverterFactory;
 import retrofit2.Retrofit;
 
 import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder.LIKE;
 
-public class OpenWeatherExecutor {
+class OpenWeatherExecutor {
 
   private final Executor mExecutor;
   private String mApiKey;
@@ -28,13 +27,13 @@ public class OpenWeatherExecutor {
   private static final String TAG = OpenWeatherExecutor.class.getSimpleName();
   private ModelConverter mConverter;
 
-  public OpenWeatherExecutor(ApiCallback apiCallback, Executor executor, String apiKey) {
+  OpenWeatherExecutor(ApiCallback apiCallback, Executor executor, String apiKey) {
     mApiCallback = apiCallback;
     mExecutor = executor;
     mApiKey = apiKey;
   }
 
-  public void performRetrofitCall(final OpenWeatherApiRequestParameters mRequestParameters) {
+  void performRetrofitCall(final OpenWeatherApiRequestParameters mRequestParameters) {
 
     mExecutor.execute(new Runnable() {
       @Override public void run() {
@@ -48,7 +47,7 @@ public class OpenWeatherExecutor {
                 .build()
                 .create(ForecastService.class);
 
-        Call<OpenWeatherForecastData> forecastCall = null;
+        Call<OpenWeatherForecastData> forecastCall;
         if (mRequestParameters.getCityName() != null) {
           forecastCall = service.findByQuery(mRequestParameters.getCityName(), LIKE, mApiKey);
         } else {
@@ -90,8 +89,8 @@ public class OpenWeatherExecutor {
     }
   }
 
-  public void setModelConverter(
-      ModelConverter<Void, OpenWeatherApiRawData, OpenWeatherForecastData> converter) {
+  void setModelConverter(
+      ModelConverter<Void, OpenWeatherForecastData> converter) {
     mConverter = converter;
   }
 }
