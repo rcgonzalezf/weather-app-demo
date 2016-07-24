@@ -31,9 +31,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.UnsupportedEncodingException;
-import java.math.RoundingMode;
 import java.net.URLEncoder;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import org.rcgonzalezf.weather.common.ServiceConfig;
@@ -273,12 +271,5 @@ public abstract class BaseActivity extends AppCompatActivity
     } else {
       Snackbar.make(mContent, getString(R.string.location_off_msg), Snackbar.LENGTH_SHORT).show();
     }
-  }
-
-  private double truncateCoordinates(double coordinate) {
-    DecimalFormat decimalFormatter = new DecimalFormat("#.###");
-    decimalFormatter.setRoundingMode(RoundingMode.DOWN);
-    coordinate = Double.parseDouble(decimalFormatter.format(coordinate));
-    return coordinate;
   }
 }
