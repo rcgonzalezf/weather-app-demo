@@ -12,7 +12,7 @@ cache:
 
 before_install:
   - chmod +x gradlew
-  - android list target
+  # - android list target
 
 android:
   components:
@@ -37,7 +37,7 @@ android:
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
     # - sys-img-armeabi-v7a-android-23
-    #- sys-img-x86-android-17
+    # - sys-img-x86-android-17
 
 script:
   - ./gradlew build jacocoTestReport assembleAndroidTest
