@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'jacoco-android'
 
 android {
   compileSdkVersion 24
@@ -56,4 +57,10 @@ dependencies {
   androidTestCompile 'com.android.support.test:runner:0.5'
   androidTestCompile 'com.android.support.test:rules:0.5'
 
+}
+
+jacocoAndroidUnitTestReport {
+  csv.enabled false
+  html.enabled true
+  xml.enabled true
 }
