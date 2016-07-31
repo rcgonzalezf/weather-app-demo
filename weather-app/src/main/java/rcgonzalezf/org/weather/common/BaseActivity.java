@@ -120,7 +120,7 @@ public abstract class BaseActivity extends AppCompatActivity
     if (permissionChecker.hasPermission()) {
       tryToUseLastKnownLocation();
     } else {
-      permissionChecker.requestLocationPermission(new PermissionResult() {
+      permissionChecker.requestLocationPermission(new PermissionResultListener() {
 
         @Override public void onSuccess() {
           tryToUseLastKnownLocation();

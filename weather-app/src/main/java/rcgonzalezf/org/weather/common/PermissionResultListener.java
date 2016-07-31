@@ -1,6 +1,6 @@
 package rcgonzalezf.org.weather.common;
 
-public interface PermissionResult {
+public interface PermissionResultListener {
 
   void onSuccess();
   void onFailure();
