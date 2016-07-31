@@ -27,6 +27,10 @@ android {
     abortOnError false
     lintConfig file("lint.xml")
   }
+
+  testOptions {
+    unitTests.returnDefaultValues = true
+  }
 }
 
 dependencies {
@@ -43,6 +47,9 @@ dependencies {
 
   testCompile 'junit:junit:4.12'
   testCompile 'com.squareup.okhttp3:mockwebserver:3.4.1'
+  testCompile 'org.mockito:mockito-core:1.10.19'
+  testCompile 'org.robolectric:robolectric:3.1.1'
+  testCompile 'org.jmockit:jmockit:1.25'
 
   androidTestCompile 'junit:junit:4.12'
   androidTestCompile 'com.android.support:support-annotations:24.1.1'
