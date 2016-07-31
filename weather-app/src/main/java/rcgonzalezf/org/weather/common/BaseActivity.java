@@ -5,10 +5,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -47,7 +50,7 @@ import static rcgonzalezf.org.weather.utils.ForecastUtils.hasInternetConnection;
 
 public abstract class BaseActivity extends AppCompatActivity
     implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-    ApiCallback, OnOfflineLoader {
+    ApiCallback, OnOfflineLoader, ActivityCompat.OnRequestPermissionsResultCallback {
 
   protected static final String OFFLINE_FILE = "OFFLINE_WEATHER";
   public static final String FORECASTS = "FORECASTS";
@@ -57,6 +60,7 @@ public abstract class BaseActivity extends AppCompatActivity
   private GoogleApiClient mGoogleApiClient;
   private DrawerLayout mDrawerLayout;
   private View mContent;
+  private PermissionChecker permissionChecker;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -110,15 +114,22 @@ public abstract class BaseActivity extends AppCompatActivity
   }
 
   @Override public void onConnected(Bundle bundle) {
-    PermissionChecker permissionChecker =
-        new PermissionChecker(Manifest.permission.ACCESS_COARSE_LOCATION, this,
-            PermissionChecker.LOCATION, mContent, R.string.permissions_location_granted,
-            R.string.permissions_location_not_granted, R.string.permissions_location_rationale);
+    permissionChecker = new PermissionChecker(Manifest.permission.ACCESS_COARSE_LOCATION, this,
+        PermissionChecker.LOCATION, mContent, R.string.permissions_location_granted,
+        R.string.permissions_location_not_granted, R.string.permissions_location_rationale);
 
     if (permissionChecker.hasPermission()) {
       tryToUseLastKnownLocation();
     } else {
-      permissionChecker.requestLocationPermission();
+      permissionChecker.requestPermission(new PermissionResultListener() {
+
+        @Override public void onSuccess() {
+          tryToUseLastKnownLocation();
+        }
+
+        @Override public void onFailure() {
+        }
+      });
     }
   }
 
@@ -270,6 +281,14 @@ public abstract class BaseActivity extends AppCompatActivity
               .build(), this);
     } else {
       Snackbar.make(mContent, getString(R.string.location_off_msg), Snackbar.LENGTH_SHORT).show();
+    }
+  }
+
+  @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+      @NonNull int[] grantResults) {
+    if (permissionChecker != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      //noinspection NewApi
+      permissionChecker.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
   }
 }
