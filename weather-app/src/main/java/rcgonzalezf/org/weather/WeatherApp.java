@@ -1,5 +1,6 @@
 package rcgonzalezf.org.weather;
 
+import com.facebook.stetho.Stetho;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import okhttp3.OkHttpClient;
 import org.rcgonzalezf.weather.WeatherLibApp;
@@ -8,6 +9,11 @@ public class WeatherApp extends WeatherLibApp {
 
   @Override public void onCreate() {
     super.onCreate();
+
+    if (org.rcgonzalezf.weather.BuildConfig.DEBUG) {
+      Stetho.initializeWithDefaults(this);
+    }
+
     setAppInstance(this);
   }
 
