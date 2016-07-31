@@ -10,7 +10,7 @@ import android.view.View;
 import java.lang.ref.WeakReference;
 import rcgonzalezf.org.weather.R;
 
-public class PermissionChecker implements ActivityCompat.OnRequestPermissionsResultCallback{
+public class PermissionChecker implements ActivityCompat.OnRequestPermissionsResultCallback {
 
   public static final int LOCATION = 10;
 
@@ -21,6 +21,7 @@ public class PermissionChecker implements ActivityCompat.OnRequestPermissionsRes
   private int permissionGrantedMessageId;
   private int permissionsNotGrantedMessageId;
   private int permissionRationaleMessageId;
+  private PermissionResult permissionResult;
 
   public PermissionChecker(String permission, Activity activity, int requestCode, View container,
       int permissionGrantedMessageId, int permissionsNotGrantedMessageId,
@@ -39,7 +40,8 @@ public class PermissionChecker implements ActivityCompat.OnRequestPermissionsRes
         == PackageManager.PERMISSION_GRANTED;
   }
 
-  public void requestLocationPermission() {
+  public void requestLocationPermission(PermissionResult permissionResult) {
+    this.permissionResult = permissionResult;
 
     if (ActivityCompat.shouldShowRequestPermissionRationale(weakContext.get(),
         permission)) {
@@ -63,20 +65,21 @@ public class PermissionChecker implements ActivityCompat.OnRequestPermissionsRes
 
   @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
       @NonNull int[] grantResults) {
+
     if (this.requestCode == requestCode) {
 
       if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         Snackbar.make(container.get(), permissionGrantedMessageId,
             Snackbar.LENGTH_SHORT).show();
+        if (permissionResult != null) permissionResult.onSuccess();
       } else {
         Snackbar.make(container.get(), permissionsNotGrantedMessageId,
             Snackbar.LENGTH_SHORT).show();
-
+        if (permissionResult != null) permissionResult.onFailure();
       }
     } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         weakContext.get().onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
-
-
   }
+
 }
