@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -120,7 +121,7 @@ public abstract class BaseActivity extends AppCompatActivity
     if (permissionChecker.hasPermission()) {
       tryToUseLastKnownLocation();
     } else {
-      permissionChecker.requestLocationPermission(new PermissionResultListener() {
+      permissionChecker.requestPermission(new PermissionResultListener() {
 
         @Override public void onSuccess() {
           tryToUseLastKnownLocation();
@@ -285,7 +286,8 @@ public abstract class BaseActivity extends AppCompatActivity
 
   @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
       @NonNull int[] grantResults) {
-    if (permissionChecker != null) {
+    if (permissionChecker != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      //noinspection NewApi
       permissionChecker.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
   }

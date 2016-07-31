@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.annotation.StringRes;
+import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.view.View;
@@ -22,7 +24,8 @@ public class PermissionChecker implements ActivityCompat.OnRequestPermissionsRes
   private int permissionGrantedMessageId;
   private int permissionsNotGrantedMessageId;
   private int permissionRationaleMessageId;
-  private PermissionResultListener permissionResultListener;
+  @VisibleForTesting
+  PermissionResultListener permissionResultListener;
 
   public PermissionChecker(@NonNull String permission,
       @NonNull Activity activity,
@@ -45,7 +48,7 @@ public class PermissionChecker implements ActivityCompat.OnRequestPermissionsRes
         == PackageManager.PERMISSION_GRANTED;
   }
 
-  public void requestLocationPermission(PermissionResultListener permissionResultListener) {
+  public void requestPermission(PermissionResultListener permissionResultListener) {
     this.permissionResultListener = permissionResultListener;
 
     if (ActivityCompat.shouldShowRequestPermissionRationale(weakContext.get(), permission)) {
@@ -64,6 +67,7 @@ public class PermissionChecker implements ActivityCompat.OnRequestPermissionsRes
     }
   }
 
+  @RequiresApi(api = Build.VERSION_CODES.M)
   @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
       @NonNull int[] grantResults) {
 
@@ -77,7 +81,7 @@ public class PermissionChecker implements ActivityCompat.OnRequestPermissionsRes
             .show();
         if (permissionResultListener != null) permissionResultListener.onFailure();
       }
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+    } else {
       weakContext.get().onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
   }
