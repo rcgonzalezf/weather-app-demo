@@ -62,13 +62,12 @@ public class WeatherActivity extends BaseActivity implements ModelAdapter.OnItem
   }
 
   private void saveForecastList(final List<Forecast> forecastList) {
-    final List<Forecast> forecasts = forecastList;
     new Thread(new Runnable() {
       @Override public void run() {
         ByteArrayOutputStream serializedData = new ByteArrayOutputStream();
         try {
           ObjectOutputStream serializer = new ObjectOutputStream(serializedData);
-          serializer.writeObject(forecasts);
+          serializer.writeObject(forecastList);
         } catch (IOException e) {
           e.printStackTrace();
         }
