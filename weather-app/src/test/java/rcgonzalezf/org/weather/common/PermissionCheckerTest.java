@@ -33,6 +33,7 @@ import static org.mockito.Mockito.mock;
   private int mTestRequestCode;
   private boolean mHasPermission;
   private boolean mOnSuccessCalled;
+  private PermissionResultListener mPermissionListener;
 
   @Before public void setup() {
     Activity activityMock = mock(Activity.class);
@@ -73,6 +74,7 @@ import static org.mockito.Mockito.mock;
 
   @Test public void shouldCallPermissionOnSuccess() {
     givenPermissionResultListener();
+    givenPermissionRequested(mPermissionListener);
 
     whenOnPermissionRequestResultGranted(true);
 
@@ -81,6 +83,7 @@ import static org.mockito.Mockito.mock;
 
   @Test public void shouldCallPermissionOnFailure() {
     givenPermissionResultListener();
+    givenPermissionRequested(mPermissionListener);
 
     whenOnPermissionRequestResultGranted(false);
 
@@ -89,6 +92,7 @@ import static org.mockito.Mockito.mock;
 
   @Test public void shouldNotBreakTheOnRequestPermissionsResultChain() {
     givenPermissionResultListener();
+    givenPermissionRequested(mPermissionListener);
 
     whenOnPermissionRequestResultForUnknownResultCode();
 
@@ -114,15 +118,20 @@ import static org.mockito.Mockito.mock;
   }
 
   private void givenPermissionResultListener() {
-    uut.permissionResultListener = new PermissionResultListener() {
-      @Override public void onSuccess() {
+    //noinspection unused
+    mPermissionListener = new MockUp<PermissionResultListener>() {
+
+      @Mock public void onSuccess() {
         mOnSuccessCalled = true;
       }
 
-      @Override public void onFailure() {
-
+      @Mock public void onFailure() {
       }
-    };
+    }.getMockInstance();
+  }
+
+  private void givenPermissionRequested(PermissionResultListener mPermissionListener) {
+    uut.requestPermission(mPermissionListener);
   }
 
   private void thenShouldShowSnackbarWithPermissionRationaleMessage(final boolean expected) {
