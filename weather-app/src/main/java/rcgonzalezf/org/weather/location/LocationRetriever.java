@@ -2,6 +2,7 @@ package rcgonzalezf.org.weather.location;
 
 import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -17,51 +18,31 @@ public class LocationRetriever
   private static final String TAG = LocationRetriever.class.getSimpleName();
 
   private GoogleApiClient mGoogleApiClient;
-  protected Location mLastLocation;
-  private WeakReference<BaseActivity> mBaseActivity;
-  private WeakReference<LocationRetrieverListener> mLocationRetrieverListener;
+  private WeakReference<BaseActivity> mWeakBaseActivity;
+  private WeakReference<LocationRetrieverListener> mWeakLocationRetrieverListener;
 
   public LocationRetriever(BaseActivity baseActivity,
       LocationRetrieverListener locationRetrieverListener) {
-    this.mBaseActivity = new WeakReference<>(baseActivity);
-    this.mLocationRetrieverListener = new WeakReference<>(locationRetrieverListener);
+    this.mWeakBaseActivity = new WeakReference<>(baseActivity);
+    this.mWeakLocationRetrieverListener = new WeakReference<>(locationRetrieverListener);
 
     buildGoogleApiClient();
   }
 
   @Override public void onConnected(Bundle bundle) {
-    mLocationRetrieverListener.get().checkForPermissions();
+    final LocationRetrieverListener locationRetrieverListener =
+        mWeakLocationRetrieverListener.get();
+    if (locationRetrieverListener != null) {
+      locationRetrieverListener.checkForPermissions();
+    }
   }
 
   @Override public void onConnectionSuspended(int i) {
     Log.d(TAG, "Google Location onConnectionSuspended " + i);
   }
 
-  @Override public void onConnectionFailed(ConnectionResult connectionResult) {
+  @Override public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
     Log.d(TAG, "Google Location onConnectionFailed " + connectionResult.getErrorMessage());
-  }
-
-  protected synchronized void buildGoogleApiClient() {
-    mGoogleApiClient = new GoogleApiClient.Builder(mBaseActivity.get()).addConnectionCallbacks(this)
-        .addOnConnectionFailedListener(this)
-        .addApi(LocationServices.API)
-        .build();
-  }
-
-  // We are handling the potential missing permission
-  @SuppressWarnings("MissingPermission") void tryToUseLastKnownLocation() {
-    mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-    if (!hasInternetConnection(mBaseActivity.get())) {
-      mBaseActivity.get().informNoInternet();
-    } else if (mLastLocation != null) {
-
-      double lat = mLastLocation.getLatitude();
-      double lon = mLastLocation.getLongitude();
-
-      mLocationRetrieverListener.get().onLocationFound(lat, lon);
-    } else {
-      mLocationRetrieverListener.get().onEmptyLocation();
-    }
   }
 
   public void connect() {
@@ -74,5 +55,42 @@ public class LocationRetriever
 
   public void onLocationPermissionsGranted() {
     tryToUseLastKnownLocation();
+  }
+
+  private synchronized void buildGoogleApiClient() {
+    final BaseActivity baseActivity = mWeakBaseActivity.get();
+    if (baseActivity != null) {
+      mGoogleApiClient = new GoogleApiClient.Builder(baseActivity).addConnectionCallbacks(this)
+          .addOnConnectionFailedListener(this)
+          .addApi(LocationServices.API)
+          .build();
+    }
+  }
+
+  private void tryToUseLastKnownLocation() {
+    final BaseActivity baseActivity = mWeakBaseActivity.get();
+    final LocationRetrieverListener locationRetrieverListener =
+        mWeakLocationRetrieverListener.get();
+
+    if (baseActivity != null && !hasInternetConnection(baseActivity)) {
+      baseActivity.informNoInternet();
+    } else if (locationRetrieverListener != null) {
+      useLastLocation(locationRetrieverListener);
+    }
+  }
+
+  // We are handling the potential missing permission
+  @SuppressWarnings("MissingPermission") private void useLastLocation(
+      LocationRetrieverListener locationRetrieverListener) {
+    final Location mLastLocation =
+        LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+    if (mLastLocation != null) {
+      double lat = mLastLocation.getLatitude();
+      double lon = mLastLocation.getLongitude();
+
+      locationRetrieverListener.onLocationFound(lat, lon);
+    } else {
+      locationRetrieverListener.onEmptyLocation();
+    }
   }
 }

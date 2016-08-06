@@ -63,7 +63,7 @@ public abstract class BaseActivity extends AppCompatActivity
     super.onCreate(savedInstanceState);
     setContentView(R.layout.weather);
     mLocationRetrieverListener = new LocationListener();
-    mLocationRetriever =  new LocationRetriever(this, mLocationRetrieverListener);
+    mLocationRetriever = new LocationRetriever(this, mLocationRetrieverListener);
 
     initToolbar();
     setupDrawerLayout();
@@ -239,9 +239,10 @@ public abstract class BaseActivity extends AppCompatActivity
 
     @Override public void checkForPermissions() {
 
-      permissionChecker = new PermissionChecker(Manifest.permission.ACCESS_FINE_LOCATION, BaseActivity.this,
-          PermissionChecker.LOCATION, mContent, R.string.permissions_location_granted,
-          R.string.permissions_location_not_granted, R.string.permissions_location_rationale);
+      permissionChecker =
+          new PermissionChecker(Manifest.permission.ACCESS_FINE_LOCATION, BaseActivity.this,
+              PermissionChecker.LOCATION, mContent, R.string.permissions_location_granted,
+              R.string.permissions_location_not_granted, R.string.permissions_location_rationale);
 
       if (permissionChecker.hasPermission()) {
         mLocationRetriever.onLocationPermissionsGranted();
@@ -272,5 +273,4 @@ public abstract class BaseActivity extends AppCompatActivity
               .build(), BaseActivity.this);
     }
   }
-
 }
