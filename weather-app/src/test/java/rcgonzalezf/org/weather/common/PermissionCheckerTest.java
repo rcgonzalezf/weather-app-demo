@@ -12,6 +12,7 @@ import android.view.View;
 import mockit.Mock;
 import mockit.MockUp;
 import mockit.Mocked;
+import mockit.Tested;
 import mockit.Verifications;
 import mockit.integration.junit4.JMockit;
 import org.junit.Before;
@@ -25,26 +26,24 @@ import static org.mockito.Mockito.mock;
 
 @RunWith(JMockit.class) public class PermissionCheckerTest {
 
-  private Activity activityMock;
-  private int testRequestCode;
-  private View containerMock;
+  @Tested private PermissionChecker uut;
 
-  @Mocked private Snackbar snackbar;
-  private int someGrantedMessageId = R.string.permissions_location_granted;
-  private int someNotGrantedMessageId = R.string.permissions_location_not_granted;
-  private int somePermissionRationaleMessageId = R.string.permissions_location_rationale;
-  private PermissionChecker uut;
-  private String somePermission;
-  private boolean hasPermission;
-  private boolean onSuccessCalled;
+  @SuppressWarnings("unused") @Mocked private Snackbar mSnackbar;
+
+  private int mTestRequestCode;
+  private boolean mHasPermission;
+  private boolean mOnSuccessCalled;
 
   @Before public void setup() {
-    activityMock = mock(Activity.class);
-    containerMock = mock(View.class);
+    Activity activityMock = mock(Activity.class);
+    View containerMock = mock(View.class);
 
-    testRequestCode = 1010101010;
-    somePermission = Manifest.permission.ACCESS_COARSE_LOCATION;
-    uut = new PermissionChecker(somePermission, activityMock, testRequestCode, containerMock,
+    mTestRequestCode = 1010101010;
+    String somePermission = Manifest.permission.ACCESS_COARSE_LOCATION;
+    int someGrantedMessageId = R.string.permissions_location_granted;
+    int someNotGrantedMessageId = R.string.permissions_location_not_granted;
+    int somePermissionRationaleMessageId = R.string.permissions_location_rationale;
+    uut = new PermissionChecker(somePermission, activityMock, mTestRequestCode, containerMock,
         someGrantedMessageId, someNotGrantedMessageId, somePermissionRationaleMessageId);
   }
 
@@ -97,19 +96,19 @@ import static org.mockito.Mockito.mock;
   }
 
   private void thenOnSuccessShouldBeCall(boolean expected) {
-    assertEquals(expected, onSuccessCalled);
+    assertEquals(expected, mOnSuccessCalled);
   }
 
   @TargetApi(Build.VERSION_CODES.M)
   private void whenOnPermissionRequestResultForUnknownResultCode() {
-    int someUnknownRequestCode = testRequestCode - 1;
-    uut.onRequestPermissionsResult(someUnknownRequestCode, null,
+    int someUnknownRequestCode = mTestRequestCode - 1;
+    uut.onRequestPermissionsResult(someUnknownRequestCode, new String[] { "somePermission" },
         new int[] { PackageManager.PERMISSION_GRANTED });
   }
 
   @TargetApi(Build.VERSION_CODES.M)
   private void whenOnPermissionRequestResultGranted(boolean permissionGranted) {
-    uut.onRequestPermissionsResult(testRequestCode, null, new int[] {
+    uut.onRequestPermissionsResult(mTestRequestCode, new String[] { "somePermission" }, new int[] {
         permissionGranted ? PackageManager.PERMISSION_GRANTED : PackageManager.PERMISSION_DENIED
     });
   }
@@ -117,7 +116,7 @@ import static org.mockito.Mockito.mock;
   private void givenPermissionResultListener() {
     uut.permissionResultListener = new PermissionResultListener() {
       @Override public void onSuccess() {
-        onSuccessCalled = true;
+        mOnSuccessCalled = true;
       }
 
       @Override public void onFailure() {
@@ -128,7 +127,7 @@ import static org.mockito.Mockito.mock;
 
   private void thenShouldShowSnackbarWithPermissionRationaleMessage(final boolean expected) {
     new Verifications() {{
-      snackbar.show();
+      mSnackbar.show();
       times = expected ? 1 : 0;
     }};
   }
@@ -147,11 +146,11 @@ import static org.mockito.Mockito.mock;
   }
 
   private void thenShouldHavePermissions() {
-    assertTrue(hasPermission);
+    assertTrue(mHasPermission);
   }
 
   private void whenCheckingIfHasPermission() {
-    hasPermission = uut.hasPermission();
+    mHasPermission = uut.hasPermission();
   }
 
   private void givenActivityCompatWithSomeGrantedPermission() {
