@@ -13,7 +13,6 @@ import mockit.MockUp;
 import mockit.Mocked;
 import mockit.Verifications;
 import mockit.integration.junit4.JMockit;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,10 +33,6 @@ import static org.mockito.Mockito.mock;
   @SuppressWarnings("unused") @Mocked private LocationServices mLocationServices;
   @SuppressWarnings("unused") @Mocked private FusedLocationProviderApi mFusedLocationProviderApi;
   private boolean logged;
-
-  @Before public void setUp() throws Exception {
-
-  }
 
   @Test public void shouldCheckForPermissionsOnConnected() {
     givenLocationRetriever();

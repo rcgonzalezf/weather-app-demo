@@ -56,14 +56,12 @@ public abstract class BaseActivity extends AppCompatActivity
   private DrawerLayout mDrawerLayout;
   private View mContent;
   private LocationRetriever mLocationRetriever;
-  private LocationRetrieverListener mLocationRetrieverListener;
-  private PermissionChecker permissionChecker;
+  private PermissionChecker mPermissionChecker;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.weather);
-    mLocationRetrieverListener = new LocationListener();
-    mLocationRetriever = new LocationRetriever(this, mLocationRetrieverListener);
+    mLocationRetriever = new LocationRetriever(this, new LocationListener());
 
     initToolbar();
     setupDrawerLayout();
@@ -229,9 +227,9 @@ public abstract class BaseActivity extends AppCompatActivity
 
   @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
       @NonNull int[] grantResults) {
-    if (permissionChecker != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+    if (mPermissionChecker != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       //noinspection NewApi
-      permissionChecker.onRequestPermissionsResult(requestCode, permissions, grantResults);
+      mPermissionChecker.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
   }
 
@@ -239,15 +237,15 @@ public abstract class BaseActivity extends AppCompatActivity
 
     @Override public void checkForPermissions() {
 
-      permissionChecker =
+      mPermissionChecker =
           new PermissionChecker(Manifest.permission.ACCESS_FINE_LOCATION, BaseActivity.this,
               PermissionChecker.LOCATION, mContent, R.string.permissions_location_granted,
               R.string.permissions_location_not_granted, R.string.permissions_location_rationale);
 
-      if (permissionChecker.hasPermission()) {
+      if (mPermissionChecker.hasPermission()) {
         mLocationRetriever.onLocationPermissionsGranted();
       } else {
-        permissionChecker.requestPermission(new PermissionResultListener() {
+        mPermissionChecker.requestPermission(new PermissionResultListener() {
 
           @Override public void onSuccess() {
             mLocationRetriever.onLocationPermissionsGranted();
