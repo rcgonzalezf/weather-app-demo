@@ -18,11 +18,11 @@ import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
 import rcgonzalezf.org.weather.models.WeatherViewModel;
 
-import static rcgonzalezf.org.weather.utils.ForecastUtils.formatDate;
-import static rcgonzalezf.org.weather.utils.ForecastUtils.formatTemperature;
-import static rcgonzalezf.org.weather.utils.ForecastUtils.getArtResourceForWeatherCondition;
-import static rcgonzalezf.org.weather.utils.ForecastUtils.getDayName;
-import static rcgonzalezf.org.weather.utils.ForecastUtils.getFormattedWind;
+import static rcgonzalezf.org.weather.utils.WeatherUtils.formatDate;
+import static rcgonzalezf.org.weather.utils.WeatherUtils.formatTemperature;
+import static rcgonzalezf.org.weather.utils.WeatherUtils.getArtResourceForWeatherCondition;
+import static rcgonzalezf.org.weather.utils.WeatherUtils.getDayName;
+import static rcgonzalezf.org.weather.utils.WeatherUtils.getFormattedWind;
 
 public class ModelAdapter<T extends WeatherViewModel>
     extends RecyclerView.Adapter<ModelAdapter.ModelViewHolder> implements View.OnClickListener {

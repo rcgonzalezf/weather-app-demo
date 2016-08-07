@@ -17,7 +17,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import rcgonzalezf.org.weather.common.BaseActivity;
-import rcgonzalezf.org.weather.utils.ForecastUtils;
+import rcgonzalezf.org.weather.utils.WeatherUtils;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -137,7 +137,7 @@ import static org.mockito.Mockito.mock;
   }
 
   private void givenInternet(final boolean hasInternet) {
-    new MockUp<ForecastUtils>() {
+    new MockUp<WeatherUtils>() {
       @SuppressWarnings("unused") @Mock boolean hasInternetConnection(Context context) {
         return hasInternet;
       }

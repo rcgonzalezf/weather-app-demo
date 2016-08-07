@@ -10,7 +10,7 @@ import com.google.android.gms.location.LocationServices;
 import java.lang.ref.WeakReference;
 import rcgonzalezf.org.weather.common.BaseActivity;
 
-import static rcgonzalezf.org.weather.utils.ForecastUtils.hasInternetConnection;
+import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
 
 public class LocationRetriever
     implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {

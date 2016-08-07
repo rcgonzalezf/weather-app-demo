@@ -50,15 +50,18 @@ class PermissionChecker implements ActivityCompat.OnRequestPermissionsResultCall
       Snackbar.make(mContainer.get(), mPermissionRationaleMessageId, Snackbar.LENGTH_INDEFINITE)
           .setAction(R.string.ok, new View.OnClickListener() {
             @Override public void onClick(View view) {
-              ActivityCompat.requestPermissions(mWeakContext.get(), new String[] { mPermission },
-                  mRequestCode);
+              requestPermissions();
             }
           })
           .show();
     } else {
-      ActivityCompat.requestPermissions(mWeakContext.get(), new String[] { mPermission },
-          mRequestCode);
+      requestPermissions();
     }
+  }
+
+  void requestPermissions() {
+    ActivityCompat.requestPermissions(mWeakContext.get(), new String[] { mPermission },
+        mRequestCode);
   }
 
   @RequiresApi(api = Build.VERSION_CODES.M)

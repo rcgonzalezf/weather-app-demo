@@ -19,7 +19,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,7 +43,7 @@ import rcgonzalezf.org.weather.location.LocationRetrieverListener;
 import rcgonzalezf.org.weather.models.Forecast;
 
 import static rcgonzalezf.org.weather.SettingsActivity.USER_NAME_TO_DISPLAY;
-import static rcgonzalezf.org.weather.utils.ForecastUtils.hasInternetConnection;
+import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
 
 public abstract class BaseActivity extends AppCompatActivity
     implements ApiCallback, OnOfflineLoader, ActivityCompat.OnRequestPermissionsResultCallback {
@@ -141,26 +140,22 @@ public abstract class BaseActivity extends AppCompatActivity
   private void setupFabButton() {
     findViewById(R.id.main_fab).setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
-        performFabAction(v);
+        performFabAction();
       }
     });
   }
 
-  protected void performFabAction(View view) {
-    LayoutInflater li = LayoutInflater.from(this);
-    View promptsView = li.inflate(R.layout.dialog_city_query, null);
-
+  protected void performFabAction() {
+    View promptsView = View.inflate(this, R.layout.dialog_city_query, null);
     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-
-    alertDialogBuilder.setView(promptsView);
-
     final EditText userInput = (EditText) promptsView.findViewById(R.id.city_input_edit_text);
 
+    alertDialogBuilder.setView(promptsView);
     alertDialogBuilder.setCancelable(false)
         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int id) {
 
-            String query = null;
+            String query;
             try {
               query = URLEncoder.encode(userInput.getText().toString(), "UTF-8");
             } catch (UnsupportedEncodingException e) {

@@ -17,9 +17,9 @@ import rcgonzalezf.org.weather.R;
  *
  * https://github.com/juleswhite/mobilecloud-15/tree/master/ex/WeatherServiceProvider
  */
-public class ForecastUtils {
+public class WeatherUtils {
 
-  public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+  private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
   public static boolean hasInternetConnection(Context context) {
     ConnectivityManager cm =
@@ -52,7 +52,9 @@ public class ForecastUtils {
       return R.drawable.art_clear;
     } else if (weatherId == 801) {
       return R.drawable.art_light_clouds;
-    } else if (weatherId >= 802 && weatherId <= 804) return R.drawable.art_clouds;
+    } else if (weatherId >= 802 && weatherId <= 804) {
+      return R.drawable.art_clouds;
+    }
 
     return -1;
   }
@@ -129,6 +131,6 @@ public class ForecastUtils {
       temperature = temperature - 273;
     }
 
-    return String.format("%1.0f\u00B0 %2$s", temperature, symbol);
+    return String.format(Locale.getDefault(), "%1.0f\u00B0 %2$s", temperature, symbol);
   }
 }
