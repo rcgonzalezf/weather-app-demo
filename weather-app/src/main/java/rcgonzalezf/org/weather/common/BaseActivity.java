@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -27,9 +26,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -43,29 +39,29 @@ import org.rcgonzalezf.weather.common.network.ApiCallback;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
+import rcgonzalezf.org.weather.location.LocationRetriever;
+import rcgonzalezf.org.weather.location.LocationRetrieverListener;
 import rcgonzalezf.org.weather.models.Forecast;
 
 import static rcgonzalezf.org.weather.SettingsActivity.USER_NAME_TO_DISPLAY;
 import static rcgonzalezf.org.weather.utils.ForecastUtils.hasInternetConnection;
 
 public abstract class BaseActivity extends AppCompatActivity
-    implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-    ApiCallback, OnOfflineLoader, ActivityCompat.OnRequestPermissionsResultCallback {
+    implements ApiCallback, OnOfflineLoader, ActivityCompat.OnRequestPermissionsResultCallback {
 
   protected static final String OFFLINE_FILE = "OFFLINE_WEATHER";
   public static final String FORECASTS = "FORECASTS";
   private static final String TAG = BaseActivity.class.getSimpleName();
 
-  protected Location mLastLocation;
-  private GoogleApiClient mGoogleApiClient;
   private DrawerLayout mDrawerLayout;
   private View mContent;
-  private PermissionChecker permissionChecker;
+  private LocationRetriever mLocationRetriever;
+  private PermissionChecker mPermissionChecker;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.weather);
-    buildGoogleApiClient();
+    mLocationRetriever = new LocationRetriever(this, new LocationListener());
 
     initToolbar();
     setupDrawerLayout();
@@ -74,20 +70,13 @@ public abstract class BaseActivity extends AppCompatActivity
     mContent = findViewById(R.id.content);
   }
 
-  protected synchronized void buildGoogleApiClient() {
-    mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this)
-        .addOnConnectionFailedListener(this)
-        .addApi(LocationServices.API)
-        .build();
-  }
-
   @Override protected void onStart() {
     super.onStart();
-    mGoogleApiClient.connect();
+    mLocationRetriever.connect();
   }
 
   @Override protected void onStop() {
-    mGoogleApiClient.disconnect();
+    mLocationRetriever.disconnect();
     super.onStop();
   }
 
@@ -111,34 +100,6 @@ public abstract class BaseActivity extends AppCompatActivity
   private void navigateToSettings() {
     Intent intent = new Intent(BaseActivity.this, SettingsActivity.class);
     startActivity(intent);
-  }
-
-  @Override public void onConnected(Bundle bundle) {
-    permissionChecker = new PermissionChecker(Manifest.permission.ACCESS_FINE_LOCATION, this,
-        PermissionChecker.LOCATION, mContent, R.string.permissions_location_granted,
-        R.string.permissions_location_not_granted, R.string.permissions_location_rationale);
-
-    if (permissionChecker.hasPermission()) {
-      tryToUseLastKnownLocation();
-    } else {
-      permissionChecker.requestPermission(new PermissionResultListener() {
-
-        @Override public void onSuccess() {
-          tryToUseLastKnownLocation();
-        }
-
-        @Override public void onFailure() {
-        }
-      });
-    }
-  }
-
-  @Override public void onConnectionSuspended(int i) {
-    Log.d(TAG, "Google Location onConnectionSuspended " + i);
-  }
-
-  @Override public void onConnectionFailed(ConnectionResult connectionResult) {
-    Log.d(TAG, "Google Location onConnectionFailed " + connectionResult.getErrorMessage());
   }
 
   protected void initToolbar() {
@@ -240,7 +201,7 @@ public abstract class BaseActivity extends AppCompatActivity
         .show();
   }
 
-  protected void informNoInternet() {
+  public void informNoInternet() {
     Toast.makeText(this, getString(R.string.no_internet_msg), Toast.LENGTH_SHORT).show();
     final List<Forecast> forecastList = getPreviousForecastList();
     loadOldData(forecastList);
@@ -264,31 +225,50 @@ public abstract class BaseActivity extends AppCompatActivity
     return storedData;
   }
 
-  // We are handling the potential missing permission
-  @SuppressWarnings("MissingPermission") void tryToUseLastKnownLocation() {
-    mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-    if (!hasInternetConnection(this)) {
-      informNoInternet();
-    } else if (mLastLocation != null) {
-      WeatherRepository<OpenWeatherApiRequestParameters> weatherRepository =
-          ServiceConfig.getInstance().getWeatherRepository();
-
-      double lat = mLastLocation.getLatitude();
-      double lon = mLastLocation.getLongitude();
-
-      weatherRepository.findWeather(
-          new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withLatLon(lat, lon)
-              .build(), this);
-    } else {
-      Snackbar.make(mContent, getString(R.string.location_off_msg), Snackbar.LENGTH_SHORT).show();
+  @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+      @NonNull int[] grantResults) {
+    if (mPermissionChecker != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      //noinspection NewApi
+      mPermissionChecker.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
   }
 
-  @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-      @NonNull int[] grantResults) {
-    if (permissionChecker != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      //noinspection NewApi
-      permissionChecker.onRequestPermissionsResult(requestCode, permissions, grantResults);
+  public class LocationListener implements LocationRetrieverListener {
+
+    @Override public void checkForPermissions() {
+
+      mPermissionChecker =
+          new PermissionChecker(Manifest.permission.ACCESS_FINE_LOCATION, BaseActivity.this,
+              PermissionChecker.LOCATION, mContent, R.string.permissions_location_granted,
+              R.string.permissions_location_not_granted, R.string.permissions_location_rationale);
+
+      if (mPermissionChecker.hasPermission()) {
+        mLocationRetriever.onLocationPermissionsGranted();
+      } else {
+        mPermissionChecker.requestPermission(new PermissionResultListener() {
+
+          @Override public void onSuccess() {
+            mLocationRetriever.onLocationPermissionsGranted();
+          }
+
+          @Override public void onFailure() {
+          }
+        });
+      }
+    }
+
+    @Override public void onEmptyLocation() {
+      Snackbar.make(mContent, getString(R.string.location_off_msg), Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override public void onLocationFound(double lat, double lon) {
+
+      WeatherRepository<OpenWeatherApiRequestParameters> weatherRepository =
+          ServiceConfig.getInstance().getWeatherRepository();
+
+      weatherRepository.findWeather(
+          new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withLatLon(lat, lon)
+              .build(), BaseActivity.this);
     }
   }
 }
