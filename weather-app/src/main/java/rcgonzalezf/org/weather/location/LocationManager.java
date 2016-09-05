@@ -3,6 +3,7 @@ package rcgonzalezf.org.weather.location;
 import android.Manifest;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 import java.lang.ref.WeakReference;
@@ -13,10 +14,13 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
 
 public class LocationManager implements LocationRetrieverListener {
 
+  @VisibleForTesting
+  static int CURRENT_SDK_INT = Build.VERSION.SDK_INT;
   private final WeakReference<BaseActivity> baseActivityWeakReference;
   private final WeakReference<View> mContentWeakReference;
   private final LocationRetriever mLocationRetriever;
-  private PermissionChecker mPermissionChecker;
+  @VisibleForTesting
+  PermissionChecker mPermissionChecker;
 
   public LocationManager(BaseActivity baseActivity, View content) {
     this.baseActivityWeakReference = new WeakReference<>(baseActivity);
@@ -67,7 +71,7 @@ public class LocationManager implements LocationRetrieverListener {
 
   public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
       @NonNull int[] grantResults) {
-    if (mPermissionChecker != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+    if (mPermissionChecker != null && CURRENT_SDK_INT >= Build.VERSION_CODES.M) {
       //noinspection NewApi
       mPermissionChecker.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
