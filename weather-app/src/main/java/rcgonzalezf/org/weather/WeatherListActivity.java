@@ -62,6 +62,10 @@ public class WeatherListActivity extends BaseActivity
     notifyAdapter(forecastList);
   }
 
+  @Override public void onError(String error) {
+    // TODO implement error handling
+  }
+
   @Override protected void searchByQuery(String query, EditText userInput) {
     WeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback> weatherRepository =
         ServiceConfig.getInstance().getWeatherRepository();
