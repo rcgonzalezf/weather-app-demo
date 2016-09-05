@@ -5,10 +5,14 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.rcgonzalezf.weather.BuildConfig;
+import org.rcgonzalezf.weather.common.listeners.OnUpdateWeatherListListener;
 import org.rcgonzalezf.weather.common.models.ForecastData;
 import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
-import org.rcgonzalezf.weather.common.network.ApiCallback;
+import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback;
+import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;
 import org.rcgonzalezf.weather.tests.TestExecutor;
 import org.rcgonzalezf.weather.tests.WeatherTestLibApp;
 import org.robolectric.RobolectricTestRunner;
@@ -23,17 +27,19 @@ import static org.mockito.Mockito.when;
 public class OpenWeatherApiRequestTest {
 
   private OpenWeatherApiRequest mOpenWeatherApiRequest;
-  private ApiCallback<OpenWeatherApiResponse, OpenWeatherApiError> mTestApiCallback;
+  private OpenWeatherApiCallback mTestApiCallback;
   private boolean mIsSuccess;
   private boolean mIsError;
-  private ModelConverter mModelConverter;
+  @Mock
+  private ModelConverter<OpenWeatherForecastData> mModelConverter;
 
   @Before public void createApiRequestBaseObject() {
-    mModelConverter = mock(ModelConverter.class);
+    MockitoAnnotations.initMocks(this);
+
     mOpenWeatherApiRequest = new OpenWeatherApiRequest("someApiKey", mModelConverter);
     mOpenWeatherApiRequest = spy(mOpenWeatherApiRequest);
 
-    mTestApiCallback = new ApiCallback<OpenWeatherApiResponse, OpenWeatherApiError>() {
+    mTestApiCallback = new OpenWeatherApiCallback(mock(OnUpdateWeatherListListener.class)) {
 
       @Override public void onSuccess(OpenWeatherApiResponse apiResponse) {
         mIsSuccess = true;

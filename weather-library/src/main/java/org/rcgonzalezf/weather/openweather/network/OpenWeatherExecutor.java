@@ -11,6 +11,7 @@ import org.rcgonzalezf.weather.WeatherLibApp;
 import org.rcgonzalezf.weather.common.models.ForecastData;
 import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
+import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback;
 import org.rcgonzalezf.weather.openweather.api.ForecastService;
 import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;
 import retrofit2.Call;
@@ -25,9 +26,9 @@ class OpenWeatherExecutor {
   private String mApiKey;
   private ApiCallback<OpenWeatherApiResponse, OpenWeatherApiError> mApiCallback;
   private static final String TAG = OpenWeatherExecutor.class.getSimpleName();
-  private ModelConverter mConverter;
+  private ModelConverter<OpenWeatherForecastData> mConverter;
 
-  OpenWeatherExecutor(ApiCallback apiCallback, Executor executor, String apiKey) {
+  OpenWeatherExecutor(OpenWeatherApiCallback apiCallback, Executor executor, String apiKey) {
     mApiCallback = apiCallback;
     mExecutor = executor;
     mApiKey = apiKey;
@@ -75,9 +76,8 @@ class OpenWeatherExecutor {
   }
 
   private void convertToModel(OpenWeatherForecastData openWeatherForecastData) throws IOException {
-    //noinspection unchecked
+
     mConverter.fromPojo(openWeatherForecastData);
-    //noinspection unchecked
     List<ForecastData> forecastData = mConverter.getModel();
 
     if (forecastData != null && !forecastData.isEmpty()) {
@@ -89,8 +89,7 @@ class OpenWeatherExecutor {
     }
   }
 
-  void setModelConverter(
-      ModelConverter<Void, OpenWeatherForecastData> converter) {
+  void setModelConverter(ModelConverter<OpenWeatherForecastData> converter) {
     mConverter = converter;
   }
 }

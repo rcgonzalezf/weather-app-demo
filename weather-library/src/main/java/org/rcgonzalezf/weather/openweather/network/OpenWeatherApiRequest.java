@@ -16,7 +16,7 @@ public class OpenWeatherApiRequest
   private static final String FORECAST = "forecast";
   private static final String URL_FORMAT = "%1$s%2$s?%3$s&APPID=%4$s";
   private final String mApiKey;
-  private final ModelConverter<Void, OpenWeatherForecastData> mModelConverter;
+  private final ModelConverter<OpenWeatherForecastData> mModelConverter;
   private OpenWeatherApiRequestParameters mRequestParameters;
 
   public OpenWeatherApiRequest(String apiKey) {
@@ -24,7 +24,7 @@ public class OpenWeatherApiRequest
   }
 
   @VisibleForTesting OpenWeatherApiRequest(String apiKey,
-      ModelConverter<Void, OpenWeatherForecastData> modelConverter) {
+      ModelConverter<OpenWeatherForecastData> modelConverter) {
     mApiKey = apiKey;
     mModelConverter = modelConverter;
   }
