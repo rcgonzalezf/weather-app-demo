@@ -1,9 +1,7 @@
-package rcgonzalezf.org.weather.models;
+package org.rcgonzalezf.weather.common.models;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.rcgonzalezf.weather.common.models.ForecastData;
-import org.rcgonzalezf.weather.common.models.WeatherData;
 
 public class ForecastMapper {
 
@@ -21,7 +19,7 @@ public class ForecastMapper {
     return map(ALL);
   }
 
-  public List<Forecast> map(int howMany) {
+  private List<Forecast> map(int howMany) {
     int size = 10;
     if(howMany == ALL) {
       size = INITIAL_SIZE * mData.size();

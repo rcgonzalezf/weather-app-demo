@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 @RunWith(RobolectricTestRunner.class) @Config(constants = BuildConfig.class, sdk = 23, application = WeatherTestLibApp.class)
 public class OpenWeatherApiRepositoryTest {
 
-  private WeatherRepository<OpenWeatherApiRequestParameters> mWeatherRepository;
+  private WeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback> mWeatherRepository;
 
   private OpenWeatherApiRequestParameters mRequestParameters;
   private ApiRequest mApiRequest;
@@ -30,7 +30,8 @@ public class OpenWeatherApiRepositoryTest {
   private boolean mExecuted;
 
   @Before public void setUpServiceConfig() {
-    mWeatherRepository = spy(ServiceConfig.getInstance().getWeatherRepository());
+    mWeatherRepository = ServiceConfig.getInstance().getWeatherRepository();
+    mWeatherRepository = spy(mWeatherRepository);
   }
 
   @Test(expected = UnsupportedOperationException.class)
@@ -75,7 +76,7 @@ public class OpenWeatherApiRepositoryTest {
   }
 
   private void whenGettingWeatherAsync() {
-    mWeatherRepository.findWeather(mRequestParameters, mock(ApiCallback.class));
+    mWeatherRepository.findWeather(mRequestParameters, mock(OpenWeatherApiCallback.class));
   }
 
   private void whenGettingWeather() {

@@ -13,14 +13,12 @@ import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;
 import org.rcgonzalezf.weather.openweather.model.Weather;
 import org.rcgonzalezf.weather.openweather.model.WeatherList;
 
-public class OpenWeatherApiModelConverter
-    implements ModelConverter<Void, OpenWeatherForecastData> {
+public class OpenWeatherApiModelConverter implements ModelConverter<OpenWeatherForecastData> {
 
   private OpenWeatherForecastData mOpenWeatherForecastData;
 
-  @Override public Void fromPojo(OpenWeatherForecastData pojo) {
+  @Override public void fromPojo(OpenWeatherForecastData pojo) {
     mOpenWeatherForecastData = pojo;
-    return null;
   }
 
   @Override public List<ForecastData> getModel() throws IOException {
@@ -32,7 +30,7 @@ public class OpenWeatherApiModelConverter
     return forecastData;
   }
 
-  protected @Nullable List<ForecastData> populateFromPojo(List<ForecastData> forecastData) {
+  private @Nullable List<ForecastData> populateFromPojo(List<ForecastData> forecastData) {
 
     if (mOpenWeatherForecastData.getWeatherList() != null
         && mOpenWeatherForecastData.getWeatherList().size() > 0) {
