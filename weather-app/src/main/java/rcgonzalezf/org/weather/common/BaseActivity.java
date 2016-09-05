@@ -32,10 +32,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import org.rcgonzalezf.weather.common.ServiceConfig;
-import org.rcgonzalezf.weather.common.WeatherRepository;
-import org.rcgonzalezf.weather.common.network.ApiCallback;
-import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
 import rcgonzalezf.org.weather.location.LocationRetriever;
@@ -46,7 +42,7 @@ import static rcgonzalezf.org.weather.SettingsActivity.USER_NAME_TO_DISPLAY;
 import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
 
 public abstract class BaseActivity extends AppCompatActivity
-    implements ApiCallback, OnOfflineLoader, ActivityCompat.OnRequestPermissionsResultCallback {
+    implements ActivityCompat.OnRequestPermissionsResultCallback, OnOfflineLoader {
 
   protected static final String OFFLINE_FILE = "OFFLINE_WEATHER";
   public static final String FORECASTS = "FORECASTS";
@@ -183,19 +179,6 @@ public abstract class BaseActivity extends AppCompatActivity
     alertDialog.show();
   }
 
-  protected void searchByQuery(String query, EditText userInput) {
-    WeatherRepository<OpenWeatherApiRequestParameters> weatherRepository =
-        ServiceConfig.getInstance().getWeatherRepository();
-
-    weatherRepository.findWeather(new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder()
-        .withCityName(query)
-        .build(), BaseActivity.this);
-
-    Toast.makeText(BaseActivity.this,
-        getString(R.string.searching) + " " + userInput.getText() + "...", Toast.LENGTH_SHORT)
-        .show();
-  }
-
   public void informNoInternet() {
     Toast.makeText(this, getString(R.string.no_internet_msg), Toast.LENGTH_SHORT).show();
     final List<Forecast> forecastList = getPreviousForecastList();
@@ -257,13 +240,11 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     @Override public void onLocationFound(double lat, double lon) {
-
-      WeatherRepository<OpenWeatherApiRequestParameters> weatherRepository =
-          ServiceConfig.getInstance().getWeatherRepository();
-
-      weatherRepository.findWeather(
-          new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withLatLon(lat, lon)
-              .build(), BaseActivity.this);
+     searchByLocation(lat, lon);
     }
   }
+
+  protected abstract void searchByQuery(String query, EditText userInput);
+  protected abstract void searchByLocation(double lat, double lon);
+
 }

@@ -2,7 +2,7 @@ package org.rcgonzalezf.weather.openweather.network;
 
 import org.rcgonzalezf.weather.common.network.ApiError;
 
-class OpenWeatherApiError implements ApiError<String>{
+public class OpenWeatherApiError implements ApiError<String>{
 
   private String mMessage;
   private ErrorCode mCode;

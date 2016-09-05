@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:name" >
-        <activity android:name=".WeatherActivity" >
+        <activity android:name=".WeatherListActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,10 +26,10 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".WeatherActivity" >
+            android:parentActivityName=".WeatherListActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="rcgonzalezf.org.weather.WeatherActivity" />
+                android:value="rcgonzalezf.org.weather.WeatherListActivity" />
         </activity>
     </application>
 
