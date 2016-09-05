@@ -19,7 +19,7 @@ public class ForecastMapper {
     return map(ALL);
   }
 
-  public List<Forecast> map(int howMany) {
+  private List<Forecast> map(int howMany) {
     int size = 10;
     if(howMany == ALL) {
       size = INITIAL_SIZE * mData.size();

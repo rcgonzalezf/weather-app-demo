@@ -25,12 +25,13 @@ public class OpenWeatherApiRepository
 
   @Override public void findWeather(OpenWeatherApiRequestParameters requestParameters,
       OpenWeatherApiCallback apiCallback) {
-    ApiRequest<OpenWeatherApiRequestParameters> request = getApiRequest();
+    ApiRequest<OpenWeatherApiRequestParameters, OpenWeatherApiCallback> request = getApiRequest();
     request.addRequestParameters(requestParameters);
     request.execute(apiCallback);
   }
 
-  @Override public ApiRequest<OpenWeatherApiRequestParameters> getApiRequest() {
+  @Override
+  public ApiRequest<OpenWeatherApiRequestParameters, OpenWeatherApiCallback> getApiRequest() {
     return getOpenWeatherApiRequest();
   }
 
