@@ -32,11 +32,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import org.rcgonzalezf.weather.common.models.Forecast;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
 import rcgonzalezf.org.weather.location.LocationRetriever;
 import rcgonzalezf.org.weather.location.LocationRetrieverListener;
-import rcgonzalezf.org.weather.models.Forecast;
 
 import static rcgonzalezf.org.weather.SettingsActivity.USER_NAME_TO_DISPLAY;
 import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
@@ -240,11 +240,11 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     @Override public void onLocationFound(double lat, double lon) {
-     searchByLocation(lat, lon);
+      searchByLocation(lat, lon);
     }
   }
 
   protected abstract void searchByQuery(String query, EditText userInput);
-  protected abstract void searchByLocation(double lat, double lon);
 
+  protected abstract void searchByLocation(double lat, double lon);
 }

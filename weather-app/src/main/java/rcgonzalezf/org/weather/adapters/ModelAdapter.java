@@ -14,9 +14,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import java.util.List;
 import org.rcgonzalezf.weather.WeatherLibApp;
+import org.rcgonzalezf.weather.common.models.WeatherViewModel;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
-import rcgonzalezf.org.weather.models.WeatherViewModel;
 
 import static rcgonzalezf.org.weather.utils.WeatherUtils.formatDate;
 import static rcgonzalezf.org.weather.utils.WeatherUtils.formatTemperature;
@@ -96,20 +96,20 @@ public class ModelAdapter<T extends WeatherViewModel>
     }
   }
 
-  public class ModelViewHolder extends RecyclerView.ViewHolder {
+  class ModelViewHolder extends RecyclerView.ViewHolder {
 
-    public TextView datetimeTextView;
-    public ImageView itemImage;
-    public TextView detailLocationNameTextView;
-    public TextView humidityTextView;
-    public TextView windSpeedTextView;
-    public TextView secondaryTempTextView;
-    public TextView primaryTempTextView;
-    public TextView dayTextView;
-    public TextView descriptionTextView;
-    public View itemView;
+    TextView datetimeTextView;
+    ImageView itemImage;
+    TextView detailLocationNameTextView;
+    TextView humidityTextView;
+    TextView windSpeedTextView;
+    TextView secondaryTempTextView;
+    TextView primaryTempTextView;
+    TextView dayTextView;
+    TextView descriptionTextView;
+    View itemView;
 
-    public ModelViewHolder(View itemView) {
+    ModelViewHolder(View itemView) {
       super(itemView);
       this.itemView = itemView;
       this.itemView.setOnClickListener(ModelAdapter.this);

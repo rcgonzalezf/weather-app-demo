@@ -5,13 +5,12 @@ import java.util.List;
 import org.rcgonzalezf.weather.common.ServiceConfig;
 import org.rcgonzalezf.weather.common.WeatherRepository;
 import org.rcgonzalezf.weather.common.models.ForecastData;
-import org.rcgonzalezf.weather.common.network.ApiCallback;
 import org.rcgonzalezf.weather.common.network.ApiRequest;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequest;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters;
 
 public class OpenWeatherApiRepository
-    implements WeatherRepository<OpenWeatherApiRequestParameters> {
+    implements WeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback> {
 
   private final ServiceConfig mServiceConfig;
 
@@ -25,7 +24,7 @@ public class OpenWeatherApiRepository
   }
 
   @Override public void findWeather(OpenWeatherApiRequestParameters requestParameters,
-      ApiCallback apiCallback) {
+      OpenWeatherApiCallback apiCallback) {
     ApiRequest<OpenWeatherApiRequestParameters> request = getApiRequest();
     request.addRequestParameters(requestParameters);
     request.execute(apiCallback);

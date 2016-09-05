@@ -1,7 +1,7 @@
 package rcgonzalezf.org.weather.common;
 
 import java.util.List;
-import rcgonzalezf.org.weather.models.Forecast;
+import org.rcgonzalezf.weather.common.models.Forecast;
 
 public interface OnOfflineLoader {
 

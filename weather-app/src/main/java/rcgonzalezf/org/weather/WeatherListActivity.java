@@ -13,23 +13,20 @@ import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import org.rcgonzalezf.weather.common.ServiceConfig;
 import org.rcgonzalezf.weather.common.WeatherRepository;
-import org.rcgonzalezf.weather.common.network.ApiCallback;
-import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiError;
+import org.rcgonzalezf.weather.common.listeners.OnUpdateWeatherListListener;
+import org.rcgonzalezf.weather.common.models.Forecast;
+import org.rcgonzalezf.weather.common.models.WeatherViewModel;
+import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters;
-import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiResponse;
 import rcgonzalezf.org.weather.adapters.ModelAdapter;
 import rcgonzalezf.org.weather.common.BaseActivity;
-import rcgonzalezf.org.weather.models.Forecast;
-import rcgonzalezf.org.weather.models.ForecastMapper;
-import rcgonzalezf.org.weather.models.WeatherViewModel;
 
 public class WeatherListActivity extends BaseActivity
-    implements ModelAdapter.OnItemClickListener {
+    implements ModelAdapter.OnItemClickListener, OnUpdateWeatherListListener {
 
   private static final String TAG = WeatherListActivity.class.getSimpleName();
   private RecyclerView mRecyclerView;
@@ -61,26 +58,29 @@ public class WeatherListActivity extends BaseActivity
     }
   }
 
+  @Override public void updateList(List<Forecast> forecastList) {
+    notifyAdapter(forecastList);
+  }
+
   @Override protected void searchByQuery(String query, EditText userInput) {
-    WeatherRepository<OpenWeatherApiRequestParameters> weatherRepository =
+    WeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback> weatherRepository =
         ServiceConfig.getInstance().getWeatherRepository();
 
     weatherRepository.findWeather(new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder()
         .withCityName(query)
         .build(), mOpenWeatherApiCallback);
 
-    Toast.makeText(this,
-        getString(R.string.searching) + " " + userInput.getText() + "...", Toast.LENGTH_SHORT)
-        .show();
+    Toast.makeText(this, getString(R.string.searching) + " " + userInput.getText() + "...",
+        Toast.LENGTH_SHORT).show();
   }
 
   @Override protected void searchByLocation(double lat, double lon) {
-    WeatherRepository<OpenWeatherApiRequestParameters> weatherRepository =
+    WeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback> weatherRepository =
         ServiceConfig.getInstance().getWeatherRepository();
 
-    weatherRepository.findWeather(
-        new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withLatLon(lat, lon)
-            .build(), mOpenWeatherApiCallback);
+    weatherRepository.findWeather(new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder()
+        .withLatLon(lat, lon)
+        .build(), mOpenWeatherApiCallback);
   }
 
   private void saveForecastList(final List<Forecast> forecastList) {
@@ -121,26 +121,5 @@ public class WeatherListActivity extends BaseActivity
         mAdapter.notifyDataSetChanged();
       }
     });
-  }
-
-  static class OpenWeatherApiCallback implements ApiCallback<OpenWeatherApiResponse, OpenWeatherApiError> {
-
-    private WeakReference<WeatherListActivity> callerActivityWeakReference;
-
-    OpenWeatherApiCallback(WeatherListActivity callerActivity){
-      this.callerActivityWeakReference = new WeakReference<>(callerActivity);
-    }
-
-    @Override public void onSuccess(OpenWeatherApiResponse apiResponse) {
-      WeatherListActivity weatherListActivity = callerActivityWeakReference.get();
-      if(weatherListActivity != null) {
-        final List<Forecast> forecastList = new ForecastMapper().withData(apiResponse.getData()).map();
-        weatherListActivity.notifyAdapter(forecastList);
-      }
-    }
-
-    @Override public void onError(OpenWeatherApiError apiError) {
-      apiError.getError();
-    }
   }
 }

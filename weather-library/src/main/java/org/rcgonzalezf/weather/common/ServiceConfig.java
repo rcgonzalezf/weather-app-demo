@@ -1,5 +1,9 @@
 package org.rcgonzalezf.weather.common;
 
+import org.rcgonzalezf.weather.common.network.ApiCallback;
+import org.rcgonzalezf.weather.common.network.ApiError;
+import org.rcgonzalezf.weather.common.network.ApiResponse;
+import org.rcgonzalezf.weather.common.network.RequestParameters;
 import org.rcgonzalezf.weather.openweather.OpenWeatherApiRepository;
 
 public class ServiceConfig {
@@ -14,7 +18,7 @@ public class ServiceConfig {
     return sInstance;
   }
 
-  public static void setInstance(ServiceConfig instance) {
+  static void setInstance(ServiceConfig instance) {
     sInstance = instance;
   }
 
@@ -28,7 +32,7 @@ public class ServiceConfig {
     return this;
   }
 
-  public WeatherRepository getWeatherRepository() {
+  public <T extends RequestParameters, A extends ApiCallback<? extends ApiResponse, ? extends ApiError>> WeatherRepository<T, A> getWeatherRepository() {
     if (getApiKey() == null || getWeatherProvider() == null) {
       throw new IllegalStateException("Should provide an apiKey and weatherProvider");
     }
@@ -46,7 +50,7 @@ public class ServiceConfig {
     return mApiKey;
   }
 
-  public WeatherProvider getWeatherProvider() {
+  private WeatherProvider getWeatherProvider() {
     return mWeatherProvider;
   }
 }

@@ -1,7 +1,6 @@
-package rcgonzalezf.org.weather.models;
+package org.rcgonzalezf.weather.common.models;
 
 import android.os.Parcel;
-import android.os.Parcelable;
 
 public class Forecast implements WeatherViewModel {
 
@@ -36,7 +35,7 @@ public class Forecast implements WeatherViewModel {
     dest.writeString(mDescription);
   }
 
-  public static final Parcelable.Creator<Forecast> CREATOR = new Parcelable.Creator<Forecast>() {
+  public static final Creator<Forecast> CREATOR = new Creator<Forecast>() {
     public Forecast createFromParcel(Parcel in) {
       return new Forecast(in);
     }
