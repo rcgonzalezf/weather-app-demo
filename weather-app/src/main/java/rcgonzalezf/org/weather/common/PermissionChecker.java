@@ -1,6 +1,5 @@
 package rcgonzalezf.org.weather.common;
 
-import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -12,11 +11,11 @@ import android.view.View;
 import java.lang.ref.WeakReference;
 import rcgonzalezf.org.weather.R;
 
-class PermissionChecker implements ActivityCompat.OnRequestPermissionsResultCallback {
+public class PermissionChecker implements ActivityCompat.OnRequestPermissionsResultCallback {
 
-  static final int LOCATION = 10;
+  public static final int LOCATION = 10;
 
-  private final WeakReference<Activity> mWeakContext;
+  private final WeakReference<BaseActivity> mWeakContext;
   private String mPermission;
   private int mRequestCode;
   private WeakReference<View> mContainer;
@@ -25,7 +24,7 @@ class PermissionChecker implements ActivityCompat.OnRequestPermissionsResultCall
   private int mPermissionRationaleMessageId;
   private PermissionResultListener mPermissionResultListener;
 
-  PermissionChecker(@NonNull String permission, @NonNull Activity activity, int requestCode,
+  public PermissionChecker(@NonNull String permission, @NonNull BaseActivity activity, int requestCode,
       @NonNull View container, @StringRes int permissionGrantedMessageId,
       @StringRes int permissionsNotGrantedMessageId, @StringRes int permissionRationaleMessageId) {
     this.mWeakContext = new WeakReference<>(activity);
@@ -37,12 +36,12 @@ class PermissionChecker implements ActivityCompat.OnRequestPermissionsResultCall
     this.mPermissionRationaleMessageId = permissionRationaleMessageId;
   }
 
-  boolean hasPermission() {
+  public boolean hasPermission() {
     return ActivityCompat.checkSelfPermission(mWeakContext.get(), mPermission)
         == PackageManager.PERMISSION_GRANTED;
   }
 
-  void requestPermission(PermissionResultListener permissionResultListener) {
+  public void requestPermission(PermissionResultListener permissionResultListener) {
     this.mPermissionResultListener = permissionResultListener;
 
     if (ActivityCompat.shouldShowRequestPermissionRationale(mWeakContext.get(), mPermission)) {

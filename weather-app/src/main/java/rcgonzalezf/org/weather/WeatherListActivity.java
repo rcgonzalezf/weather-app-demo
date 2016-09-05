@@ -78,7 +78,7 @@ public class WeatherListActivity extends BaseActivity
         Toast.LENGTH_SHORT).show();
   }
 
-  @Override protected void searchByLocation(double lat, double lon) {
+  @Override public void searchByLocation(double lat, double lon) {
     WeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback> weatherRepository =
         ServiceConfig.getInstance().getWeatherRepository();
 

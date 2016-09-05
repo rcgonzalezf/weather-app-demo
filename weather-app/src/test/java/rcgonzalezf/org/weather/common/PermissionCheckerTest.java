@@ -36,7 +36,7 @@ import static org.mockito.Mockito.mock;
   private PermissionResultListener mPermissionListener;
 
   @Before public void setup() {
-    Activity activityMock = mock(Activity.class);
+    BaseActivity activityMock = mock(BaseActivity.class);
     View containerMock = mock(View.class);
 
     mTestRequestCode = 1010101010;

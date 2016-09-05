@@ -1,10 +1,8 @@
 package rcgonzalezf.org.weather.common;
 
-import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -35,8 +33,7 @@ import java.util.List;
 import org.rcgonzalezf.weather.common.models.Forecast;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
-import rcgonzalezf.org.weather.location.LocationRetriever;
-import rcgonzalezf.org.weather.location.LocationRetrieverListener;
+import rcgonzalezf.org.weather.location.LocationManager;
 
 import static rcgonzalezf.org.weather.SettingsActivity.USER_NAME_TO_DISPLAY;
 import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
@@ -50,13 +47,12 @@ public abstract class BaseActivity extends AppCompatActivity
 
   private DrawerLayout mDrawerLayout;
   private View mContent;
-  private LocationRetriever mLocationRetriever;
-  private PermissionChecker mPermissionChecker;
+  private LocationManager mLocationManager;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.weather);
-    mLocationRetriever = new LocationRetriever(this, new LocationListener());
+    mLocationManager = new LocationManager(this, mContent);
 
     initToolbar();
     setupDrawerLayout();
@@ -67,11 +63,11 @@ public abstract class BaseActivity extends AppCompatActivity
 
   @Override protected void onStart() {
     super.onStart();
-    mLocationRetriever.connect();
+    mLocationManager.connect();
   }
 
   @Override protected void onStop() {
-    mLocationRetriever.disconnect();
+    mLocationManager.disconnect();
     super.onStop();
   }
 
@@ -205,46 +201,10 @@ public abstract class BaseActivity extends AppCompatActivity
 
   @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
       @NonNull int[] grantResults) {
-    if (mPermissionChecker != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      //noinspection NewApi
-      mPermissionChecker.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-  }
-
-  public class LocationListener implements LocationRetrieverListener {
-
-    @Override public void checkForPermissions() {
-
-      mPermissionChecker =
-          new PermissionChecker(Manifest.permission.ACCESS_FINE_LOCATION, BaseActivity.this,
-              PermissionChecker.LOCATION, mContent, R.string.permissions_location_granted,
-              R.string.permissions_location_not_granted, R.string.permissions_location_rationale);
-
-      if (mPermissionChecker.hasPermission()) {
-        mLocationRetriever.onLocationPermissionsGranted();
-      } else {
-        mPermissionChecker.requestPermission(new PermissionResultListener() {
-
-          @Override public void onSuccess() {
-            mLocationRetriever.onLocationPermissionsGranted();
-          }
-
-          @Override public void onFailure() {
-          }
-        });
-      }
-    }
-
-    @Override public void onEmptyLocation() {
-      Snackbar.make(mContent, getString(R.string.location_off_msg), Snackbar.LENGTH_SHORT).show();
-    }
-
-    @Override public void onLocationFound(double lat, double lon) {
-      searchByLocation(lat, lon);
-    }
+    mLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
   }
 
   protected abstract void searchByQuery(String query, EditText userInput);
 
-  protected abstract void searchByLocation(double lat, double lon);
+  public abstract void searchByLocation(double lat, double lon);
 }
