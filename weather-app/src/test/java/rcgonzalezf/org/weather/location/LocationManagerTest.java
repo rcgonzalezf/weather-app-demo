@@ -20,10 +20,10 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
 @RunWith(JMockit.class) public class LocationManagerTest {
 
   @Tested private LocationManager uut;
-  @Mocked private View mContent;
-  @Mocked private BaseActivity mBaseActivity;
-  @Mocked private LocationRetriever mLocationRetriever;
-  @Mocked private PermissionChecker mPermissionChecker;
+  @SuppressWarnings("unused") @Mocked private View mContent;
+  @SuppressWarnings("unused") @Mocked private BaseActivity mBaseActivity;
+  @SuppressWarnings("unused") @Mocked private LocationRetriever mLocationRetriever;
+  @SuppressWarnings("unused") @Mocked private PermissionChecker mPermissionChecker;
   private int mRequestCode;
   private String[] mPermissions;
   private int[] mGrantResults;
