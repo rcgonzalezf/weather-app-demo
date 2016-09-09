@@ -52,13 +52,12 @@ public abstract class BaseActivity extends AppCompatActivity
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.weather);
-    mLocationManager = new LocationManager(this, mContent);
-
     initToolbar();
     setupDrawerLayout();
     setupFabButton();
 
     mContent = findViewById(R.id.content);
+    mLocationManager = new LocationManager(this, mContent);
   }
 
   @Override protected void onStart() {
