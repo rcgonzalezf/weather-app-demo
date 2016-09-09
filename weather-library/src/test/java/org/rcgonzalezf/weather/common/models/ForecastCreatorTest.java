@@ -24,6 +24,7 @@ public class ForecastCreatorTest {
   private Forecast[] forecastArray;
   private Parcel someParcel;
   private Forecast forecastCreated;
+  private int describeContentValue;
 
   @Before public void setup() {
     forecast = new Forecast();
@@ -78,6 +79,23 @@ public class ForecastCreatorTest {
     whenCreatingFromParcel();
 
     thenForecastCreatedShouldNotBeEqualTo(forecast);
+  }
+
+  @Test public void shouldNotDescribeContent() {
+    givenForecastWithValues(1, 1, "someCity", 1d, 1d, "someHumidity", "someDate", "someCountry", 1d,
+        "someDesc");
+
+    whenDescribingContentForParcelable();
+
+    thenDescriptorShouldBe(0);
+  }
+
+  private void thenDescriptorShouldBe(int expected) {
+    assertEquals(expected, describeContentValue);
+  }
+
+  private void whenDescribingContentForParcelable() {
+    describeContentValue = forecast.describeContents();
   }
 
   private void givenNewDate(String newDate) {

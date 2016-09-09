@@ -162,6 +162,7 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
   }
 
   private void thenCityNameShouldBe(String expected) {
+    assertTrue(mForecastData.toString().contains(expected));
     assertEquals(expected, mForecastData.getCity().getName());
   }
 

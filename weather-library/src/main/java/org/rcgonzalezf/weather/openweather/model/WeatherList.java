@@ -1,13 +1,8 @@
 package org.rcgonzalezf.weather.openweather.model;
 
 public class WeatherList {
-  private Clouds clouds;
-
-  private String dt;
 
   private Wind wind;
-
-  private Sys sys;
 
   private Weather[] weather;
 
@@ -15,36 +10,12 @@ public class WeatherList {
 
   private Main main;
 
-  public Clouds getClouds() {
-    return clouds;
-  }
-
-  public void setClouds(Clouds clouds) {
-    this.clouds = clouds;
-  }
-
-  public String getDt() {
-    return dt;
-  }
-
-  public void setDt(String dt) {
-    this.dt = dt;
-  }
-
   public Wind getWind() {
     return wind;
   }
 
   public void setWind(Wind wind) {
     this.wind = wind;
-  }
-
-  public Sys getSys() {
-    return sys;
-  }
-
-  public void setSys(Sys sys) {
-    this.sys = sys;
   }
 
   public Weather[] getWeather() {
