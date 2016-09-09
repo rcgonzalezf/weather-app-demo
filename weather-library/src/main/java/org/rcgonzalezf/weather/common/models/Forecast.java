@@ -23,16 +23,16 @@ public class Forecast implements WeatherViewModel {
   }
 
   @Override public void writeToParcel(Parcel dest, int flags) {
-    dest.writeInt(mCityId);
-    dest.writeString(mCityName);
-    dest.writeDouble(mSpeed);
-    dest.writeDouble(mTemp);
-    dest.writeString(mHumidity);
-    dest.writeString(mDateTime);
-    dest.writeInt(mWeatherId);
+    dest.writeInt(getId());
+    dest.writeString(getCityName());
+    dest.writeDouble(getSpeed());
+    dest.writeDouble(getTemperature());
+    dest.writeString(getHumidity());
+    dest.writeString(getDateTime());
+    dest.writeInt(getWeatherId());
     dest.writeString(getCountry());
-    dest.writeDouble(mDeg);
-    dest.writeString(mDescription);
+    dest.writeDouble(getDeg());
+    dest.writeString(getDescription());
   }
 
   public static final Creator<Forecast> CREATOR = new Creator<Forecast>() {

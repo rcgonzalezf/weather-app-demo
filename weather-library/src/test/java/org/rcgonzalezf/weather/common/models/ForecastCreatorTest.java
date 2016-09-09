@@ -13,6 +13,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(RobolectricTestRunner.class)
@@ -47,7 +48,52 @@ public class ForecastCreatorTest {
     thenForecastCreatedShouldBeEqualTo(forecast);
   }
 
+  @Test public void shouldWriteFromParcelWithNullValues() {
+    givenForecastWithValues(1, 1, "someCity", 1d, 1d, null, null, "someCountry", 1d,
+        "someDesc");
+    givenWritingToParcel();
+
+    whenCreatingFromParcel();
+
+    thenForecastCreatedShouldBeEqualTo(forecast);
+  }
+
+  @Test public void shouldNotMatchGivenDifferentHumidity() {
+    givenForecastWithValues(1, 1, "someCity", 1d, 1d, "someHumidity", "someDate", "someCountry", 1d,
+        "someDesc");
+    givenWritingToParcel();
+    givenNewHumidity("newHumidity");
+
+    whenCreatingFromParcel();
+
+    thenForecastCreatedShouldNotBeEqualTo(forecast);
+  }
+
+  @Test public void shouldNotMatchGivenDifferentDate() {
+    givenForecastWithValues(1, 1, "someCity", 1d, 1d, "someHumidity", "someDate", "someCountry", 1d,
+        "someDesc");
+    givenWritingToParcel();
+    givenNewDate("newDate");
+
+    whenCreatingFromParcel();
+
+    thenForecastCreatedShouldNotBeEqualTo(forecast);
+  }
+
+  private void givenNewDate(String newDate) {
+    forecast.setDateTime(newDate);
+  }
+
+  private void thenForecastCreatedShouldNotBeEqualTo(Forecast forecast) {
+    assertNotEquals(forecast, forecastCreated);
+  }
+
+  private void givenNewHumidity(String newHumidity) {
+    forecast.setHumidity(newHumidity);
+  }
+
   private void thenForecastCreatedShouldBeEqualTo(Forecast expectedForecast) {
+    assertEquals(expectedForecast.hashCode(), forecastCreated.hashCode());
     assertEquals(expectedForecast, forecastCreated);
   }
 
