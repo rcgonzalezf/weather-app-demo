@@ -1,6 +1,7 @@
 package org.rcgonzalezf.weather.openweather.model;
 
-public class Main {
+// Gson
+@SuppressWarnings("unused") public class Main {
 
   private long humidity;
 
@@ -10,16 +11,7 @@ public class Main {
     return humidity;
   }
 
-  public void setHumidity(long humidity) {
-    this.humidity = humidity;
-  }
-
   public double getTemp() {
     return temp;
   }
-
-  public void setTemp(double temp) {
-    this.temp = temp;
-  }
-
 }
