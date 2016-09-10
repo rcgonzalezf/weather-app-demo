@@ -1,5 +1,6 @@
 package rcgonzalezf.org.weather;
 
+import android.support.annotation.VisibleForTesting;
 import com.facebook.stetho.Stetho;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import okhttp3.OkHttpClient;
@@ -7,10 +8,12 @@ import org.rcgonzalezf.weather.WeatherLibApp;
 
 public class WeatherApp extends WeatherLibApp {
 
+  @VisibleForTesting static boolean sIsDebugMode = BuildConfig.DEBUG;
+
   @Override public void onCreate() {
     super.onCreate();
 
-    if (org.rcgonzalezf.weather.BuildConfig.DEBUG) {
+    if (sIsDebugMode) {
       Stetho.initializeWithDefaults(this);
     }
 
@@ -21,7 +24,7 @@ public class WeatherApp extends WeatherLibApp {
 
     OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder();
 
-    if (BuildConfig.DEBUG) {
+    if (sIsDebugMode) {
       okHttpBuilder.addInterceptor(new StethoInterceptor());
     }
 
