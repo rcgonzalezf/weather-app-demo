@@ -5,10 +5,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -66,7 +66,7 @@ public class WeatherListActivity extends BaseActivity
     // TODO implement error handling
   }
 
-  @Override protected void searchByQuery(String query, EditText userInput) {
+  @Override protected void searchByQuery(String query, Editable userInput) {
     WeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback> weatherRepository =
         ServiceConfig.getInstance().getWeatherRepository();
 
@@ -74,7 +74,7 @@ public class WeatherListActivity extends BaseActivity
         .withCityName(query)
         .build(), mOpenWeatherApiCallback);
 
-    Toast.makeText(this, getString(R.string.searching) + " " + userInput.getText() + "...",
+    Toast.makeText(this, getString(R.string.searching) + " " + userInput + "...",
         Toast.LENGTH_SHORT).show();
   }
 

@@ -8,12 +8,12 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationServices;
+import mockit.Expectations;
 import mockit.Mock;
 import mockit.MockUp;
 import mockit.Mocked;
 import mockit.Verifications;
 import mockit.integration.junit4.JMockit;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import rcgonzalezf.org.weather.common.BaseActivity;
@@ -87,7 +87,7 @@ import static org.mockito.Mockito.mock;
     thenShouldInformNoInternet();
   }
 
-  @Ignore("Problems with the mock") @Test public void shouldNotifyEmptyLocationListener() {
+ @Test public void shouldNotifyEmptyLocationListener() {
     givenLocationRetriever();
     givenInternet(true);
     givenLocationFound(false);
@@ -108,11 +108,12 @@ import static org.mockito.Mockito.mock;
   }
 
   @SuppressWarnings("MissingPermission") private void givenLocationFound(final boolean found) {
-    new MockUp<FusedLocationProviderApi>() {
-      @SuppressWarnings("unused") @Mock Location getLastLocation(GoogleApiClient var1) {
-        return found ? mock(Location.class) : null;
-      }
-    };
+
+    final Location location = found ? mock(Location.class) : null;
+
+    new Expectations(uut) {{
+      uut.getLastLocation(); result = location;
+    }};
   }
 
   private void thenShouldNotifyLocationFound() {

@@ -3,6 +3,7 @@ package rcgonzalezf.org.weather.location;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -79,11 +80,8 @@ public class LocationRetriever
     }
   }
 
-  // We are handling the potential missing permission
-  @SuppressWarnings("MissingPermission") private void useLastLocation(
-      LocationRetrieverListener locationRetrieverListener) {
-    final Location mLastLocation =
-        LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+  private void useLastLocation(LocationRetrieverListener locationRetrieverListener) {
+    final Location mLastLocation = getLastLocation();
     if (mLastLocation != null) {
       double lat = mLastLocation.getLatitude();
       double lon = mLastLocation.getLongitude();
@@ -92,5 +90,11 @@ public class LocationRetriever
     } else {
       locationRetrieverListener.onEmptyLocation();
     }
+  }
+
+  // We are handling the potential missing permission
+  @VisibleForTesting
+  @SuppressWarnings("MissingPermission")  Location getLastLocation() {
+    return LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
   }
 }
