@@ -1,12 +1,14 @@
 package rcgonzalezf.org.weather.common;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -24,6 +26,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.gson.Gson;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import mockit.Expectations;
@@ -41,12 +45,14 @@ import org.rcgonzalezf.weather.common.models.Forecast;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
 import rcgonzalezf.org.weather.location.LocationManager;
+import rcgonzalezf.org.weather.utils.WeatherUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static rcgonzalezf.org.weather.common.BaseActivity.FORECASTS;
+import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
 
 @RunWith(JMockit.class) public class BaseActivityTest {
 
@@ -71,6 +77,13 @@ import static rcgonzalezf.org.weather.common.BaseActivity.FORECASTS;
   private boolean mIsNullUserDisplayName;
   private View mView;
   private String mStoredData;
+  private int mRequestCode;
+  private String[] mPermissions;
+  private int[] mGrantResults;
+  private Editable mUserInput;
+  private View.OnClickListener mFabClickListener;
+  private DialogInterface.OnClickListener mDialogClickListener;
+  private NavigationView.OnNavigationItemSelectedListener mNavigationListener;
 
   @Before public void setUp() {
     mView = new MockUp<View>() {
@@ -101,7 +114,7 @@ import static rcgonzalezf.org.weather.common.BaseActivity.FORECASTS;
 
       @SuppressWarnings("unused") @Mock boolean onOptionsItemSelected(MenuItem item) {
         mSuperOnOptionsItemSelectedCalled = true;
-        return mSuperOnOptionsItemSelectedCalled;
+        return true;
       }
     };
 
@@ -230,6 +243,222 @@ import static rcgonzalezf.org.weather.common.BaseActivity.FORECASTS;
     List<Forecast> storedData = whenGettingTheSavedData();
 
     thenShouldHaveStoredData(storedData);
+  }
+
+  @Test
+  public void shouldDelegateOnRequestPermissionsResult(@Mocked LocationManager mLocationManager) {
+    givenActivityCreated();
+    givenPermissionResultParameters();
+
+    whenHandlingRequestPermissionsResult();
+
+    thenShouldDelegateThePermissionsResult(mLocationManager);
+  }
+
+  @SuppressWarnings("UnusedParameters") @Test
+  public void shouldSearchByQuery(@Mocked Toast toast, @Mocked Editable editable,
+      @Mocked WeatherUtils weatherUtils) {
+    givenValidEditableInput(editable);
+    givenHasInternet(true);
+
+    whenSearchingByManualInput();
+
+    thenShouldSearchByQuery(true);
+  }
+
+  @SuppressWarnings("UnusedParameters") @Test
+  public void shouldInformNoInternetIfSearchByQueryAndLostConnectivity(@Mocked Toast toast,
+      @Mocked Editable editable, @Mocked WeatherUtils weatherUtils) {
+    givenValidEditableInput(editable);
+    givenHasInternet(false);
+
+    whenSearchingByManualInput();
+
+    thenShouldSearchByQuery(false);
+    thenShouldInformNoInternet();
+  }
+
+  @Test public void shouldNotPerformQueryAndInformUserForInvalidInput(@Mocked Toast toast,
+      @Mocked Editable editable,
+      @SuppressWarnings("UnusedParameters") @Mocked URLEncoder urlEncoder)
+      throws UnsupportedEncodingException {
+    givenInvalidEditableInput(editable);
+
+    whenSearchingByManualInput();
+
+    thenShouldShowTheToast(toast);
+    thenShouldSearchByQuery(false);
+  }
+
+  @Test public void shouldCloseTheDrawerOnHomePressed(
+      @SuppressWarnings("UnusedParameters") @Mocked Snackbar snackbar, @Mocked MenuItem item) {
+    givenActivityCreated();
+
+    whenPressingHome(item);
+
+    thenShouldCloseDrawer();
+  }
+
+  @SuppressWarnings("UnusedParameters") @Test
+  public void shouldDelegateActionWhenFabIsClicked(@Mocked AlertDialog alertDialog,
+      @Mocked AlertDialog.Builder alertDialogBuilder) {
+    givenFabClickListener();
+
+    whenClickingTheFab();
+
+    thenShouldPerformFabAction();
+  }
+
+  @Test public void shouldCancelDialogOnCancel(@Mocked DialogInterface dialog) {
+    givenCancelClickListener();
+
+    whenClickingDialog(dialog);
+
+    thenShouldCancel(dialog);
+  }
+
+  @SuppressWarnings("UnusedParameters") @Test
+  public void shouldSearchByManualInputOnDialogOk(@Mocked DialogInterface dialog,
+      @Mocked Editable editable, @Mocked WeatherUtils weatherUtils, @Mocked Toast toast) {
+    givenHasInternet(true);
+    givenOkClickListener(editable);
+
+    whenClickingDialog(dialog);
+
+    thenShouldSearchByManualInput(editable);
+  }
+
+  @Test
+  public void shouldNavigateToSettingsWhenSelectingFromDrawer(@Mocked MenuItem item, @Mocked Intent intent) {
+    givenNavigationListener();
+    givenMenuItemId(item,R.id.drawer_settings );
+
+    whenNavigationItemSelected(item);
+
+    thenShouldNavigateToSettings(intent);
+  }
+
+  @Test
+  public void shouldHandleHomePressedWhenSelectingFromDrawerNotKnownItem(@Mocked MenuItem item, @Mocked Snackbar snackbar) {
+    givenActivityCreated();
+    givenNavigationListener();
+    givenMenuItemId(item, -1);
+
+    whenNavigationItemSelected(item);
+
+    thenShouldHandleHomePressed(item);
+  }
+
+  private void thenShouldHandleHomePressed(final MenuItem item) {
+    new Verifications() {{
+      uut.homePressed(item);
+    }};
+  }
+
+  private void whenNavigationItemSelected(MenuItem item) {
+    mNavigationListener.onNavigationItemSelected(item);
+  }
+
+  private void givenNavigationListener() {
+    mNavigationListener = uut.getNavigationListener();
+  }
+
+  private void thenShouldSearchByManualInput(final Editable editable) {
+    new Expectations() {{
+      uut.searchByManualInput(editable);
+    }};
+  }
+
+  private void givenOkClickListener(Editable editable) {
+    mDialogClickListener = uut.getOkClickListener(editable);
+  }
+
+  private void thenShouldCancel(final DialogInterface dialog) {
+    new Verifications() {{
+      dialog.cancel();
+    }};
+  }
+
+  private void whenClickingDialog(DialogInterface dialog) {
+    mDialogClickListener.onClick(dialog, 1);
+  }
+
+  private void givenCancelClickListener() {
+    mDialogClickListener = uut.getCancelListener();
+  }
+
+  private void thenShouldPerformFabAction() {
+    new Expectations() {{
+      uut.performFabAction();
+    }};
+  }
+
+  private void whenClickingTheFab() {
+    mFabClickListener.onClick(null);
+  }
+
+  private void givenFabClickListener() {
+    mFabClickListener = uut.getFabClickListener();
+  }
+
+  private void thenShouldCloseDrawer() {
+    new Verifications() {{
+      mDrawerLayout.closeDrawers();
+    }};
+  }
+
+  private void whenPressingHome(MenuItem item) {
+    uut.homePressed(item);
+  }
+
+  private void givenInvalidEditableInput(final Editable editable)
+      throws UnsupportedEncodingException {
+    mUserInput = editable;
+    new Expectations() {{
+      URLEncoder.encode(editable.toString(), "UTF-8");
+      result = new UnsupportedEncodingException("");
+    }};
+  }
+
+  private void thenShouldInformNoInternet() {
+    new Verifications() {{
+      uut.informNoInternet();
+    }};
+  }
+
+  private void thenShouldSearchByQuery(boolean expected) {
+    assertEquals(expected, mSearchingByQuery);
+  }
+
+  private void whenSearchingByManualInput() {
+    uut.searchByManualInput(mUserInput);
+  }
+
+  private void givenHasInternet(final boolean hasInternet) {
+    new Expectations() {{
+      hasInternetConnection(withAny(mFragmentActivity));
+      result = hasInternet;
+    }};
+  }
+
+  private void givenValidEditableInput(Editable editable) {
+    mUserInput = editable;
+  }
+
+  private void thenShouldDelegateThePermissionsResult(final LocationManager locationManager) {
+    new Verifications() {{
+      locationManager.onRequestPermissionsResult(mRequestCode, mPermissions, mGrantResults);
+    }};
+  }
+
+  private void whenHandlingRequestPermissionsResult() {
+    uut.onRequestPermissionsResult(mRequestCode, mPermissions, mGrantResults);
+  }
+
+  private void givenPermissionResultParameters() {
+    this.mRequestCode = 1;
+    this.mPermissions = new String[] { "" };
+    this.mGrantResults = new int[] { 1 };
   }
 
   private void thenShouldHaveStoredData(List<Forecast> storedData) {
