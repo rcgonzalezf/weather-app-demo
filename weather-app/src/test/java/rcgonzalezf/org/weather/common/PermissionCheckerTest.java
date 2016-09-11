@@ -21,8 +21,10 @@ import org.junit.runner.RunWith;
 import rcgonzalezf.org.weather.R;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @RunWith(JMockit.class) public class PermissionCheckerTest {
 
@@ -54,7 +56,15 @@ import static org.mockito.Mockito.mock;
 
     whenCheckingIfHasPermission();
 
-    thenShouldHavePermissions();
+    thenShouldHavePermissions(true);
+  }
+
+  @Test public void shouldReturnFalseIfAppHasPermissions() {
+    givenActivityCompatWithRejectedPermission();
+
+    whenCheckingIfHasPermission();
+
+    thenShouldHavePermissions(false);
   }
 
   @Test public void shouldShowPermissionRationale() {
@@ -82,6 +92,15 @@ import static org.mockito.Mockito.mock;
     thenOnSuccessShouldBeCall(true);
   }
 
+  @Test public void shouldCallFailureOnEmptyGrantedResults() {
+    givenPermissionResultListener();
+    givenPermissionRequested(mPermissionListener);
+
+    whenOnPermissionRequestWithEmptyGrantedResults();
+
+    thenOnSuccessShouldBeCall(false);
+  }
+
   @Test public void shouldCallPermissionOnFailure() {
     givenPermissionResultListener();
     givenPermissionRequested(mPermissionListener);
@@ -106,6 +125,40 @@ import static org.mockito.Mockito.mock;
     whenClickingOk();
 
     thenShouldRequestPermissions();
+  }
+
+  @Test public void shouldNotNotifyFailureOnNullListener() {
+    givenUutSpied();
+
+    whenHandlingRejectedPermissions();
+
+    thenNoMoreInteractionsIfListenerIsNull();
+  }
+
+  @Test public void shouldNotNotifySuccessOnNullListener() {
+    givenUutSpied();
+
+    whenHandlingGrantedPermissions();
+
+    thenNoMoreInteractionsIfListenerIsNull();
+  }
+
+  private void whenHandlingGrantedPermissions() {
+    uut.handleGranted();
+    verify(uut).handleGranted();
+  }
+
+  private void givenUutSpied() {
+    uut = spy(uut);
+  }
+
+  private void thenNoMoreInteractionsIfListenerIsNull() {
+    verifyNoMoreInteractions(uut);
+  }
+
+  private void whenHandlingRejectedPermissions() {
+    uut.handleRejected();
+    verify(uut).handleRejected();
   }
 
   private void thenShouldRequestPermissions() {
@@ -138,6 +191,11 @@ import static org.mockito.Mockito.mock;
     uut.onRequestPermissionsResult(mTestRequestCode, new String[] { "somePermission" }, new int[] {
         permissionGranted ? PackageManager.PERMISSION_GRANTED : PackageManager.PERMISSION_DENIED
     });
+  }
+
+  @TargetApi(Build.VERSION_CODES.M)
+  private void whenOnPermissionRequestWithEmptyGrantedResults() {
+    uut.onRequestPermissionsResult(mTestRequestCode, new String[] { "somePermission" }, new int[] {});
   }
 
   private void givenPermissionResultListener() {
@@ -177,8 +235,8 @@ import static org.mockito.Mockito.mock;
     };
   }
 
-  private void thenShouldHavePermissions() {
-    assertTrue(mHasPermission);
+  private void thenShouldHavePermissions(boolean expected) {
+    assertEquals(expected, mHasPermission);
   }
 
   private void whenCheckingIfHasPermission() {
@@ -193,4 +251,14 @@ import static org.mockito.Mockito.mock;
       }
     };
   }
+
+  private void givenActivityCompatWithRejectedPermission() {
+    new MockUp<ActivityCompat>() {
+      @SuppressWarnings("unused") @Mock int checkSelfPermission(Context context,
+          String permission) {
+        return PackageManager.PERMISSION_DENIED;
+      }
+    };
+  }
+
 }

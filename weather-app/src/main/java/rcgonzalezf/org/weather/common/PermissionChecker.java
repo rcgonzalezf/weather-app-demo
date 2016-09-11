@@ -73,21 +73,32 @@ public class PermissionChecker implements ActivityCompat.OnRequestPermissionsRes
       @NonNull int[] grantResults) {
 
     if (this.mRequestCode == requestCode) {
-
+      int messageResId;
       if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-        Snackbar.make(mContainer.get(), mPermissionGrantedMessageId, Snackbar.LENGTH_SHORT).show();
-        if (mPermissionResultListener != null) {
-          mPermissionResultListener.onSuccess();
-        }
+        messageResId = mPermissionGrantedMessageId;
+        handleGranted();
       } else {
-        Snackbar.make(mContainer.get(), mPermissionsNotGrantedMessageId, Snackbar.LENGTH_SHORT)
-            .show();
-        if (mPermissionResultListener != null) {
-          mPermissionResultListener.onFailure();
-        }
+        messageResId = mPermissionsNotGrantedMessageId;
+        handleRejected();
       }
+      Snackbar.make(mContainer.get(), messageResId, Snackbar.LENGTH_SHORT)
+          .show();
     } else {
       mWeakContext.get().onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+  }
+
+  @VisibleForTesting
+  void handleRejected() {
+    if (mPermissionResultListener != null) {
+      mPermissionResultListener.onFailure();
+    }
+  }
+
+  @VisibleForTesting
+  void handleGranted() {
+    if (mPermissionResultListener != null) {
+      mPermissionResultListener.onSuccess();
     }
   }
 }
