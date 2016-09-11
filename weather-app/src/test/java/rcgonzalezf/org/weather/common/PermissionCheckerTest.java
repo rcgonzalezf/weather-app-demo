@@ -34,6 +34,7 @@ import static org.mockito.Mockito.mock;
   private boolean mHasPermission;
   private boolean mOnSuccessCalled;
   private PermissionResultListener mPermissionListener;
+  private View.OnClickListener mOkClickListener;
 
   @Before public void setup() {
     BaseActivity activityMock = mock(BaseActivity.class);
@@ -97,6 +98,28 @@ import static org.mockito.Mockito.mock;
     whenOnPermissionRequestResultForUnknownResultCode();
 
     thenOnSuccessShouldBeCall(false);
+  }
+
+  @Test public void shouldRequestPermissionsWhenSnackBarIsClickedOnOk() {
+    givenSnackBarOkClickListener();
+
+    whenClickingOk();
+
+    thenShouldRequestPermissions();
+  }
+
+  private void thenShouldRequestPermissions() {
+    new Verifications() {{
+      uut.requestPermissions();
+    }};
+  }
+
+  private void whenClickingOk() {
+    mOkClickListener.onClick(null);
+  }
+
+  private void givenSnackBarOkClickListener() {
+    mOkClickListener = uut.getSnackBarClickListener();
   }
 
   private void thenOnSuccessShouldBeCall(boolean expected) {

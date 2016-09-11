@@ -5,6 +5,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.annotation.StringRes;
+import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.view.View;
@@ -24,8 +25,8 @@ public class PermissionChecker implements ActivityCompat.OnRequestPermissionsRes
   private int mPermissionRationaleMessageId;
   private PermissionResultListener mPermissionResultListener;
 
-  public PermissionChecker(@NonNull String permission, @NonNull BaseActivity activity, int requestCode,
-      @NonNull View container, @StringRes int permissionGrantedMessageId,
+  public PermissionChecker(@NonNull String permission, @NonNull BaseActivity activity,
+      int requestCode, @NonNull View container, @StringRes int permissionGrantedMessageId,
       @StringRes int permissionsNotGrantedMessageId, @StringRes int permissionRationaleMessageId) {
     this.mWeakContext = new WeakReference<>(activity);
     this.mPermission = permission;
@@ -47,15 +48,19 @@ public class PermissionChecker implements ActivityCompat.OnRequestPermissionsRes
     if (ActivityCompat.shouldShowRequestPermissionRationale(mWeakContext.get(), mPermission)) {
 
       Snackbar.make(mContainer.get(), mPermissionRationaleMessageId, Snackbar.LENGTH_INDEFINITE)
-          .setAction(R.string.ok, new View.OnClickListener() {
-            @Override public void onClick(View view) {
-              requestPermissions();
-            }
-          })
+          .setAction(R.string.ok, getSnackBarClickListener())
           .show();
     } else {
       requestPermissions();
     }
+  }
+
+  @VisibleForTesting @NonNull View.OnClickListener getSnackBarClickListener() {
+    return new View.OnClickListener() {
+      @Override public void onClick(View view) {
+        requestPermissions();
+      }
+    };
   }
 
   void requestPermissions() {
@@ -63,8 +68,8 @@ public class PermissionChecker implements ActivityCompat.OnRequestPermissionsRes
         mRequestCode);
   }
 
-  @RequiresApi(api = Build.VERSION_CODES.M)
-  @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+  @RequiresApi(api = Build.VERSION_CODES.M) @Override
+  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
       @NonNull int[] grantResults) {
 
     if (this.mRequestCode == requestCode) {
