@@ -6,13 +6,10 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 import org.rcgonzalezf.weather.common.ServiceConfig;
@@ -90,18 +87,9 @@ public class WeatherListActivity extends BaseActivity
   private void saveForecastList(final List<Forecast> forecastList) {
     new Thread(new Runnable() {
       @Override public void run() {
-        ByteArrayOutputStream serializedData = new ByteArrayOutputStream();
-        try {
-          ObjectOutputStream serializer = new ObjectOutputStream(serializedData);
-          serializer.writeObject(forecastList);
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-
         SharedPreferences prefs = getSharedPreferences(OFFLINE_FILE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(FORECASTS,
-            Base64.encodeToString(serializedData.toByteArray(), Base64.DEFAULT));
+        editor.putString(FORECASTS, new Gson().toJson(forecastList));
         editor.apply();
       }
     }).start();
