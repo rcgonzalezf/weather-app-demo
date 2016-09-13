@@ -37,6 +37,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
   private boolean mOnSuccessCalled;
   private PermissionResultListener mPermissionListener;
   private View.OnClickListener mOkClickListener;
+  private boolean mOnFailureCalled;
 
   @Before public void setup() {
     BaseActivity activityMock = mock(BaseActivity.class);
@@ -89,7 +90,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
     whenOnPermissionRequestResultGranted(true);
 
-    thenOnSuccessShouldBeCall(true);
+    thenShouldCallOnSuccess(true);
+    thenShouldCallOnFailure(false);
   }
 
   @Test public void shouldCallFailureOnEmptyGrantedResults() {
@@ -98,7 +100,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
     whenOnPermissionRequestWithEmptyGrantedResults();
 
-    thenOnSuccessShouldBeCall(false);
+    thenShouldCallOnSuccess(false);
+    thenShouldCallOnFailure(true);
   }
 
   @Test public void shouldCallPermissionOnFailure() {
@@ -107,7 +110,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
     whenOnPermissionRequestResultGranted(false);
 
-    thenOnSuccessShouldBeCall(false);
+    thenShouldCallOnSuccess(false);
+    thenShouldCallOnFailure(true);
   }
 
   @Test public void shouldNotBreakTheOnRequestPermissionsResultChain() {
@@ -116,7 +120,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
     whenOnPermissionRequestResultForUnknownResultCode();
 
-    thenOnSuccessShouldBeCall(false);
+    thenShouldCallOnSuccess(false);
+    thenShouldCallOnFailure(false);
   }
 
   @Test public void shouldRequestPermissionsWhenSnackBarIsClickedOnOk() {
@@ -175,8 +180,12 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
     mOkClickListener = uut.getSnackBarClickListener();
   }
 
-  private void thenOnSuccessShouldBeCall(boolean expected) {
+  private void thenShouldCallOnSuccess(boolean expected) {
     assertEquals(expected, mOnSuccessCalled);
+  }
+
+  private void thenShouldCallOnFailure(boolean expected) {
+    assertEquals(expected, mOnFailureCalled);
   }
 
   @TargetApi(Build.VERSION_CODES.M)
@@ -207,6 +216,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
       }
 
       @Mock public void onFailure() {
+        mOnFailureCalled = true;
       }
     }.getMockInstance();
   }
