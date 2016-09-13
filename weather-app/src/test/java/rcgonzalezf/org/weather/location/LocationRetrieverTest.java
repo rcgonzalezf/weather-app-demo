@@ -20,7 +20,11 @@ import rcgonzalezf.org.weather.common.BaseActivity;
 import rcgonzalezf.org.weather.utils.WeatherUtils;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @RunWith(JMockit.class) public class LocationRetrieverTest {
 
@@ -40,6 +44,14 @@ import static org.mockito.Mockito.mock;
     whenConnected();
 
     thenShouldCheckForPermissions();
+  }
+
+  @Test public void shouldNotPerformActionOnNullListenerOnConnected() {
+    givenNullLocationRetrieverListener();
+
+    whenConnected();
+
+    thenNoMoreInteractionAreExpected();
   }
 
   @Test public void shouldConnectGoogleApiClient() {
@@ -87,7 +99,15 @@ import static org.mockito.Mockito.mock;
     thenShouldInformNoInternet();
   }
 
- @Test public void shouldNotifyEmptyLocationListener() {
+  @Test public void shouldNotInteractIfNoBaseActivity() {
+    givenLocationRetriever();
+
+    whenTryingToGetTheLastKnowLocationWithBaseActivity(null);
+
+    thenNoMoreInteractionAreExpected();
+  }
+
+  @Test public void shouldNotifyEmptyLocationListener() {
     givenLocationRetriever();
     givenInternet(true);
     givenLocationFound(false);
@@ -107,12 +127,22 @@ import static org.mockito.Mockito.mock;
     thenShouldNotifyLocationFound();
   }
 
+  @Test public void shouldNotInteractOnLocationFoundListenerNull() {
+    givenNullLocationRetrieverListener();
+    givenInternet(true);
+
+    whenTryingToGetTheLastKnowLocationWithBaseActivity(mSomeBaseActivity);
+
+    thenNoMoreInteractionAreExpected();
+  }
+
   @SuppressWarnings("MissingPermission") private void givenLocationFound(final boolean found) {
 
     final Location location = found ? mock(Location.class) : null;
 
     new Expectations(uut) {{
-      uut.getLastLocation(); result = location;
+      uut.getLastLocation();
+      result = location;
     }};
   }
 
@@ -147,6 +177,7 @@ import static org.mockito.Mockito.mock;
 
   private void whenLocationPermissionsGranted() {
     uut.onLocationPermissionsGranted();
+    verify(uut).onLocationPermissionsGranted();
   }
 
   private void whenConnectionFailed() {
@@ -209,9 +240,23 @@ import static org.mockito.Mockito.mock;
 
   private void whenConnected() {
     uut.onConnected(mock(Bundle.class));
+    verify(uut).onConnected(any(Bundle.class));
   }
 
   private void givenLocationRetriever() {
-    uut = new LocationRetriever(mSomeBaseActivity, mTestLocationRetrieverListener);
+    uut = spy(new LocationRetriever(mSomeBaseActivity, mTestLocationRetrieverListener));
+  }
+
+  private void givenNullLocationRetrieverListener() {
+    uut = spy(new LocationRetriever(mSomeBaseActivity, null));
+  }
+
+  private void thenNoMoreInteractionAreExpected() {
+    verifyNoMoreInteractions(uut);
+  }
+
+  private void whenTryingToGetTheLastKnowLocationWithBaseActivity(BaseActivity baseActivity) {
+    uut.tryToUseLastKnownLocation(baseActivity);
+    verify(uut).tryToUseLastKnownLocation(any(BaseActivity.class));
   }
 }

@@ -13,7 +13,7 @@ import rcgonzalezf.org.weather.common.BaseActivity;
 
 import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
 
-public class LocationRetriever
+class LocationRetriever
     implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
   private static final String TAG = LocationRetriever.class.getSimpleName();
@@ -22,12 +22,14 @@ public class LocationRetriever
   private WeakReference<BaseActivity> mWeakBaseActivity;
   private WeakReference<LocationRetrieverListener> mWeakLocationRetrieverListener;
 
-  public LocationRetriever(BaseActivity baseActivity,
+  LocationRetriever(@NonNull BaseActivity baseActivity,
       LocationRetrieverListener locationRetrieverListener) {
-    this.mWeakBaseActivity = new WeakReference<>(baseActivity);
-    this.mWeakLocationRetrieverListener = new WeakReference<>(locationRetrieverListener);
-
-    buildGoogleApiClient();
+    mWeakBaseActivity = new WeakReference<>(baseActivity);
+    mWeakLocationRetrieverListener = new WeakReference<>(locationRetrieverListener);
+    mGoogleApiClient = new GoogleApiClient.Builder(baseActivity).addConnectionCallbacks(this)
+        .addOnConnectionFailedListener(this)
+        .addApi(LocationServices.API)
+        .build();
   }
 
   @Override public void onConnected(Bundle bundle) {
@@ -46,37 +48,30 @@ public class LocationRetriever
     Log.d(TAG, "Google Location onConnectionFailed " + connectionResult.getErrorMessage());
   }
 
-  public void connect() {
+  void connect() {
     mGoogleApiClient.connect();
   }
 
-  public void disconnect() {
+  void disconnect() {
     mGoogleApiClient.disconnect();
   }
 
-  public void onLocationPermissionsGranted() {
-    tryToUseLastKnownLocation();
+  void onLocationPermissionsGranted() {
+    final BaseActivity baseActivity = mWeakBaseActivity.get();
+    tryToUseLastKnownLocation(baseActivity);
   }
 
-  private synchronized void buildGoogleApiClient() {
-    final BaseActivity baseActivity = mWeakBaseActivity.get();
-    if (baseActivity != null) {
-      mGoogleApiClient = new GoogleApiClient.Builder(baseActivity).addConnectionCallbacks(this)
-          .addOnConnectionFailedListener(this)
-          .addApi(LocationServices.API)
-          .build();
-    }
-  }
-
-  private void tryToUseLastKnownLocation() {
-    final BaseActivity baseActivity = mWeakBaseActivity.get();
+  @VisibleForTesting
+  void tryToUseLastKnownLocation(BaseActivity baseActivity) {
     final LocationRetrieverListener locationRetrieverListener =
         mWeakLocationRetrieverListener.get();
 
-    if (baseActivity != null && !hasInternetConnection(baseActivity)) {
-      baseActivity.informNoInternet();
-    } else if (locationRetrieverListener != null) {
-      useLastLocation(locationRetrieverListener);
+    if (baseActivity != null) {
+      if (!hasInternetConnection(baseActivity)) {
+        baseActivity.informNoInternet();
+      } else if (locationRetrieverListener != null) {
+        useLastLocation(locationRetrieverListener);
+      }
     }
   }
 
@@ -93,8 +88,7 @@ public class LocationRetriever
   }
 
   // We are handling the potential missing permission
-  @VisibleForTesting
-  @SuppressWarnings("MissingPermission")  Location getLastLocation() {
+  @VisibleForTesting @SuppressWarnings("MissingPermission") Location getLastLocation() {
     return LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
   }
 }
