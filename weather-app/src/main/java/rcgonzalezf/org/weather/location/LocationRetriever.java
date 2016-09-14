@@ -48,6 +48,10 @@ class LocationRetriever
     Log.d(TAG, "Google Location onConnectionFailed " + connectionResult.getErrorMessage());
   }
 
+  void onLocationPermissionFailure() {
+    Log.d(TAG, "Location permission failure");
+  }
+
   void connect() {
     mGoogleApiClient.connect();
   }

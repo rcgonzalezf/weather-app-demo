@@ -5,6 +5,7 @@ import android.os.Build;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 import mockit.Expectations;
+import mockit.FullVerifications;
 import mockit.Mocked;
 import mockit.Tested;
 import mockit.Verifications;
@@ -48,6 +49,22 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
     thenShouldNotifyOnLocationPermissionGranted();
   }
 
+  @Test public void shouldNotInteractOnLocationsPermissionGrantedWithNullBaseActivityAndContent() {
+    givenPermissionChecker();
+
+    whenCheckingPermissions(null, null);
+
+    thenShouldNotInteractWith(mPermissionChecker);
+  }
+
+  @Test public void shouldNotInteractOnLocationsPermissionGrantedWithBaseActivityAndNullContent() {
+    givenPermissionChecker();
+
+    whenCheckingPermissions(mBaseActivity, null);
+
+    thenShouldNotInteractWith(mPermissionChecker);
+  }
+
   @Test public void shouldRequestPermissionsIfAppDoesNotHaveGrantedLocationPermission(
       @Mocked PermissionResultListener permissionResultListener) {
     givenPermissionGranted(false);
@@ -64,12 +81,36 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
     thenShouldNotifyUser(snackbar);
   }
 
+  @Test public void shouldNotInteractIfEmptyLocationAndNullBaseActivityAndContent(
+      @Mocked Snackbar snackbar) {
+
+    whenEmptyLocationReceived(null, null);
+
+    thenShouldNotInteractWith(snackbar);
+  }
+
+  @Test public void shouldNotInteractIfEmptyLocationAndBaseActivityWithNullContent(
+      @Mocked Snackbar snackbar) {
+
+    whenEmptyLocationReceived(mBaseActivity, null);
+
+    thenShouldNotInteractWith(snackbar);
+  }
+
   @Test public void shouldSearchByLocationOnLocationFound() {
     givenLatLonLocation();
 
     whenFindingLocation();
 
     thenShouldSearchByLocation();
+  }
+
+  @Test public void shouldNotInteractIfNullBaseActivityOnLocationFound() {
+    givenLatLonLocation();
+
+    whenFindingLocation(null);
+
+    thenShouldNotInteractWith(mBaseActivity);
   }
 
   @Test public void shouldDelegateRequestPermissionResultForMApiAndAbove() {
@@ -92,6 +133,14 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
     thenShouldDelegateOnRequestPermissionResult(false);
   }
 
+  @Test public void shouldNotInteractIfPermissionCheckerIsNull() {
+    givenPermissionResultParameters();
+
+    whenRequestingPermissionResult();
+
+    thenShouldNotInteractWith(mPermissionChecker);
+  }
+
   @Test public void shouldDelegateConnect() {
 
     whenConnecting();
@@ -104,6 +153,40 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
     whenDisconnecting();
 
     thenShouldDelegateDisconnect();
+  }
+
+  @Test public void shouldNotifyLocationGrantedOnSuccessPermissionsSuccess() {
+    PermissionResultListener permissionResultListener = givenPermissionResultListener();
+
+    whenSuccessfullyGettingPermissions(permissionResultListener);
+
+    thenShouldNotifyOnLocationPermissionGranted();
+  }
+
+  @Test public void shouldNotifyLocationFailureOnPermissionsFailure() {
+    PermissionResultListener permissionResultListener = givenPermissionResultListener();
+
+    whenGettingPermissionsFailure(permissionResultListener);
+
+    thenShouldNotifyOnLocationPermissionFailure();
+  }
+
+  private void whenGettingPermissionsFailure(PermissionResultListener permissionResultListener) {
+    permissionResultListener.onFailure();
+  }
+
+  private void whenSuccessfullyGettingPermissions(
+      PermissionResultListener permissionResultListener) {
+    permissionResultListener.onSuccess();
+  }
+
+  private PermissionResultListener givenPermissionResultListener() {
+    return uut.getPermissionResultListener();
+  }
+
+  private void thenShouldNotInteractWith(Object mock) {
+    new FullVerifications(mock) {
+    };
   }
 
   private void whenDisconnecting() {
@@ -173,6 +256,10 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
     uut.onLocationFound(mLat, mLon);
   }
 
+  private void whenFindingLocation(BaseActivity baseActivity) {
+    uut.onLocationFound(baseActivity, mLat, mLon);
+  }
+
   private void thenShouldNotifyUser(final Snackbar snackbar) {
     new Verifications() {{
       snackbar.show();
@@ -183,6 +270,10 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
     uut.onEmptyLocation();
   }
 
+  private void whenEmptyLocationReceived(BaseActivity baseActivity, View content) {
+    uut.onEmptyLocation(baseActivity, content);
+  }
+
   private void thenShouldRequestPermissions(
       final PermissionResultListener permissionResultListener) {
     new Verifications() {{
@@ -190,10 +281,20 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
     }};
   }
 
+  private void thenShouldNotifyOnLocationPermissionFailure() {
+    new Verifications() {{
+      mLocationRetriever.onLocationPermissionFailure();
+    }};
+  }
+
   private void thenShouldNotifyOnLocationPermissionGranted() {
     new Verifications() {{
       mLocationRetriever.onLocationPermissionsGranted();
     }};
+  }
+
+  private void whenCheckingPermissions(BaseActivity baseActivity, View content) {
+    uut.checkForPermissions(baseActivity, content);
   }
 
   private void whenCheckingPermissions() {

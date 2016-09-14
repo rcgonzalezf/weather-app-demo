@@ -81,6 +81,15 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
     thenLogged();
   }
 
+  @Test public void shouldHandleOnLocationPermissionFailure() {
+    givenLogger();
+    givenLocationRetriever();
+
+    whenLocationPermissionFailure();
+
+    thenLogged();
+  }
+
   @Test public void shouldHandleOnConnectionFailed() {
     givenLogger();
     givenLocationRetriever();
@@ -199,6 +208,10 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
   private void whenConnectionSuspended() {
     uut.onConnectionSuspended(0);
+  }
+
+  private void whenLocationPermissionFailure() {
+    uut.onLocationPermissionFailure();
   }
 
   private void thenGoogleApiDisconnect() {
