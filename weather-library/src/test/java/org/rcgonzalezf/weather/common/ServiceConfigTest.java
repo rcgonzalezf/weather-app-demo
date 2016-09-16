@@ -29,7 +29,7 @@ import static org.junit.Assert.assertNotNull;
 
   @Test(expected = IllegalStateException.class) public void shouldThrowExceptionIfNoApiKeyIsSet() {
     givenNullApiKey();
-    givenSomeProvider();
+    givenSomeKnownProvider();
     whenRetrievingRepository();
   }
 
@@ -39,7 +39,7 @@ import static org.junit.Assert.assertNotNull;
   }
 
   @Test public void shouldGetRepositoryInstanceForValidConfig() {
-    givenSomeProvider();
+    givenSomeKnownProvider();
     whenRetrievingRepository();
     thenShouldHaveRepositoryInstance();
   }
@@ -52,7 +52,7 @@ import static org.junit.Assert.assertNotNull;
     mWeatherRepository = mServiceConfig.getWeatherRepository();
   }
 
-  private void givenSomeProvider() {
+  private void givenSomeKnownProvider() {
     mServiceConfig.setWeatherProvider(mDefaultProvider);
   }
 

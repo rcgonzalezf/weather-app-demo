@@ -14,18 +14,14 @@ public class OpenWeatherApiRequestParameters implements RequestParameters {
   private Units units;
 
   @Override public String getQueryString() {
-    return getmQueryString();
+    return mQueryString;
   }
 
   @Override public Map<String, String> getKeyValueParameters() {
     throw new UnsupportedOperationException("This service doesn't provides this method");
   }
 
-  private String getmQueryString() {
-    return mQueryString;
-  }
-
-  private void setmQueryString(String mQueryString) {
+  private void setQueryString(String mQueryString) {
     this.mQueryString = mQueryString;
   }
 
@@ -111,7 +107,7 @@ public class OpenWeatherApiRequestParameters implements RequestParameters {
         ++i;
       }
 
-      mOpenWeatherApiRequestParameters.setmQueryString(queryBuilder.toString());
+      mOpenWeatherApiRequestParameters.setQueryString(queryBuilder.toString());
       return mOpenWeatherApiRequestParameters;
     }
 

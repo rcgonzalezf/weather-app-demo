@@ -39,6 +39,15 @@ public class OpenWeatherApiCallbackTest {
     thenListUpdated(true);
   }
 
+  @Test
+  public void shouldIgnoreUpdateTheListOnSuccessWhenListenerIsNull() {
+    givenUut();
+
+    whenCallbackIsNotifiedForSuccessWithNullListener(mock(OpenWeatherApiResponse.class));
+
+    thenListUpdated(false);
+    thenOnErrorIsCalled(false);
+  }
 
   @Test
   public void shouldNotifyErrorOnError() {
@@ -47,6 +56,24 @@ public class OpenWeatherApiCallbackTest {
     whenCallbackIsNotifiedForError(new OpenWeatherApiError());
 
     thenOnErrorIsCalled(true);
+  }
+
+  @Test
+  public void shouldIgnoreErrorOnErrorWhenListenerIsNull() {
+    givenUut();
+
+    whenCallbackIsNotifiedForErrorWithNullListener(new OpenWeatherApiError());
+
+    thenOnErrorIsCalled(false);
+    thenListUpdated(false);
+  }
+
+  private void whenCallbackIsNotifiedForSuccessWithNullListener(OpenWeatherApiResponse openWeatherApiResponse) {
+    uut.onSuccess(openWeatherApiResponse, null);
+  }
+
+  private void whenCallbackIsNotifiedForErrorWithNullListener(OpenWeatherApiError openWeatherApiError) {
+    uut.onError(openWeatherApiError, null);
   }
 
   private void thenOnErrorIsCalled(boolean expected) {
