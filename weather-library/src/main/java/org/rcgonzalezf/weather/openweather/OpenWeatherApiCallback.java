@@ -40,7 +40,7 @@ public class OpenWeatherApiCallback
   }
 
   @Override public void onError(OpenWeatherApiError apiError) {
-    Log.e(TAG, apiError.getError());
+    Log.e(TAG, apiError.getError() + apiError.getCode());
     OnUpdateWeatherListListener onUpdateWeatherListListener =
         mOnUpdateWeatherListListenerWeakReference.get();
     onError(apiError, onUpdateWeatherListListener);

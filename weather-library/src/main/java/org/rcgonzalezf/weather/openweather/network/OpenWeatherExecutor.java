@@ -1,7 +1,7 @@
 package org.rcgonzalezf.weather.openweather.network;
 
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
-import com.facebook.stetho.okhttp3.StethoInterceptor;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -27,6 +27,8 @@ class OpenWeatherExecutor {
   private ApiCallback<OpenWeatherApiResponse, OpenWeatherApiError> mApiCallback;
   private static final String TAG = OpenWeatherExecutor.class.getSimpleName();
   private ModelConverter<OpenWeatherForecastData> mConverter;
+  @VisibleForTesting
+  WeatherLibApp mWeatherLibApp = WeatherLibApp.getInstance();
 
   OpenWeatherExecutor(OpenWeatherApiCallback apiCallback, Executor executor, String apiKey) {
     mApiCallback = apiCallback;
@@ -38,8 +40,7 @@ class OpenWeatherExecutor {
 
     mExecutor.execute(new Runnable() {
       @Override public void run() {
-        OkHttpClient okClient =
-            new OkHttpClient.Builder().addNetworkInterceptor(new StethoInterceptor()).build();
+        OkHttpClient okClient = mWeatherLibApp.createOkHttpClient();
 
         ForecastService service =
             new Retrofit.Builder().baseUrl("http://api.openweathermap.org/data/2.5/")
@@ -70,7 +71,7 @@ class OpenWeatherExecutor {
 
   private void notifyOnError() {
     final OpenWeatherApiError error = new OpenWeatherApiError();
-    error.setMessage(WeatherLibApp.getInstance().getString(R.string.empty_result));
+    error.setMessage(mWeatherLibApp.getString(R.string.empty_result));
     error.setCode(ErrorCode.EMPTY);
     mApiCallback.onError(error);
   }
