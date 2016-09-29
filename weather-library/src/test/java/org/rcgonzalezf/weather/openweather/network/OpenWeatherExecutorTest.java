@@ -22,38 +22,31 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@RunWith(RobolectricTestRunner.class) @Config(constants = BuildConfig.class, sdk = 23, application = WeatherTestLibApp.class)
+@RunWith(RobolectricTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 23, application = WeatherTestLibApp.class)
 public class OpenWeatherExecutorTest {
 
   private OpenWeatherExecutor uut;
-  private OpenWeatherApiCallback mApiCallBack;
   private Executor mExecutor;
-  private String mSomeApiKey;
   private OpenWeatherApiRequestParameters mRequestParameters;
 
-  @Mock
-  private ModelConverter<OpenWeatherForecastData> mModelConverter;
+  @Mock private ModelConverter<OpenWeatherForecastData> mModelConverter;
 
-
-  @Before
-  public void createOpenWeatherExecutor() {
+  @Before public void createOpenWeatherExecutor() {
     MockitoAnnotations.initMocks(this);
 
-    mApiCallBack = mock(OpenWeatherApiCallback.class);
+    OpenWeatherApiCallback mApiCallBack = mock(OpenWeatherApiCallback.class);
     mExecutor = spy(new TestExecutor());
-    mSomeApiKey = "someKey";
+    String mSomeApiKey = "someKey";
     uut = new OpenWeatherExecutor(mApiCallBack, mExecutor, mSomeApiKey);
     uut.setModelConverter(mModelConverter);
-    //uut.mWeatherLibApp = new WeatherTestLibApp();
   }
 
-  @After
-  public void setAppInstanceToPreviousValue() {
+  @After public void setAppInstanceToPreviousValue() {
 
   }
 
-  @Test
-  public void shouldExecuteWhenPerformingCallForCityName() {
+  @Test public void shouldExecuteWhenPerformingCallForCityName() {
     givenRequestParametersWithCityName();
 
     whenPerformingCall();
@@ -61,8 +54,7 @@ public class OpenWeatherExecutorTest {
     thenShouldExecute();
   }
 
-  @Test
-  public void shouldExecuteWhenPerformingCallForLatLon() {
+  @Test public void shouldExecuteWhenPerformingCallForLatLon() {
     givenRequestParametersWithLatLon();
 
     whenPerformingCall();
@@ -71,15 +63,19 @@ public class OpenWeatherExecutorTest {
   }
 
   private void givenRequestParametersWithLatLon() {
-    mRequestParameters = new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withLatLon(1d,1d).build();
+    mRequestParameters =
+        new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withLatLon(1d, 1d)
+            .build();
   }
 
   private void givenRequestParametersWithCityName() {
-    mRequestParameters = new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withCityName("someCity").build();
+    mRequestParameters =
+        new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withCityName("someCity")
+            .build();
   }
 
   private void thenShouldExecute() {
-   verify(mExecutor, times(1)).execute(any(Runnable.class));
+    verify(mExecutor, times(1)).execute(any(Runnable.class));
   }
 
   private void whenPerformingCall() {
