@@ -4,6 +4,8 @@ import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -88,6 +90,13 @@ public class ForecastCreatorTest {
     whenDescribingContentForParcelable();
 
     thenDescriptorShouldBe(0);
+  }
+
+  @Test
+  public void equalsContract() {
+    EqualsVerifier.forClass(Forecast.class)
+        .suppress(Warning.NONFINAL_FIELDS, Warning.NULL_FIELDS)
+        .verify();
   }
 
   private void thenDescriptorShouldBe(int expected) {

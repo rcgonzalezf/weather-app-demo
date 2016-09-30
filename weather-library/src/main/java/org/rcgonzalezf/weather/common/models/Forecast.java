@@ -2,7 +2,7 @@ package org.rcgonzalezf.weather.common.models;
 
 import android.os.Parcel;
 
-public class Forecast implements WeatherViewModel {
+public final class Forecast implements WeatherViewModel {
 
   public Forecast() {
   }
