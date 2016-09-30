@@ -1,7 +1,6 @@
 package org.rcgonzalezf.weather.openweather.network;
 
 import java.util.concurrent.Executor;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,10 +39,6 @@ public class OpenWeatherExecutorTest {
     String mSomeApiKey = "someKey";
     uut = new OpenWeatherExecutor(mApiCallBack, mExecutor, mSomeApiKey);
     uut.setModelConverter(mModelConverter);
-  }
-
-  @After public void setAppInstanceToPreviousValue() {
-
   }
 
   @Test public void shouldExecuteWhenPerformingCallForCityName() {
