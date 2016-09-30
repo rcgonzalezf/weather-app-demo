@@ -46,6 +46,7 @@ public class OpenWeatherApiRequestTest {
       }
 
       @Override public void onError(OpenWeatherApiError apiError) {
+        ErrorCode.valueOf("EMPTY");
         mIsError = true;
       }
     };
