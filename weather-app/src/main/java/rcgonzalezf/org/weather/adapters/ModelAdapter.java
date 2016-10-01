@@ -20,9 +20,9 @@ import rcgonzalezf.org.weather.SettingsActivity;
 
 import static rcgonzalezf.org.weather.utils.WeatherUtils.formatDate;
 import static rcgonzalezf.org.weather.utils.WeatherUtils.formatTemperature;
-import static rcgonzalezf.org.weather.utils.WeatherUtils.getArtResourceForWeatherCondition;
+import static rcgonzalezf.org.weather.utils.WeatherArtUtils.getArtResourceForWeatherCondition;
 import static rcgonzalezf.org.weather.utils.WeatherUtils.getDayName;
-import static rcgonzalezf.org.weather.utils.WeatherUtils.getFormattedWind;
+import static rcgonzalezf.org.weather.utils.WeatherWindUtils.getFormattedWind;
 
 public class ModelAdapter<T extends WeatherViewModel>
     extends RecyclerView.Adapter<ModelAdapter.ModelViewHolder> implements View.OnClickListener {
