@@ -1,10 +1,11 @@
 package rcgonzalezf.org.weather.utils;
 
+import android.support.annotation.DrawableRes;
 import rcgonzalezf.org.weather.R;
 
 public class WeatherArtUtils {
 
-  public static int getArtResourceForWeatherCondition(int weatherId) {
+  public static @DrawableRes int getArtResourceForWeatherCondition(int weatherId) {
     // Based on weather code data found at:
     // http://bugs.openweathermap.org/projects/api/wiki/Weather_Condition_Codes
     if (weatherId >= 200 && weatherId <= 232) {
@@ -19,7 +20,7 @@ public class WeatherArtUtils {
       return R.drawable.art_rain;
     } else if (weatherId >= 600 && weatherId <= 622) {
       return R.drawable.art_snow;
-    } else if (weatherId >= 701 && weatherId <= 761) {
+    } else if (weatherId >= 701 && weatherId < 761) {
       return R.drawable.art_fog;
     } else if (weatherId == 761 || weatherId == 781) {
       return R.drawable.art_storm;

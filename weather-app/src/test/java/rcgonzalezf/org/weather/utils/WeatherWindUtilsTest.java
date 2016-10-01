@@ -33,13 +33,13 @@ import static org.junit.Assert.assertNotNull;
     });
   }
 
-  @Parameterized.Parameter public double windDirStr;
+  @SuppressWarnings("WeakerAccess") @Parameterized.Parameter public double windDirStr;
 
-  @Parameterized.Parameter(value = 1) public String expectedWindFormattedStr;
+  @SuppressWarnings("WeakerAccess") @Parameterized.Parameter(value = 1) public String expectedWindFormattedStr;
 
-  @Mocked private Context mContext;
+  @SuppressWarnings("unused") @Mocked private Context mContext;
 
-  private double mWindSpeedStr = 3d;
+  @SuppressWarnings("FieldCanBeLocal") private double mWindSpeedStr = 3d;
   private String mFormattedWindStr;
 
   @Test public void shouldGetFormattedWindDirectionString() throws Exception {
