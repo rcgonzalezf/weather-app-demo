@@ -13,6 +13,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 import mockit.Expectations;
+import mockit.FullVerifications;
 import mockit.Mocked;
 import mockit.Tested;
 import mockit.Verifications;
@@ -22,12 +23,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.rcgonzalezf.weather.WeatherLibApp;
 import org.rcgonzalezf.weather.common.models.Forecast;
+import org.rcgonzalezf.weather.common.models.WeatherViewModel;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @RunWith(JMockit.class) public class ModelAdapterTest {
 
@@ -42,6 +48,8 @@ import static org.mockito.Mockito.mock;
   @Mocked private PreferenceManager mPreferenceManager;
   private ModelAdapter.ModelViewHolder mModelViewHolder;
   private int mItemCount;
+  private Runnable mItemClickListenerRunnable;
+  private ModelAdapter.OnItemClickListener mItemClickListener;
 
   @Before public void setUp() throws Exception {
     mModels = new ArrayList<>();
@@ -109,6 +117,41 @@ import static org.mockito.Mockito.mock;
     thenHandlerShouldPostRunnable();
   }
 
+  @Test public void shouldNotPostDelayedItemClickOnClickForNullItemClickListener(
+      @SuppressWarnings("UnusedParameters") @Mocked Handler handler) {
+
+    whenClicking();
+
+    thenNoInteractionsOnHandler(handler);
+  }
+
+  @Test public void shouldCallItemClickListenerOnItemClick() {
+    givenItemClickListener();
+    givenRunnable();
+
+    whenRunning();
+
+    thenItemClickListenerShouldHandleItemClick();
+  }
+
+  private void thenItemClickListenerShouldHandleItemClick() {
+    //noinspection unchecked
+    verify(mItemClickListener, times(1)).onItemClick(eq(mTextView), any(WeatherViewModel.class));
+  }
+
+  private void whenRunning() {
+    mItemClickListenerRunnable.run();
+  }
+
+  private void givenRunnable() {
+    mItemClickListenerRunnable = uut.createClickRunnable(mTextView);
+  }
+
+  private void thenNoInteractionsOnHandler(Handler handler) {
+    new FullVerifications(handler) {
+    };
+  }
+
   private void thenHandlerShouldPostRunnable() {
     new Verifications() {{
       new Handler().postDelayed(withAny(mock(Runnable.class)), 200);
@@ -120,7 +163,8 @@ import static org.mockito.Mockito.mock;
   }
 
   private void givenItemClickListener() {
-    uut.setOnItemClickListener(mock(ModelAdapter.OnItemClickListener.class));
+    mItemClickListener = mock(ModelAdapter.OnItemClickListener.class);
+    uut.setOnItemClickListener(mItemClickListener);
   }
 
   @Test public void shouldSetItemClickListener() {
