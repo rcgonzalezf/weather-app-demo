@@ -3,6 +3,8 @@ package rcgonzalezf.org.weather;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -61,6 +63,7 @@ public class WeatherListActivity extends BaseActivity
 
   @Override public void onError(String error) {
     // TODO implement error handling
+    Log.d(TAG, error);
   }
 
   @Override protected void searchByQuery(String query, Editable userInput) {
@@ -106,12 +109,16 @@ public class WeatherListActivity extends BaseActivity
 
   private void notifyAdapter(final List<Forecast> forecastList) {
     saveForecastList(forecastList);
+    runOnUiThread(createNotifyRunnable(forecastList));
+  }
 
-    runOnUiThread(new Runnable() {
+  @VisibleForTesting
+  @NonNull Runnable createNotifyRunnable(final List<Forecast> forecastList) {
+    return new Runnable() {
       @Override public void run() {
         mAdapter.setItems(forecastList);
         mAdapter.notifyDataSetChanged();
       }
-    });
+    };
   }
 }
