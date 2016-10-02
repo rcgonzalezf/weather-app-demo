@@ -32,16 +32,18 @@ import static org.mockito.Mockito.mock;
 
   @Tested private WeatherListActivity uut;
 
-  @Mocked private BaseActivity mBaseActivity;
-  @Mocked private RecyclerView mRecyclerView;
-  @Mocked private ModelAdapter<Forecast> mAdapter;
-  @Mocked private OpenWeatherApiCallback mOpenWeatherApiCallback;
+  @SuppressWarnings("unused") @Mocked private BaseActivity mBaseActivity;
+  @SuppressWarnings("unused") @Mocked private RecyclerView mRecyclerView;
+  @SuppressWarnings("unused") @Mocked private ModelAdapter<Forecast> mAdapter;
+  @SuppressWarnings("unused") @Mocked private OpenWeatherApiCallback mOpenWeatherApiCallback;
 
-  @Mocked private OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder
+  @SuppressWarnings("unused") @Mocked
+  private OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder
       mOpenWeatherApiRequestBuilder;
-  @Mocked private WeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback>
+  @SuppressWarnings("unused") @Mocked
+  private WeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback>
       mWeatherRepository;
-  @Mocked private ServiceConfig mServiceConfig;
+  @SuppressWarnings("unused") @Mocked private ServiceConfig mServiceConfig;
   private List<Forecast> mForecastList;
   private String mQuery;
   private Runnable mNotifyAdapterRunnable;
@@ -139,7 +141,7 @@ import static org.mockito.Mockito.mock;
     thenWeatherRepositoryShouldFindWeather();
   }
 
-  @Test public void shouldNotifyDataSetChangeOnRunningTheNotifyRunnable(){
+  @Test public void shouldNotifyDataSetChangeOnRunningTheNotifyRunnable() {
     givenActivityCreated();
     givenForecastList();
     givenNotifyRunnable();
@@ -156,7 +158,7 @@ import static org.mockito.Mockito.mock;
   }
 
   private void thenAdapterShouldNotifyDataSetChanges() {
-    new Verifications(){{
+    new Verifications() {{
       mAdapter.notifyDataSetChanged();
     }};
   }
