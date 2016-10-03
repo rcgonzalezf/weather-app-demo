@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -15,7 +16,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
+import android.text.Editable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,12 +24,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 import org.rcgonzalezf.weather.common.models.Forecast;
 import rcgonzalezf.org.weather.R;
@@ -49,16 +48,19 @@ public abstract class BaseActivity extends AppCompatActivity
   private View mContent;
   private LocationManager mLocationManager;
 
+  protected abstract void searchByQuery(String query, Editable userInput);
+
+  public abstract void searchByLocation(double lat, double lon);
+
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.weather);
-    mLocationManager = new LocationManager(this, mContent);
-
     initToolbar();
     setupDrawerLayout();
-    setupFabButton();
+    findViewById(R.id.main_fab).setOnClickListener(getFabClickListener());
 
     mContent = findViewById(R.id.content);
+    mLocationManager = new LocationManager(this, mContent);
   }
 
   @Override protected void onStart() {
@@ -88,11 +90,6 @@ public abstract class BaseActivity extends AppCompatActivity
     return super.onOptionsItemSelected(item);
   }
 
-  private void navigateToSettings() {
-    Intent intent = new Intent(BaseActivity.this, SettingsActivity.class);
-    startActivity(intent);
-  }
-
   protected void initToolbar() {
     final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
@@ -108,18 +105,7 @@ public abstract class BaseActivity extends AppCompatActivity
     mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
     NavigationView view = (NavigationView) findViewById(R.id.navigation_view);
-    view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-      @Override public boolean onNavigationItemSelected(MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.drawer_settings) {
-          navigateToSettings();
-        } else {
-          Snackbar.make(mContent, menuItem.getTitle() + " pressed", Snackbar.LENGTH_SHORT).show();
-          menuItem.setChecked(true);
-          mDrawerLayout.closeDrawers();
-        }
-        return true;
-      }
-    });
+    view.setNavigationItemSelectedListener(getNavigationListener());
 
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     TextView textView = (TextView) findViewById(R.id.user_display_name);
@@ -129,50 +115,16 @@ public abstract class BaseActivity extends AppCompatActivity
     }
   }
 
-  private void setupFabButton() {
-    findViewById(R.id.main_fab).setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View v) {
-        performFabAction();
-      }
-    });
-  }
-
   protected void performFabAction() {
     View promptsView = View.inflate(this, R.layout.dialog_city_query, null);
-    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
     final EditText userInput = (EditText) promptsView.findViewById(R.id.city_input_edit_text);
 
-    alertDialogBuilder.setView(promptsView);
-    alertDialogBuilder.setCancelable(false)
-        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-          public void onClick(DialogInterface dialog, int id) {
-
-            String query;
-            try {
-              query = URLEncoder.encode(userInput.getText().toString(), "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-              Log.e(TAG, "Can't encode URL", e);
-              Toast.makeText(BaseActivity.this,
-                  getString(R.string.invalid_input) + ": " + userInput.getText() + "...",
-                  Toast.LENGTH_SHORT).show();
-              return;
-            }
-
-            if (!hasInternetConnection(BaseActivity.this)) {
-              informNoInternet();
-            } else {
-              searchByQuery(query, userInput);
-            }
-          }
-        })
-        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-          public void onClick(DialogInterface dialog, int id) {
-            dialog.cancel();
-          }
-        });
-
-    AlertDialog alertDialog = alertDialogBuilder.create();
-    alertDialog.show();
+    new AlertDialog.Builder(this).setView(promptsView)
+        .setCancelable(false)
+        .setPositiveButton("OK", getOkClickListener(userInput.getText()))
+        .setNegativeButton("Cancel", getCancelListener())
+        .create()
+        .show();
   }
 
   public void informNoInternet() {
@@ -186,16 +138,9 @@ public abstract class BaseActivity extends AppCompatActivity
     String serializedData = sharedPreferences.getString(FORECASTS, null);
     List<Forecast> storedData = null;
     if (serializedData != null) {
-      try {
-        ByteArrayInputStream input =
-            new ByteArrayInputStream(Base64.decode(serializedData, Base64.DEFAULT));
-        ObjectInputStream inputStream = new ObjectInputStream(input);
-        storedData = (ArrayList<Forecast>) inputStream.readObject();
-      } catch (IOException | ClassNotFoundException | java.lang.IllegalArgumentException e) {
-        Log.e(TAG, "Can't retrive previous offline data", e);
-      }
+      storedData = new Gson().fromJson(serializedData, new TypeToken<List<Forecast>>() {
+      }.getType());
     }
-
     return storedData;
   }
 
@@ -204,7 +149,71 @@ public abstract class BaseActivity extends AppCompatActivity
     mLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
   }
 
-  protected abstract void searchByQuery(String query, EditText userInput);
+  @VisibleForTesting void searchByManualInput(Editable userInput) {
+    String query;
+    try {
+      query = URLEncoder.encode(userInput.toString(), "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      Log.e(TAG, "Can't encode URL", e);
+      Toast.makeText(BaseActivity.this,
+          getString(R.string.invalid_input) + ": " + userInput + "...", Toast.LENGTH_SHORT).show();
+      return;
+    }
 
-  public abstract void searchByLocation(double lat, double lon);
+    if (!hasInternetConnection(BaseActivity.this)) {
+      informNoInternet();
+    } else {
+      searchByQuery(query, userInput);
+    }
+  }
+
+  @VisibleForTesting void homePressed(MenuItem menuItem) {
+    Snackbar.make(mContent, menuItem.getTitle() + " pressed", Snackbar.LENGTH_SHORT).show();
+    menuItem.setChecked(true);
+    mDrawerLayout.closeDrawers();
+  }
+
+  @VisibleForTesting @NonNull View.OnClickListener getFabClickListener() {
+    return new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        performFabAction();
+      }
+    };
+  }
+
+  @VisibleForTesting @NonNull DialogInterface.OnClickListener getCancelListener() {
+    return new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int id) {
+        dialog.cancel();
+      }
+    };
+  }
+
+  @VisibleForTesting @NonNull DialogInterface.OnClickListener getOkClickListener(
+      final Editable userInput) {
+    return new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int id) {
+        searchByManualInput(userInput);
+      }
+    };
+  }
+
+  @VisibleForTesting @NonNull
+  NavigationView.OnNavigationItemSelectedListener getNavigationListener() {
+    return new NavigationView.OnNavigationItemSelectedListener() {
+      @Override public boolean onNavigationItemSelected(MenuItem menuItem) {
+        if (menuItem.getItemId() == R.id.drawer_settings) {
+          navigateToSettings();
+        } else {
+          homePressed(menuItem);
+        }
+        return true;
+      }
+    };
+  }
+
+  private void navigateToSettings() {
+    Intent intent = new Intent(BaseActivity.this, SettingsActivity.class);
+    startActivity(intent);
+  }
 }

@@ -1,6 +1,7 @@
 package org.rcgonzalezf.weather;
 
 import android.app.Application;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import java.io.File;
 import okhttp3.OkHttpClient;
@@ -31,7 +32,8 @@ public abstract class WeatherLibApp extends Application {
     sAppInstance = appInstance;
   }
 
-  private void enableHttpResponseCache() {
+  @VisibleForTesting
+  void enableHttpResponseCache() {
     try {
       long httpCacheSize = 10 * 1024 * 1024; // 10 MiB
       File httpCacheDir = new File(getCacheDir(), "http");

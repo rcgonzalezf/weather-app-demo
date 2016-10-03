@@ -3,16 +3,15 @@ package rcgonzalezf.org.weather;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Base64;
+import android.text.Editable;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 import org.rcgonzalezf.weather.common.ServiceConfig;
@@ -64,9 +63,10 @@ public class WeatherListActivity extends BaseActivity
 
   @Override public void onError(String error) {
     // TODO implement error handling
+    Log.d(TAG, error);
   }
 
-  @Override protected void searchByQuery(String query, EditText userInput) {
+  @Override protected void searchByQuery(String query, Editable userInput) {
     WeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback> weatherRepository =
         ServiceConfig.getInstance().getWeatherRepository();
 
@@ -74,7 +74,7 @@ public class WeatherListActivity extends BaseActivity
         .withCityName(query)
         .build(), mOpenWeatherApiCallback);
 
-    Toast.makeText(this, getString(R.string.searching) + " " + userInput.getText() + "...",
+    Toast.makeText(this, getString(R.string.searching) + " " + userInput + "...",
         Toast.LENGTH_SHORT).show();
   }
 
@@ -90,18 +90,9 @@ public class WeatherListActivity extends BaseActivity
   private void saveForecastList(final List<Forecast> forecastList) {
     new Thread(new Runnable() {
       @Override public void run() {
-        ByteArrayOutputStream serializedData = new ByteArrayOutputStream();
-        try {
-          ObjectOutputStream serializer = new ObjectOutputStream(serializedData);
-          serializer.writeObject(forecastList);
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-
         SharedPreferences prefs = getSharedPreferences(OFFLINE_FILE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(FORECASTS,
-            Base64.encodeToString(serializedData.toByteArray(), Base64.DEFAULT));
+        editor.putString(FORECASTS, new Gson().toJson(forecastList));
         editor.apply();
       }
     }).start();
@@ -118,12 +109,16 @@ public class WeatherListActivity extends BaseActivity
 
   private void notifyAdapter(final List<Forecast> forecastList) {
     saveForecastList(forecastList);
+    runOnUiThread(createNotifyRunnable(forecastList));
+  }
 
-    runOnUiThread(new Runnable() {
+  @VisibleForTesting
+  @NonNull Runnable createNotifyRunnable(final List<Forecast> forecastList) {
+    return new Runnable() {
       @Override public void run() {
         mAdapter.setItems(forecastList);
         mAdapter.notifyDataSetChanged();
       }
-    });
+    };
   }
 }

@@ -1,5 +1,6 @@
 package org.rcgonzalezf.weather.openweather;
 
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -25,6 +26,12 @@ public class OpenWeatherApiCallback
   @Override public void onSuccess(OpenWeatherApiResponse apiResponse) {
     OnUpdateWeatherListListener onUpdateWeatherListListener =
         mOnUpdateWeatherListListenerWeakReference.get();
+    onSuccess(apiResponse, onUpdateWeatherListListener);
+  }
+
+  @VisibleForTesting
+  void onSuccess(OpenWeatherApiResponse apiResponse,
+      OnUpdateWeatherListListener onUpdateWeatherListListener) {
     if (onUpdateWeatherListListener != null) {
       final List<Forecast> forecastList =
           new ForecastMapper().withData(apiResponse.getData()).map();
@@ -33,9 +40,15 @@ public class OpenWeatherApiCallback
   }
 
   @Override public void onError(OpenWeatherApiError apiError) {
-    Log.e(TAG, apiError.getError());
+    Log.e(TAG, apiError.getError() + apiError.getCode());
     OnUpdateWeatherListListener onUpdateWeatherListListener =
         mOnUpdateWeatherListListenerWeakReference.get();
+    onError(apiError, onUpdateWeatherListListener);
+  }
+
+  @VisibleForTesting
+  void onError(OpenWeatherApiError apiError,
+      OnUpdateWeatherListListener onUpdateWeatherListListener) {
     if (onUpdateWeatherListListener != null) {
       onUpdateWeatherListListener.onError(apiError.getError());
     }

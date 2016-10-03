@@ -3,6 +3,8 @@ package rcgonzalezf.org.weather.utils;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -29,50 +31,25 @@ public class WeatherUtils {
     return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
   }
 
-  public static int getArtResourceForWeatherCondition(int weatherId) {
-    // Based on weather code data found at:
-    // http://bugs.openweathermap.org/projects/api/wiki/Weather_Condition_Codes
-    if (weatherId >= 200 && weatherId <= 232) {
-      return R.drawable.art_storm;
-    } else if (weatherId >= 300 && weatherId <= 321) {
-      return R.drawable.art_light_rain;
-    } else if (weatherId >= 500 && weatherId <= 504) {
-      return R.drawable.art_rain;
-    } else if (weatherId == 511) {
-      return R.drawable.art_snow;
-    } else if (weatherId >= 520 && weatherId <= 531) {
-      return R.drawable.art_rain;
-    } else if (weatherId >= 600 && weatherId <= 622) {
-      return R.drawable.art_snow;
-    } else if (weatherId >= 701 && weatherId <= 761) {
-      return R.drawable.art_fog;
-    } else if (weatherId == 761 || weatherId == 781) {
-      return R.drawable.art_storm;
-    } else if (weatherId == 800) {
-      return R.drawable.art_clear;
-    } else if (weatherId == 801) {
-      return R.drawable.art_light_clouds;
-    } else if (weatherId >= 802 && weatherId <= 804) {
-      return R.drawable.art_clouds;
-    }
-
-    return -1;
-  }
 
   public static String getDayName(Context context, String dateStr) {
+    Date todayDate = new Date();
+   return getDayName(context, dateStr, todayDate);
+  }
+
+  @VisibleForTesting
+  static String getDayName(Context context, String dateStr, Date todayDate) {
     SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
     try {
       Date inputDate = dateFormat.parse(dateStr);
-      Date todayDate = new Date();
-
-      if (todayDate.equals(inputDate)) {
+      if (isSameDay(inputDate, todayDate)) {
         return context.getString(R.string.today);
       } else {
         Calendar cal = Calendar.getInstance();
         cal.setTime(todayDate);
         cal.add(Calendar.DATE, 1);
         Date tomorrowDate = cal.getTime();
-        if (tomorrowDate.equals(inputDate)) {
+        if (isSameDay(inputDate, tomorrowDate)) {
           return context.getString(R.string.tomorrow);
         } else {
           SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
@@ -82,6 +59,31 @@ public class WeatherUtils {
     } catch (ParseException e) {
       return dateStr;
     }
+  }
+
+  /**
+   * <p>Checks if two dates are on the same day ignoring time.</p>
+   * @param date1  the first date, not altered, not null
+   * @param date2  the second date, not altered, not null
+   * @return true if they represent the same day
+   */
+  private static boolean isSameDay(@NonNull Date date1, @NonNull  Date date2) {
+    Calendar cal1 = Calendar.getInstance();
+    cal1.setTime(date1);
+    Calendar cal2 = Calendar.getInstance();
+    cal2.setTime(date2);
+    return isSameDay(cal1, cal2);
+  }
+
+  /**
+   * <p>Checks if two calendars represent the same day ignoring time.</p>
+   * @param cal1  the first calendar, not altered, not null
+   * @param cal2  the second calendar, not altered, not null
+   * @return true if they represent the same day
+   */
+  private static boolean isSameDay(@NonNull Calendar cal1, @NonNull Calendar cal2) {
+    return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+        cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
   }
 
   public static String formatDate(String dateStr) {
@@ -95,33 +97,8 @@ public class WeatherUtils {
     }
   }
 
-  public static String getFormattedWind(Context context, double windSpeedStr, double windDirStr) {
-    String windFormat = "%1$s: %2$s km/h %3$s";
-
-    // From wind direction in degrees, determine compass direction
-    // as a string (e.g., NW).
-    String direction = "Unknown";
-    if (windDirStr >= 337.5 || windDirStr < 22.5) {
-      direction = "N";
-    } else if (windDirStr >= 22.5 && windDirStr < 67.5) {
-      direction = "NE";
-    } else if (windDirStr >= 67.5 && windDirStr < 112.5) {
-      direction = "E";
-    } else if (windDirStr >= 112.5 && windDirStr < 157.5) {
-      direction = "SE";
-    } else if (windDirStr >= 157.5 && windDirStr < 202.5) {
-      direction = "S";
-    } else if (windDirStr >= 202.5 && windDirStr < 247.5) {
-      direction = "SW";
-    } else if (windDirStr >= 247.5 && windDirStr < 292.5) {
-      direction = "W";
-    } else if (windDirStr >= 292.5 && windDirStr < 337.5) direction = "NW";
-
-    return String.format(windFormat, context.getString(R.string.wind), windSpeedStr, direction);
-  }
-
   public static String formatTemperature(double temperature, boolean isFahrenheit, String symbol) {
-    if (isFahrenheit)
+    if (!isFahrenheit)
     // Conversion of Kelvin to Fahrenheit temperature.
     {
       temperature = 1.8 * (temperature - 273) + 32;

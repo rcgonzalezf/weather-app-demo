@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 @RunWith(RobolectricTestRunner.class) @Config(constants = BuildConfig.class, sdk = 23, application = WeatherTestLibApp.class)
 public class OpenWeatherApiRequestTest {
 
-  private OpenWeatherApiRequest mOpenWeatherApiRequest;
+  private OpenWeatherApiRequest uut;
   private OpenWeatherApiCallback mTestApiCallback;
   private boolean mIsSuccess;
   private boolean mIsError;
@@ -36,8 +36,8 @@ public class OpenWeatherApiRequestTest {
   @Before public void createApiRequestBaseObject() {
     MockitoAnnotations.initMocks(this);
 
-    mOpenWeatherApiRequest = new OpenWeatherApiRequest("someApiKey", mModelConverter);
-    mOpenWeatherApiRequest = spy(mOpenWeatherApiRequest);
+    uut = new OpenWeatherApiRequest("someApiKey", mModelConverter);
+    uut = spy(uut);
 
     mTestApiCallback = new OpenWeatherApiCallback(mock(OnUpdateWeatherListListener.class)) {
 
@@ -46,11 +46,12 @@ public class OpenWeatherApiRequestTest {
       }
 
       @Override public void onError(OpenWeatherApiError apiError) {
+        ErrorCode.valueOf("EMPTY");
         mIsError = true;
       }
     };
-    mOpenWeatherApiRequest.addRequestParameters(mock(OpenWeatherApiRequestParameters.class));
-    when(mOpenWeatherApiRequest.getExecutor()).thenReturn(new TestExecutor());
+    uut.addRequestParameters(mock(OpenWeatherApiRequestParameters.class));
+    when(uut.getExecutor()).thenReturn(new TestExecutor());
   }
 
   @Test public void shouldNotifySuccess() throws Exception {
@@ -94,7 +95,7 @@ public class OpenWeatherApiRequestTest {
   }
 
   private void whenExecuting() {
-    mOpenWeatherApiRequest.execute(mTestApiCallback);
+    uut.execute(mTestApiCallback);
   }
 
   private void thenCallbackShouldBeSuccess() {

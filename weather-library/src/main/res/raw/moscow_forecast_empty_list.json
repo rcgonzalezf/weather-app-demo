@@ -1,0 +1,19 @@
+{
+  "city": {
+    "id": 524901,
+    "name": "Moscow",
+    "coord": {
+      "lon": 37.615555,
+      "lat": 55.75222
+    },
+    "country": "RU",
+    "population": 0,
+    "sys": {
+      "population": 0
+    }
+  },
+  "cod": "200",
+  "message": 0.0036,
+  "cnt": 40,
+  "list": []
+}

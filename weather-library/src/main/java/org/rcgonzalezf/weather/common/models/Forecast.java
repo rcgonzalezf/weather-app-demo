@@ -2,7 +2,7 @@ package org.rcgonzalezf.weather.common.models;
 
 import android.os.Parcel;
 
-public class Forecast implements WeatherViewModel {
+public final class Forecast implements WeatherViewModel {
 
   public Forecast() {
   }
@@ -23,16 +23,16 @@ public class Forecast implements WeatherViewModel {
   }
 
   @Override public void writeToParcel(Parcel dest, int flags) {
-    dest.writeInt(mCityId);
-    dest.writeString(mCityName);
-    dest.writeDouble(mSpeed);
-    dest.writeDouble(mTemp);
-    dest.writeString(mHumidity);
-    dest.writeString(mDateTime);
-    dest.writeInt(mWeatherId);
+    dest.writeInt(getId());
+    dest.writeString(getCityName());
+    dest.writeDouble(getSpeed());
+    dest.writeDouble(getTemperature());
+    dest.writeString(getHumidity());
+    dest.writeString(getDateTime());
+    dest.writeInt(getWeatherId());
     dest.writeString(getCountry());
-    dest.writeDouble(mDeg);
-    dest.writeString(mDescription);
+    dest.writeDouble(getDeg());
+    dest.writeString(getDescription());
   }
 
   public static final Creator<Forecast> CREATOR = new Creator<Forecast>() {
@@ -136,5 +136,47 @@ public class Forecast implements WeatherViewModel {
 
   public void setDescription(String description) {
     this.mDescription = description;
+  }
+
+  @Override public boolean equals(Object other) {
+    if (this == other) return true;
+    if (other == null || getClass() != other.getClass()) return false;
+
+    Forecast forecast = (Forecast) other;
+
+    if (mWeatherId != forecast.mWeatherId) return false;
+    if (mCityId != forecast.mCityId) return false;
+    if (Double.compare(forecast.mSpeed, mSpeed) != 0) return false;
+    if (Double.compare(forecast.mTemp, mTemp) != 0) return false;
+    if (Double.compare(forecast.mDeg, mDeg) != 0) return false;
+    if (!mCityName.equals(forecast.mCityName)) return false;
+    if (mHumidity != null ? !mHumidity.equals(forecast.mHumidity) : forecast.mHumidity != null) {
+      return false;
+    }
+    if (mDateTime != null ? !mDateTime.equals(forecast.mDateTime) : forecast.mDateTime != null) {
+      return false;
+    }
+    if (!mCountry.equals(forecast.mCountry)) return false;
+    return mDescription != null ? mDescription.equals(forecast.mDescription)
+        : forecast.mDescription == null;
+  }
+
+  @Override public int hashCode() {
+    int result;
+    long temp;
+    result = mWeatherId;
+    result = 31 * result + mCityId;
+    result = 31 * result + mCityName.hashCode();
+    temp = Double.doubleToLongBits(mSpeed);
+    result = 31 * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(mTemp);
+    result = 31 * result + (int) (temp ^ (temp >>> 32));
+    result = 31 * result + (mHumidity != null ? mHumidity.hashCode() : 0);
+    result = 31 * result + (mDateTime != null ? mDateTime.hashCode() : 0);
+    result = 31 * result + mCountry.hashCode();
+    temp = Double.doubleToLongBits(mDeg);
+    result = 31 * result + (int) (temp ^ (temp >>> 32));
+    result = 31 * result + (mDescription != null ? mDescription.hashCode() : 0);
+    return result;
   }
 }

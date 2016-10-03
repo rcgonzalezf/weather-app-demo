@@ -20,4 +20,8 @@ public class OpenWeatherApiError implements ApiError<String>{
   public void setCode(ErrorCode code) {
     mCode = code;
   }
+
+  public ErrorCode getCode() {
+    return mCode;
+  }
 }

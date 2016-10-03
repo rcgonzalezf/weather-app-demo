@@ -27,15 +27,15 @@ import static org.mockito.Mockito.spy;
 @Config(constants = BuildConfig.class, sdk = 23, application = WeatherTestLibApp.class)
 public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
 
-  private OpenWeatherApiModelConverter mOpenWeatherApiModelConverter;
+  private OpenWeatherApiModelConverter uut;
   private OpenWeatherForecastData openWeatherForecastData;
   private List<ForecastData> mModel;
   private ForecastData mForecastData;
   private WeatherData mWeatherData;
 
   @Before public void initModelConverter() {
-    mOpenWeatherApiModelConverter = new OpenWeatherApiModelConverter();
-    mOpenWeatherApiModelConverter = spy(mOpenWeatherApiModelConverter);
+    uut = new OpenWeatherApiModelConverter();
+    uut = spy(uut);
   }
 
   @Test public void shouldReturnModelWithOneCountryGivenInputStreamByCityIdMoscow()
@@ -112,6 +112,40 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
     thenModelShouldBeEmpty();
   }
 
+  @Test public void shouldReturnEmptyListForNullPojo() throws IOException {
+    givenInputStreamCityNotFound();
+
+    whenGenerateModel();
+
+    thenModelShouldBeEmpty();
+  }
+
+  @Test public void shouldReturnEmptyListForEmptyListValidCity() throws IOException {
+    givenInputStreamCityWithEmptyList();
+    givenPojo();
+
+    whenGenerateModel();
+
+    thenModelShouldBeEmpty();
+  }
+
+  @Test public void shouldReturnEmptyListForHttp400ListValidCity() throws IOException {
+    givenInputStreamCityWithHttp400();
+    givenPojo();
+
+    whenGenerateModel();
+
+    thenModelShouldBeEmpty();
+  }
+
+  private void givenInputStreamCityWithHttp400() {
+    givenJson(R.raw.moscow_forecast_non_http_400);
+  }
+
+  private void givenInputStreamCityWithEmptyList() {
+    givenJson(R.raw.moscow_forecast_empty_list);
+  }
+
   private void thenToStringShouldContain(String expected) {
     assertTrue(mForecastData.toString().contains(expected));
   }
@@ -162,6 +196,7 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
   }
 
   private void thenCityNameShouldBe(String expected) {
+    assertTrue(mForecastData.toString().contains(expected));
     assertEquals(expected, mForecastData.getCity().getName());
   }
 
@@ -171,8 +206,8 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
   }
 
   private void whenGenerateModel() throws IOException {
-    mOpenWeatherApiModelConverter.fromPojo(openWeatherForecastData);
-    mModel = mOpenWeatherApiModelConverter.getModel();
+    uut.fromPojo(openWeatherForecastData);
+    mModel = uut.getModel();
   }
 
   private void givenInputStreamByCityIdMoscow() throws IOException {

@@ -14,15 +14,13 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
 
 public class LocationManager implements LocationRetrieverListener {
 
-  @VisibleForTesting
-  static int CURRENT_SDK_INT = Build.VERSION.SDK_INT;
+  @VisibleForTesting static int CURRENT_SDK_INT = Build.VERSION.SDK_INT;
   private final WeakReference<BaseActivity> baseActivityWeakReference;
   private final WeakReference<View> mContentWeakReference;
   private final LocationRetriever mLocationRetriever;
-  @VisibleForTesting
-  PermissionChecker mPermissionChecker;
+  @VisibleForTesting PermissionChecker mPermissionChecker;
 
-  public LocationManager(BaseActivity baseActivity, View content) {
+  public LocationManager(@NonNull BaseActivity baseActivity, View content) {
     this.baseActivityWeakReference = new WeakReference<>(baseActivity);
     this.mContentWeakReference = new WeakReference<>(content);
     this.mLocationRetriever = new LocationRetriever(baseActivity, this);
@@ -31,42 +29,18 @@ public class LocationManager implements LocationRetrieverListener {
   @Override public void checkForPermissions() {
     BaseActivity baseActivity = baseActivityWeakReference.get();
     View content = mContentWeakReference.get();
-    if (baseActivity != null && content != null) {
-      mPermissionChecker =
-          new PermissionChecker(Manifest.permission.ACCESS_FINE_LOCATION, baseActivity,
-              PermissionChecker.LOCATION, content, R.string.permissions_location_granted,
-              R.string.permissions_location_not_granted, R.string.permissions_location_rationale);
-
-      if (mPermissionChecker.hasPermission()) {
-        mLocationRetriever.onLocationPermissionsGranted();
-      } else {
-        mPermissionChecker.requestPermission(new PermissionResultListener() {
-
-          @Override public void onSuccess() {
-            mLocationRetriever.onLocationPermissionsGranted();
-          }
-
-          @Override public void onFailure() {
-          }
-        });
-      }
-    }
+    checkForPermissions(baseActivity, content);
   }
 
   @Override public void onEmptyLocation() {
     BaseActivity baseActivity = baseActivityWeakReference.get();
     View content = mContentWeakReference.get();
-    if (baseActivity != null && content != null) {
-      Snackbar.make(content, baseActivity.getString(R.string.location_off_msg),
-          Snackbar.LENGTH_SHORT).show();
-    }
+    onEmptyLocation(baseActivity, content);
   }
 
   @Override public void onLocationFound(double lat, double lon) {
     BaseActivity baseActivity = baseActivityWeakReference.get();
-    if (baseActivity != null) {
-      baseActivity.searchByLocation(lat, lon);
-    }
+    onLocationFound(baseActivity, lat, lon);
   }
 
   public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
@@ -83,5 +57,46 @@ public class LocationManager implements LocationRetrieverListener {
 
   public void disconnect() {
     mLocationRetriever.disconnect();
+  }
+
+  @VisibleForTesting @NonNull PermissionResultListener getPermissionResultListener() {
+    return new PermissionResultListener() {
+
+      @Override public void onSuccess() {
+        mLocationRetriever.onLocationPermissionsGranted();
+      }
+
+      @Override public void onFailure() {
+        mLocationRetriever.onLocationPermissionFailure();
+      }
+    };
+  }
+
+  @VisibleForTesting void checkForPermissions(BaseActivity baseActivity, View content) {
+    if (baseActivity != null && content != null) {
+      mPermissionChecker =
+          new PermissionChecker(Manifest.permission.ACCESS_FINE_LOCATION, baseActivity,
+              PermissionChecker.LOCATION, content, R.string.permissions_location_granted,
+              R.string.permissions_location_not_granted, R.string.permissions_location_rationale);
+
+      if (mPermissionChecker.hasPermission()) {
+        mLocationRetriever.onLocationPermissionsGranted();
+      } else {
+        mPermissionChecker.requestPermission(getPermissionResultListener());
+      }
+    }
+  }
+
+  @VisibleForTesting void onEmptyLocation(BaseActivity baseActivity, View content) {
+    if (baseActivity != null && content != null) {
+      Snackbar.make(content, baseActivity.getString(R.string.location_off_msg),
+          Snackbar.LENGTH_SHORT).show();
+    }
+  }
+
+  @VisibleForTesting void onLocationFound(BaseActivity baseActivity, double lat, double lon) {
+    if (baseActivity != null) {
+      baseActivity.searchByLocation(lat, lon);
+    }
   }
 }

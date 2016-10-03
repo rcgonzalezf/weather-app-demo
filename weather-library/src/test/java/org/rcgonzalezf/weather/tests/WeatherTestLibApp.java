@@ -16,9 +16,11 @@ public class WeatherTestLibApp extends WeatherLibApp {
     mServiceConfig = ServiceConfig.getInstance();
     mServiceConfig.setApiKey(getString(R.string.open_weather_map_api_key));
     mServiceConfig.setWeatherProvider(WeatherProvider.OpenWeather);
+
+    WeatherProvider.valueOf("OpenWeather");
   }
 
   @Override public OkHttpClient createOkHttpClient() {
-    return null;
+    return new OkHttpClient.Builder().build();
   }
 }
