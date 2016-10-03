@@ -19,6 +19,7 @@ import org.junit.runner.RunWith;
 import rcgonzalezf.org.weather.common.BaseActivity;
 import rcgonzalezf.org.weather.utils.WeatherUtils;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -37,6 +38,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
   @SuppressWarnings("unused") @Mocked private LocationServices mLocationServices;
   @SuppressWarnings("unused") @Mocked private FusedLocationProviderApi mFusedLocationProviderApi;
   private boolean logged;
+  private Location mLastLocation;
 
   @Test public void shouldCheckForPermissionsOnConnected() {
     givenLocationRetriever();
@@ -143,6 +145,22 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
     whenTryingToGetTheLastKnowLocationWithBaseActivity(mSomeBaseActivity);
 
     thenNoMoreInteractionAreExpected();
+  }
+
+  @Test public void shouldGetLastLocation() {
+    givenNullLocationRetrieverListener();
+
+    whenGettingLastLocation();
+
+    thenLastLocationShouldNotBeNull();
+  }
+
+  private void thenLastLocationShouldNotBeNull() {
+    assertNotNull(mLastLocation);
+  }
+
+  private void whenGettingLastLocation() {
+    mLastLocation = uut.getLastLocation();
   }
 
   @SuppressWarnings("MissingPermission") private void givenLocationFound(final boolean found) {
