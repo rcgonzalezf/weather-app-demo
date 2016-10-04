@@ -2,11 +2,14 @@ package rcgonzalezf.org.weather;
 
 import android.app.Application;
 import android.content.Context;
+import com.crashlytics.android.Crashlytics;
 import com.facebook.stetho.Stetho;
+import io.fabric.sdk.android.Fabric;
 import mockit.Mock;
 import mockit.MockUp;
 import mockit.Mocked;
 import mockit.Tested;
+import mockit.Verifications;
 import mockit.integration.junit4.JMockit;
 import okhttp3.OkHttpClient;
 import org.junit.After;
@@ -23,26 +26,28 @@ import static org.junit.Assert.assertTrue;
 
   @Tested private WeatherApp uut;
 
-  @SuppressWarnings("unused") @Mocked private Application application;
+  @SuppressWarnings("unused") @Mocked private Application mApplication;
+  @Mocked Crashlytics mCrashlytics;
+  @Mocked Fabric mFabric;
 
-  private boolean stethoInitialized;
-  private boolean isDebugModeOriginal;
-  private OkHttpClient okHttpClient;
+  private boolean mStethoInitialized;
+  private boolean mIsDebugModeOriginal;
+  private OkHttpClient mOkHttpClient;
 
   @Before public void setUpApplication() throws Exception {
 
     new MockUp<Stetho>() {
       @SuppressWarnings("unused") @Mock void initializeWithDefaults(final Context context) {
-        stethoInitialized = true;
+        mStethoInitialized = true;
       }
     };
 
-    isDebugModeOriginal = WeatherApp.sIsDebugMode;
+    mIsDebugModeOriginal = WeatherApp.sIsDebugMode;
     uut = new WeatherApp();
   }
 
   @After public void resetIsDebugMode() {
-    WeatherApp.sIsDebugMode = isDebugModeOriginal;
+    WeatherApp.sIsDebugMode = mIsDebugModeOriginal;
   }
 
   @Test public void shouldSetTheAppInstanceOnCreatingTheApplication() {
@@ -59,6 +64,7 @@ import static org.junit.Assert.assertTrue;
     whenCreatingTheApplication();
 
     thenStethoShouldBeInitialized(true);
+    thenFabricShouldBeInitialized(false);
   }
 
   private void givenDebugMode() {
@@ -72,6 +78,14 @@ import static org.junit.Assert.assertTrue;
     whenCreatingTheApplication();
 
     thenStethoShouldBeInitialized(false);
+  }
+
+  @Test public void shouldInitializeFabricIfTheAppNotInDebug() {
+    givenIsNotDebugMode();
+
+    whenCreatingTheApplication();
+
+    thenFabricShouldBeInitialized(true);
   }
 
   @Test public void shouldAddStethoInterceptorIfIsDebugMode() {
@@ -91,15 +105,15 @@ import static org.junit.Assert.assertTrue;
   }
 
   private void thenShouldNotHaveInterceptors() {
-    assertTrue(okHttpClient.interceptors().isEmpty());
+    assertTrue(mOkHttpClient.interceptors().isEmpty());
   }
 
   private void thenShouldAddTheInterceptor() {
-    assertFalse(okHttpClient.interceptors().isEmpty());
+    assertFalse(mOkHttpClient.interceptors().isEmpty());
   }
 
   private void whenCreatingTheOkHttpClient() {
-    okHttpClient = uut.createOkHttpClient();
+    mOkHttpClient = uut.createOkHttpClient();
   }
 
   private void givenIsNotDebugMode() {
@@ -107,8 +121,17 @@ import static org.junit.Assert.assertTrue;
   }
 
   private void thenStethoShouldBeInitialized(boolean expected) {
-    assertEquals(expected, stethoInitialized);
+    assertEquals(expected, mStethoInitialized);
   }
+
+  private void thenFabricShouldBeInitialized(boolean initialized) {
+    if(initialized) {
+      new Verifications() {{
+        Fabric.with(uut, new Crashlytics());
+      }};
+    }
+  }
+
 
   private void thenAppInstanceShouldNotBeNull() {
     assertNotNull(WeatherApp.getInstance());

@@ -31,6 +31,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="rcgonzalezf.org.weather.WeatherListActivity" />
         </activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="@string/fabric_io_api_key" />
     </application>
 
 </manifest>

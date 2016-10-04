@@ -4,5 +4,6 @@
   <!-- Use example
   http://api.openweathermap.org/data/2.5/forecast/city?id=524901&APPID=test
   -->
+  <string name="fabric_io_api_key" translatable="false">test</string>
 
 </resources>

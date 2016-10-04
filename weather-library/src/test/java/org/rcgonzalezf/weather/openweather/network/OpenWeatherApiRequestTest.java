@@ -56,7 +56,9 @@ public class OpenWeatherApiRequestTest {
 
   @Test public void shouldNotifySuccess() throws Exception {
     givenValidRequestReturningModel();
+
     whenExecuting();
+
     thenCallbackShouldBeSuccess();
   }
 
