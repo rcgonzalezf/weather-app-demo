@@ -26,6 +26,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.gson.Gson;
+import com.newrelic.agent.android.AgentConfiguration;
+import com.newrelic.agent.android.NewRelic;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -38,6 +40,7 @@ import mockit.Mocked;
 import mockit.Tested;
 import mockit.Verifications;
 import mockit.integration.junit4.JMockit;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -71,7 +74,7 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
   @SuppressWarnings("unused") @Mocked private FloatingActionButton mFloatingActionButton;
 
   private boolean mRetrievingFromCache;
-  private boolean mSearchingByLocation;
+  @SuppressWarnings("unused") private boolean mSearchingByLocation;
   private boolean mSearchingByQuery;
   private boolean mSuperOnOptionsItemSelectedCalled;
   private boolean mIsNullUserDisplayName;
@@ -84,8 +87,10 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
   private View.OnClickListener mFabClickListener;
   private DialogInterface.OnClickListener mDialogClickListener;
   private NavigationView.OnNavigationItemSelectedListener mNavigationListener;
+  private boolean mIsDebugMode;
 
   @Before public void setUp() {
+    //noinspection unused
     mView = new MockUp<View>() {
       @Mock View inflate(Context context, int resource, ViewGroup root) {
         return mEditText;
@@ -131,6 +136,33 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
         mRetrievingFromCache = true;
       }
     };
+    mIsDebugMode = BaseActivity.sIsDebugMode;
+  }
+
+  @After
+  public void returnStaticVariables() {
+    BaseActivity.sIsDebugMode = mIsDebugMode;
+  }
+
+  @Test public void shouldInitNewRelicManagerWhenCreatingTheActivity(
+      @SuppressWarnings("UnusedParameters") @Mocked LocationManager mLocationManager, @Mocked
+      NewRelic newRelic, @Mocked AgentConfiguration agentConfiguration
+      ) {
+    givenDebugMode(false);
+
+    whenCreatingTheActivity();
+
+    thenNewRelicShouldBeInitialized();
+  }
+
+  private void thenNewRelicShouldBeInitialized() {
+    new Verifications() {{
+      NewRelic.withApplicationToken(withAny("apiKey")).start(withAny(uut.getApplicationContext()));
+    }};
+  }
+
+  private void givenDebugMode(boolean isDebugMode) {
+    BaseActivity.sIsDebugMode = isDebugMode;
   }
 
   @Test public void shouldInitLocationManagerWhenCreatingTheActivity(
@@ -339,7 +371,8 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
   }
 
   @Test
-  public void shouldHandleHomePressedWhenSelectingFromDrawerNotKnownItem(@Mocked MenuItem item, @Mocked Snackbar snackbar) {
+  public void shouldHandleHomePressedWhenSelectingFromDrawerNotKnownItem(@Mocked MenuItem item, @SuppressWarnings("UnusedParameters")
+  @Mocked Snackbar snackbar) {
     givenActivityCreated();
     givenNavigationListener();
     givenMenuItemId(item, -1);
