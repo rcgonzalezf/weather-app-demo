@@ -1,4 +1,5 @@
 <resources>
   <string name="empty_result">Empty List</string>
   <string name="open_weather_map_api_key">abcde</string>
+  <string name="crittercism_api_key" translatable="false">AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</string>
 </resources>

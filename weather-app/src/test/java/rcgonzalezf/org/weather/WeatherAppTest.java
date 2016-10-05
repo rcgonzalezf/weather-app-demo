@@ -2,11 +2,13 @@ package rcgonzalezf.org.weather;
 
 import android.app.Application;
 import android.content.Context;
+import com.crittercism.app.Crittercism;
 import com.facebook.stetho.Stetho;
 import mockit.Mock;
 import mockit.MockUp;
 import mockit.Mocked;
 import mockit.Tested;
+import mockit.Verifications;
 import mockit.integration.junit4.JMockit;
 import okhttp3.OkHttpClient;
 import org.junit.After;
@@ -61,8 +63,13 @@ import static org.junit.Assert.assertTrue;
     thenStethoShouldBeInitialized(true);
   }
 
-  private void givenDebugMode() {
-    WeatherApp.sIsDebugMode = true;
+  @Test public void shouldInitializeCrittercismOnCreatingTheAppOnNonDebugMode(
+      @Mocked Crittercism crittercism) {
+    givenNonDebugMode();
+
+    whenCreatingTheApplication();
+
+    thenCrittercismShouldBeInitialized();
   }
 
   @Test public void shouldNotInitializeStethoOnCreatingTheAppIfNotDebug() {
@@ -88,6 +95,20 @@ import static org.junit.Assert.assertTrue;
     whenCreatingTheOkHttpClient();
 
     thenShouldNotHaveInterceptors();
+  }
+
+  private void thenCrittercismShouldBeInitialized() {
+    new Verifications() {{
+      Crittercism.initialize(withAny(uut), withAny("apiKey"));
+    }};
+  }
+
+  private void givenNonDebugMode() {
+    WeatherApp.sIsDebugMode = false;
+  }
+
+  private void givenDebugMode() {
+    WeatherApp.sIsDebugMode = true;
   }
 
   private void thenShouldNotHaveInterceptors() {
