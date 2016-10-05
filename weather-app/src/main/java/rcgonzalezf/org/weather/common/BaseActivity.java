@@ -26,10 +26,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.newrelic.agent.android.NewRelic;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 import org.rcgonzalezf.weather.common.models.Forecast;
+import rcgonzalezf.org.weather.BuildConfig;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
 import rcgonzalezf.org.weather.location.LocationManager;
@@ -43,6 +45,7 @@ public abstract class BaseActivity extends AppCompatActivity
   protected static final String OFFLINE_FILE = "OFFLINE_WEATHER";
   public static final String FORECASTS = "FORECASTS";
   private static final String TAG = BaseActivity.class.getSimpleName();
+  @VisibleForTesting static boolean sIsDebugMode = BuildConfig.DEBUG;
 
   private DrawerLayout mDrawerLayout;
   private View mContent;
@@ -61,6 +64,9 @@ public abstract class BaseActivity extends AppCompatActivity
 
     mContent = findViewById(R.id.content);
     mLocationManager = new LocationManager(this, mContent);
+    if(!sIsDebugMode) {
+      NewRelic.withApplicationToken(getString(R.string.newrelic_api_key)).start(getApplicationContext());
+    }
   }
 
   @Override protected void onStart() {
