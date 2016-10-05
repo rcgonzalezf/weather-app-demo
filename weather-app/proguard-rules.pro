@@ -23,3 +23,7 @@
 
 
 -keep class com.facebook.stetho.**{ *; }
+
+-keep class com.newrelic.** { *; }
+-dontwarn com.newrelic.**
+-keepattributes Exceptions, Signature, InnerClasses, LineNumberTable

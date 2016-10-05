@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'jacoco-android'
+apply plugin: 'newrelic'
 
 android {
   compileSdkVersion 24
@@ -48,6 +49,7 @@ dependencies {
   compile 'com.android.support:design:24.2.1'
   compile 'com.android.support:palette-v7:24.2.1'
   compile 'com.google.android.gms:play-services-location:9.6.1'
+  compile 'com.newrelic.agent.android:android-agent:5.8.3'
 
   testCompile 'junit:junit:4.12'
   testCompile 'com.squareup.okhttp3:mockwebserver:3.4.1'

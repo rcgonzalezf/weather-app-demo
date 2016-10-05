@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.newrelic.agent.android.NewRelic;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
@@ -61,6 +62,9 @@ public abstract class BaseActivity extends AppCompatActivity
 
     mContent = findViewById(R.id.content);
     mLocationManager = new LocationManager(this, mContent);
+
+    NewRelic.withApplicationToken(getString(R.string.newrelic_api_key))
+        .start(getApplicationContext());
   }
 
   @Override protected void onStart() {
