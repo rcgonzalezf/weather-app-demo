@@ -6,10 +6,16 @@ import com.facebook.stetho.Stetho;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import okhttp3.OkHttpClient;
 import org.rcgonzalezf.weather.WeatherLibApp;
+import rcgonzalezf.org.weather.common.analytics.AnalyticsManager;
 
 public class WeatherApp extends WeatherLibApp {
 
   @VisibleForTesting static boolean sIsDebugMode = BuildConfig.DEBUG;
+  private static AnalyticsManager sAnalyticsManagerInstance;
+
+  public static AnalyticsManager getAnalyticsManager() {
+    return sAnalyticsManagerInstance;
+  }
 
   @Override public void onCreate() {
     super.onCreate();
