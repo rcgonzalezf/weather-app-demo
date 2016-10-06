@@ -14,6 +14,9 @@ public class WeatherApp extends WeatherLibApp {
   private static AnalyticsManager sAnalyticsManagerInstance;
 
   public static AnalyticsManager getAnalyticsManager() {
+    if (sAnalyticsManagerInstance == null) {
+      sAnalyticsManagerInstance = new AnalyticsManager(getInstance());
+    }
     return sAnalyticsManagerInstance;
   }
 

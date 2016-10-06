@@ -4,5 +4,5 @@ public interface AnalyticsObserver {
 
   void onScreen(String screenName, AnalyticsBaseData analyticsBaseData);
 
-  void onAction(AnalyticsEvent analyticsEvent);
+  void onAction(AnalyticsEvent analyticsEvent, String screenName, AnalyticsBaseData analyticsBaseData);
 }

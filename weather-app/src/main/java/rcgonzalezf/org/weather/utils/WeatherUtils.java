@@ -1,6 +1,7 @@
 package rcgonzalezf.org.weather.utils;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
@@ -109,5 +110,14 @@ public class WeatherUtils {
     }
 
     return String.format(Locale.getDefault(), "%1.0f\u00B0 %2$s", temperature, symbol);
+  }
+
+  /**
+   * Helper method to determine if the device has an extra-large screen. For
+   * example, 10" tablets are extra-large.
+   */
+  public static boolean isXLargeTablet(Context context) {
+    return (context.getResources().getConfiguration().screenLayout
+        & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
   }
 }

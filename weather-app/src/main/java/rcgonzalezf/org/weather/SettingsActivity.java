@@ -1,8 +1,6 @@
 package rcgonzalezf.org.weather;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -12,6 +10,7 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 import java.util.List;
+import rcgonzalezf.org.weather.utils.WeatherUtils;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -58,16 +57,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
   /** {@inheritDoc} */
   @Override public boolean onIsMultiPane() {
-    return isXLargeTablet(this);
-  }
-
-  /**
-   * Helper method to determine if the device has an extra-large screen. For
-   * example, 10" tablets are extra-large.
-   */
-  private static boolean isXLargeTablet(Context context) {
-    return (context.getResources().getConfiguration().screenLayout
-        & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+    return WeatherUtils.isXLargeTablet(this);
   }
 
   /** {@inheritDoc} */
