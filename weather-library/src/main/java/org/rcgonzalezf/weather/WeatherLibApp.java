@@ -22,6 +22,7 @@ public abstract class WeatherLibApp extends Application {
     mServiceConfig.setWeatherProvider(WeatherProvider.OpenWeather);
 
     enableHttpResponseCache();
+    addAnalyticsObservers();
   }
 
   public static WeatherLibApp getInstance() {
@@ -46,4 +47,6 @@ public abstract class WeatherLibApp extends Application {
   }
 
   public abstract OkHttpClient createOkHttpClient();
+
+  public abstract void addAnalyticsObservers();
 }

@@ -31,6 +31,7 @@ import static org.junit.Assert.assertTrue;
   private boolean stethoInitialized;
   private boolean isDebugModeOriginal;
   private OkHttpClient okHttpClient;
+  @SuppressWarnings("unused") @Mocked AnalyticsManager analyticsManager;
 
   @Before public void setUpApplication() throws Exception {
 
@@ -65,7 +66,7 @@ import static org.junit.Assert.assertTrue;
   }
 
   @Test public void shouldInitializeCrittercismOnCreatingTheAppOnNonDebugMode(
-      @Mocked Crittercism crittercism) {
+      @SuppressWarnings("UnusedParameters") @Mocked Crittercism crittercism) {
     givenNonDebugMode();
 
     whenCreatingTheApplication();
@@ -98,9 +99,7 @@ import static org.junit.Assert.assertTrue;
     thenShouldNotHaveInterceptors();
   }
 
-  @Test public void shouldCreateNewAnalyticsManagerIfNoInstance(
-      @SuppressWarnings("UnusedParameters") @Mocked
-      AnalyticsManager analyticsManager) {
+  @Test public void shouldCreateNewAnalyticsManagerIfNoInstance() {
     givenAnalyticsManagerInstance();
 
     whenGettingAnalyticsManager();
@@ -113,9 +112,7 @@ import static org.junit.Assert.assertTrue;
   }
 
   private void thenShouldCreateNewInstance() {
-    new Verifications() {{
-      new AnalyticsManager(withAny(WeatherApp.getInstance()));
-    }};
+    assertNotNull(WeatherApp.getAnalyticsManager());
   }
 
   private void whenGettingAnalyticsManager() {

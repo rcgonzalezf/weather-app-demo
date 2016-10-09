@@ -23,4 +23,7 @@ public class WeatherTestLibApp extends WeatherLibApp {
   @Override public OkHttpClient createOkHttpClient() {
     return new OkHttpClient.Builder().build();
   }
+
+  @Override public void addAnalyticsObservers() {
+  }
 }

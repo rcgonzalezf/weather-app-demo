@@ -7,6 +7,7 @@ import com.facebook.stetho.okhttp3.StethoInterceptor;
 import okhttp3.OkHttpClient;
 import org.rcgonzalezf.weather.WeatherLibApp;
 import rcgonzalezf.org.weather.common.analytics.AnalyticsManager;
+import rcgonzalezf.org.weather.common.analytics.observer.LogcatAnalyticsObserver;
 
 public class WeatherApp extends WeatherLibApp {
 
@@ -14,6 +15,7 @@ public class WeatherApp extends WeatherLibApp {
   private static AnalyticsManager sAnalyticsManagerInstance;
 
   @Override public void onCreate() {
+    setAppInstance(this);
     super.onCreate();
 
     if (sIsDebugMode) {
@@ -21,8 +23,6 @@ public class WeatherApp extends WeatherLibApp {
     } else {
       Crittercism.initialize(this, getString(R.string.crittercism_api_key));
     }
-
-    setAppInstance(this);
   }
 
   @Override public OkHttpClient createOkHttpClient() {
@@ -34,6 +34,12 @@ public class WeatherApp extends WeatherLibApp {
     }
 
     return okHttpBuilder.build();
+  }
+
+  @Override public void addAnalyticsObservers() {
+    if (sIsDebugMode) {
+      getAnalyticsManager().addObserver(new LogcatAnalyticsObserver());
+    }
   }
 
   public static AnalyticsManager getAnalyticsManager() {
