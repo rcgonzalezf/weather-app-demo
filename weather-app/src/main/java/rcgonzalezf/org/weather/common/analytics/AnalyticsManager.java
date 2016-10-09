@@ -42,11 +42,11 @@ public class AnalyticsManager {
     mAnalyticsObservers.add(analyticsObserver);
   }
 
-  public boolean isMultipane() {
+  private boolean isMultipane() {
     return WeatherUtils.isXLargeTablet(mContext);
   }
 
-  public void notifyOnScreenLoad(String screenName) {
+  void notifyOnScreenLoad(String screenName) {
     mScreenName = screenName;
     addBaseData();
 
@@ -75,11 +75,11 @@ public class AnalyticsManager {
     return networkType;
   }
 
-  public void removeObserver(AnalyticsObserver analyticsObserver) {
+  void removeObserver(AnalyticsObserver analyticsObserver) {
     mAnalyticsObservers.remove(analyticsObserver);
   }
 
-  public void notifyOnAction(AnalyticsEvent analyticsEvent) {
+  void notifyOnAction(AnalyticsEvent analyticsEvent) {
     addBaseData();
     for (AnalyticsObserver analyticsObserver : mAnalyticsObservers) {
       analyticsObserver.onAction(analyticsEvent, mScreenName, mAnalyticsBaseData);

@@ -44,6 +44,7 @@ import org.junit.runner.RunWith;
 import org.rcgonzalezf.weather.common.models.Forecast;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
+import rcgonzalezf.org.weather.common.analytics.Analytics;
 import rcgonzalezf.org.weather.location.LocationManager;
 import rcgonzalezf.org.weather.utils.WeatherUtils;
 
@@ -69,9 +70,9 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
   @SuppressWarnings("unused") @Mocked private SharedPreferences mSharedPreferences;
   @SuppressWarnings("unused") @Mocked private PreferenceManager mPreferenceManager;
   @SuppressWarnings("unused") @Mocked private FloatingActionButton mFloatingActionButton;
+  @Mocked private Analytics mAnalytics;
 
   private boolean mRetrievingFromCache;
-  private boolean mSearchingByLocation;
   private boolean mSearchingByQuery;
   private boolean mSuperOnOptionsItemSelectedCalled;
   private boolean mIsNullUserDisplayName;
@@ -86,6 +87,7 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
   private NavigationView.OnNavigationItemSelectedListener mNavigationListener;
 
   @Before public void setUp() {
+    //noinspection unused
     mView = new MockUp<View>() {
       @Mock View inflate(Context context, int resource, ViewGroup root) {
         return mEditText;
@@ -124,7 +126,6 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
       }
 
       @Override public void searchByLocation(double lat, double lon) {
-        mSearchingByLocation = true;
       }
 
       @Override public void loadOldData(List<Forecast> forecastList) {
@@ -328,10 +329,10 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
     thenShouldSearchByManualInput(editable);
   }
 
-  @Test
-  public void shouldNavigateToSettingsWhenSelectingFromDrawer(@Mocked MenuItem item, @Mocked Intent intent) {
+  @Test public void shouldNavigateToSettingsWhenSelectingFromDrawer(@Mocked MenuItem item,
+      @Mocked Intent intent) {
     givenNavigationListener();
-    givenMenuItemId(item,R.id.drawer_settings );
+    givenMenuItemId(item, R.id.drawer_settings);
 
     whenNavigationItemSelected(item);
 
@@ -339,7 +340,8 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
   }
 
   @Test
-  public void shouldHandleHomePressedWhenSelectingFromDrawerNotKnownItem(@Mocked MenuItem item, @Mocked Snackbar snackbar) {
+  public void shouldHandleHomePressedWhenSelectingFromDrawerNotKnownItem(@Mocked MenuItem item,
+      @SuppressWarnings("UnusedParameters") @Mocked Snackbar snackbar) {
     givenActivityCreated();
     givenNavigationListener();
     givenMenuItemId(item, -1);

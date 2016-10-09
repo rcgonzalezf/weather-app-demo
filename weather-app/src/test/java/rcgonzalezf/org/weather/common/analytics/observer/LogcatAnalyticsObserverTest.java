@@ -11,6 +11,8 @@ import org.junit.runner.RunWith;
 import rcgonzalezf.org.weather.common.analytics.AnalyticsBaseData;
 import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent;
 
+import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.SEARCH_COMPLETED;
+
 @RunWith(JMockit.class) public class LogcatAnalyticsObserverTest {
 
   @Tested private LogcatAnalyticsObserver uut;
@@ -44,9 +46,8 @@ import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent;
   }
 
   private void givenAnalyticsEvent() {
-    mAnalyticsEvent = new AnalyticsEvent();
-    mAnalyticsEvent.name = "button pressed";
-    mAnalyticsEvent.additionalValue = "testA";
+    mAnalyticsEvent =
+        new AnalyticsEvent(SEARCH_COMPLETED, "testA");
   }
 
   private void whenHandlingOnAction() {

@@ -9,6 +9,5 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsManager.NONE;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsManager.UNKNOWN;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsManager.WIFI;
 
-@StringDef({ MOBILE, UNKNOWN, NONE, WIFI }) @Retention(RetentionPolicy.SOURCE)
-public @interface NetworkType {
+@StringDef({ MOBILE, UNKNOWN, NONE, WIFI }) @Retention(RetentionPolicy.SOURCE) @interface NetworkType {
 }

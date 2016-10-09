@@ -1,5 +1,7 @@
 package rcgonzalezf.org.weather;
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -7,6 +9,7 @@ import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import mockit.Expectations;
@@ -25,8 +28,12 @@ import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters;
 import rcgonzalezf.org.weather.adapters.ModelAdapter;
 import rcgonzalezf.org.weather.common.BaseActivity;
+import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent;
 
 import static org.mockito.Mockito.mock;
+import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.LOCATION_SEARCH;
+import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.NO_NETWORK_SEARCH;
+import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.SEARCH_COMPLETED;
 
 @RunWith(JMockit.class) public class WeatherListActivityTest {
 
@@ -44,6 +51,7 @@ import static org.mockito.Mockito.mock;
   private WeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback>
       mWeatherRepository;
   @SuppressWarnings("unused") @Mocked private ServiceConfig mServiceConfig;
+  @SuppressWarnings("unused") @Mocked AnalyticsEvent mAnalyticsEvent;
   private List<Forecast> mForecastList;
   private String mQuery;
   private Runnable mNotifyAdapterRunnable;
@@ -78,12 +86,13 @@ import static org.mockito.Mockito.mock;
 
   @Test public void shouldLoadOldData() {
     givenForecastList();
-    givenForecastElement();
+    givenForecastElement("someCity");
 
     whenLoadingOldData();
 
     thenBaseActivityShouldPostRunnableOnUiThread();
     thenNotifyAdapterRunnableShouldBeCreated();
+    thenShouldTrackEvent(NO_NETWORK_SEARCH, "someCity");
   }
 
   @Test
@@ -91,6 +100,7 @@ import static org.mockito.Mockito.mock;
     whenLoadingOldData();
 
     thenLogDataShouldBeWritten("No data even in offline mode :(");
+    thenShouldTrackEvent(NO_NETWORK_SEARCH, "EMPTY");
   }
 
   @Test
@@ -100,16 +110,28 @@ import static org.mockito.Mockito.mock;
     whenLoadingOldData();
 
     thenLogDataShouldBeWritten("No data even in offline mode :(");
+    thenShouldTrackEvent(NO_NETWORK_SEARCH, "EMPTY");
   }
 
-  @Test public void shouldNotifyAdapterOnUpdatingList() {
+  @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity() {
     givenForecastList();
-    givenForecastElement();
+    givenForecastElement("someCity");
 
     whenUpdatingList();
 
     thenBaseActivityShouldPostRunnableOnUiThread();
     thenNotifyAdapterRunnableShouldBeCreated();
+    thenShouldTrackEvent(SEARCH_COMPLETED, "cityName: " + "someCity");
+  }
+
+  @Test public void shouldNotifyAdapterOnUpdatingListWithEmptyCityForEmptyList() {
+    givenForecastList();
+
+    whenUpdatingList();
+
+    thenBaseActivityShouldPostRunnableOnUiThread();
+    thenNotifyAdapterRunnableShouldBeCreated();
+    thenShouldTrackEvent(SEARCH_COMPLETED, "cityName: " + "");
   }
 
   @Test public void shouldHandleError(@SuppressWarnings("UnusedParameters") @Mocked Log log) {
@@ -119,6 +141,7 @@ import static org.mockito.Mockito.mock;
     whenHandlingError(givenErrorString);
 
     thenLogDataShouldBeWritten(givenErrorString);
+    thenShouldTrackEvent(SEARCH_COMPLETED, "error: " + givenErrorString);
   }
 
   @Test public void shouldBuildWithCityNameOnSearchingByQuery(@Mocked Editable editable,
@@ -131,14 +154,17 @@ import static org.mockito.Mockito.mock;
     thenWeatherRepositoryShouldFindWeather();
   }
 
-  @Test public void shouldBuildWithLatLonOnSearchingByLocation() {
+  @Test public void shouldBuildWithLatLonOnSearchingByLocation(@Mocked Geocoder geocoder)
+      throws IOException {
     double givenLat = 1d;
     double givenLon = 1d;
+    givenGeocoderThrowsException(geocoder, givenLat, givenLon);
 
     whenSearchingByLocation(givenLat, givenLon);
 
     thenBuilderShouldAddLatLon(givenLat, givenLon);
     thenWeatherRepositoryShouldFindWeather();
+    thenShouldTrackEvent(LOCATION_SEARCH, "Geocoder Failure");
   }
 
   @Test public void shouldNotifyDataSetChangeOnRunningTheNotifyRunnable() {
@@ -149,6 +175,48 @@ import static org.mockito.Mockito.mock;
     whenRunningNotifyRunnable();
 
     thenAdapterShouldNotifyDataSetChanges();
+  }
+
+  @Test public void shouldBuildWithCityNameOnSearchingByLocationWithGeocoderCity(
+      @Mocked Geocoder geocoder, @Mocked Address address) throws IOException {
+    double givenLat = 1d;
+    double givenLon = 1d;
+    givenQuery("Some City Name");
+    givenGeocoderCity(geocoder, address, givenLat, givenLon);
+
+    whenSearchingByLocation(givenLat, givenLon);
+
+    thenBuilderShouldAddCityName();
+    thenWeatherRepositoryShouldFindWeather();
+    thenShouldTrackEvent(LOCATION_SEARCH, mQuery);
+  }
+
+  private void thenShouldTrackEvent(final String eventName, final String additionalDetails) {
+    new Verifications() {{
+      //noinspection WrongConstant
+      new AnalyticsEvent(withEqual(eventName), withEqual(additionalDetails));
+      mBaseActivity.trackOnActionEvent(withAny(mAnalyticsEvent));
+    }};
+  }
+
+  private void givenGeocoderCity(final Geocoder geocoder, final Address address, final double lat,
+      final double lon) throws IOException {
+    final List<Address> addresses = new ArrayList<>();
+    addresses.add(address);
+    new Expectations() {{
+      geocoder.getFromLocation(lat, lon, 1);
+      result = addresses;
+      addresses.get(0).getLocality();
+      result = mQuery;
+    }};
+  }
+
+  private void givenGeocoderThrowsException(final Geocoder geocoder, final double lat,
+      final double lon) throws IOException {
+    new Expectations() {{
+      geocoder.getFromLocation(lat, lon, 1);
+      result = new IndexOutOfBoundsException("");
+    }};
   }
 
   private void thenNotifyAdapterRunnableShouldBeCreated() {
@@ -228,8 +296,10 @@ import static org.mockito.Mockito.mock;
     uut.loadOldData(mForecastList);
   }
 
-  private void givenForecastElement() {
-    mForecastList.add(new Forecast());
+  private void givenForecastElement(String cityName) {
+    Forecast forecast = new Forecast();
+    forecast.setCityName(cityName);
+    mForecastList.add(forecast);
   }
 
   private void givenForecastList() {

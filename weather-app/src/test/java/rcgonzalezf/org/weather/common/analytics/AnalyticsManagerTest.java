@@ -188,8 +188,7 @@ import static org.mockito.Mockito.verify;
   }
 
   private void whenNotifyingOnAction() {
-    AnalyticsEvent analyticsEvent = new AnalyticsEvent();
-    analyticsEvent.name = mAction;
+    AnalyticsEvent analyticsEvent = new AnalyticsEvent(mAction, null);
     uut.notifyOnAction(analyticsEvent);
   }
 

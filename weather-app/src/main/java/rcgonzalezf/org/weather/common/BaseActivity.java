@@ -32,9 +32,12 @@ import java.util.List;
 import org.rcgonzalezf.weather.common.models.Forecast;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
+import rcgonzalezf.org.weather.common.analytics.Analytics;
+import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent;
 import rcgonzalezf.org.weather.location.LocationManager;
 
 import static rcgonzalezf.org.weather.SettingsActivity.USER_NAME_TO_DISPLAY;
+import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.MANUAL_SEARCH;
 import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
 
 public abstract class BaseActivity extends AppCompatActivity
@@ -61,6 +64,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
     mContent = findViewById(R.id.content);
     mLocationManager = new LocationManager(this, mContent);
+    trackOnScreen();
   }
 
   @Override protected void onStart() {
@@ -184,6 +188,7 @@ public abstract class BaseActivity extends AppCompatActivity
   @VisibleForTesting @NonNull DialogInterface.OnClickListener getCancelListener() {
     return new DialogInterface.OnClickListener() {
       public void onClick(DialogInterface dialog, int id) {
+        trackOnActionEvent(new AnalyticsEvent(MANUAL_SEARCH, "CANCEL"));
         dialog.cancel();
       }
     };
@@ -193,6 +198,7 @@ public abstract class BaseActivity extends AppCompatActivity
       final Editable userInput) {
     return new DialogInterface.OnClickListener() {
       public void onClick(DialogInterface dialog, int id) {
+        trackOnActionEvent(new AnalyticsEvent(MANUAL_SEARCH, userInput.toString()));
         searchByManualInput(userInput);
       }
     };
@@ -215,5 +221,13 @@ public abstract class BaseActivity extends AppCompatActivity
   private void navigateToSettings() {
     Intent intent = new Intent(BaseActivity.this, SettingsActivity.class);
     startActivity(intent);
+  }
+
+  public void trackOnScreen() {
+    new Analytics().trackOnScreen(this.getClass().getSimpleName());
+  }
+
+  public void trackOnActionEvent(@NonNull final AnalyticsEvent event) {
+    new Analytics().trackOnActionEvent(event);
   }
 }
