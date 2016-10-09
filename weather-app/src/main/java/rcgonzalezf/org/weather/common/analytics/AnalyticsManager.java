@@ -12,6 +12,12 @@ import rcgonzalezf.org.weather.BuildConfig;
 import rcgonzalezf.org.weather.utils.WeatherUtils;
 
 public class AnalyticsManager {
+
+  static final String MOBILE = "Mobile";
+  static final String UNKNOWN = "Unknown";
+  static final String NONE = "None";
+  static final String WIFI = "Wifi";
+
   @VisibleForTesting static final String ANDROID_VERSION = "ANDROID_VERSION";
   @VisibleForTesting static final String APP_VERSION = "APP_VERSION";
   @VisibleForTesting static final String NETWORK = "NETWORK";
@@ -49,22 +55,22 @@ public class AnalyticsManager {
     }
   }
 
-  @NonNull private NetworkType getNetworkType() {
+  @NonNull @NetworkType private String getNetworkType() {
     ConnectivityManager connectivityManager =
         (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
     NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-    NetworkType networkType;
+    String networkType;
 
     if (activeNetwork != null) {
       if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
-        networkType = NetworkType.Wifi;
+        networkType = WIFI;
       } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
-        networkType = NetworkType.Mobile;
+        networkType = MOBILE;
       } else {
-        networkType = NetworkType.Unknown;
+        networkType = UNKNOWN;
       }
     } else {
-      networkType = NetworkType.None;
+      networkType = NONE;
     }
     return networkType;
   }
@@ -81,6 +87,6 @@ public class AnalyticsManager {
   }
 
   private void addBaseData() {
-    mAnalyticsBaseData.data().put(NETWORK, getNetworkType().name());
+    mAnalyticsBaseData.data().put(NETWORK, getNetworkType());
   }
 }

@@ -26,18 +26,15 @@ import static org.mockito.Mockito.verify;
 
 @RunWith(JMockit.class) public class AnalyticsManagerTest {
 
-  @Tested
-  private AnalyticsManager uut;
+  @Tested private AnalyticsManager uut;
 
-  @Mocked private Stetho mStetho;
-  @Mocked private ConnectivityManager mConnectivityManager;
-  @Mocked private Configuration mConfiguration;
-  @Mocked private Context mContext;
-  @Mocked private NetworkInfo mNetworkInfo;
+  @SuppressWarnings("unused") @Mocked private Stetho mStetho;
+  @SuppressWarnings("unused") @Mocked private ConnectivityManager mConnectivityManager;
+  @SuppressWarnings("unused") @Mocked private Configuration mConfiguration;
+  @SuppressWarnings("unused") @Mocked private Context mContext;
+  @SuppressWarnings("unused") @Mocked private NetworkInfo mNetworkInfo;
 
   private boolean mHandlingOnScreen;
-  private boolean mHandlingOnAction;
-  private AnalyticsEvent mSomeAnalyticsEvent;
 
   private AnalyticsBaseData mAnalyticsBaseData;
   private String mOriginalAndroidVersion;
@@ -55,8 +52,6 @@ import static org.mockito.Mockito.verify;
 
     @Override public void onAction(AnalyticsEvent analyticsEvent, String screenName,
         AnalyticsBaseData analyticsBaseData) {
-      mHandlingOnAction = true;
-      mSomeAnalyticsEvent = analyticsEvent;
       mScreen = screenName;
     }
   };
@@ -78,10 +73,11 @@ import static org.mockito.Mockito.verify;
     AnalyticsManager.sAppVersion = mOriginalAppVersion;
   }
 
-  @Test public void shouldContainBaseData(@Mocked WeatherUtils weatherUtils) {
+  @Test public void shouldContainBaseDataWithWifi(
+      @SuppressWarnings("UnusedParameters") @Mocked WeatherUtils weatherUtils) {
     givenAndroidVersion("6.0");
     givenAppVersion("0.4");
-    givenIsMultipane(true, weatherUtils);
+    givenIsMultipane(true);
     givenNetwork(ConnectivityManager.TYPE_WIFI);
     givenUut();
 
@@ -90,6 +86,54 @@ import static org.mockito.Mockito.verify;
     thenAnalyticsDataShouldContain(AnalyticsManager.ANDROID_VERSION, "6.0");
     thenAnalyticsDataShouldContain(AnalyticsManager.APP_VERSION, "0.4");
     thenAnalyticsDataShouldContain(AnalyticsManager.NETWORK, "Wifi");
+    thenAnalyticsDataShouldContain(AnalyticsManager.MULTIPANE, "true");
+  }
+
+  @Test public void shouldContainBaseDataWithMobileNetwork(
+      @SuppressWarnings("UnusedParameters") @Mocked WeatherUtils weatherUtils) {
+    givenAndroidVersion("6.0");
+    givenAppVersion("0.4");
+    givenIsMultipane(true);
+    givenNetwork(ConnectivityManager.TYPE_MOBILE);
+    givenUut();
+
+    whenNotifyOnScreen("test");
+
+    thenAnalyticsDataShouldContain(AnalyticsManager.ANDROID_VERSION, "6.0");
+    thenAnalyticsDataShouldContain(AnalyticsManager.APP_VERSION, "0.4");
+    thenAnalyticsDataShouldContain(AnalyticsManager.NETWORK, "Mobile");
+    thenAnalyticsDataShouldContain(AnalyticsManager.MULTIPANE, "true");
+  }
+
+  @Test public void shouldContainBaseDataWithUnknownNetwork(
+      @SuppressWarnings("UnusedParameters") @Mocked WeatherUtils weatherUtils) {
+    givenAndroidVersion("6.0");
+    givenAppVersion("0.4");
+    givenIsMultipane(true);
+    givenNetwork(ConnectivityManager.TYPE_DUMMY);
+    givenUut();
+
+    whenNotifyOnScreen("test");
+
+    thenAnalyticsDataShouldContain(AnalyticsManager.ANDROID_VERSION, "6.0");
+    thenAnalyticsDataShouldContain(AnalyticsManager.APP_VERSION, "0.4");
+    thenAnalyticsDataShouldContain(AnalyticsManager.NETWORK, "Unknown");
+    thenAnalyticsDataShouldContain(AnalyticsManager.MULTIPANE, "true");
+  }
+
+  @Test public void shouldContainBaseDataWithNoNetwork(
+      @SuppressWarnings("UnusedParameters") @Mocked WeatherUtils weatherUtils) {
+    givenAndroidVersion("6.0");
+    givenAppVersion("0.4");
+    givenIsMultipane(true);
+    givenNullNetwork();
+    givenUut();
+
+    whenNotifyOnScreen("test");
+
+    thenAnalyticsDataShouldContain(AnalyticsManager.ANDROID_VERSION, "6.0");
+    thenAnalyticsDataShouldContain(AnalyticsManager.APP_VERSION, "0.4");
+    thenAnalyticsDataShouldContain(AnalyticsManager.NETWORK, "None");
     thenAnalyticsDataShouldContain(AnalyticsManager.MULTIPANE, "true");
   }
 
@@ -170,9 +214,9 @@ import static org.mockito.Mockito.verify;
     uut.notifyOnScreenLoad(screenName);
   }
 
-  private void givenIsMultipane(final boolean isMultipane, final WeatherUtils weatherUtils) {
+  private void givenIsMultipane(final boolean isMultipane) {
     new Expectations() {{
-      weatherUtils.isXLargeTablet(mContext);
+      WeatherUtils.isXLargeTablet(mContext);
       result = isMultipane;
     }};
   }
@@ -181,6 +225,13 @@ import static org.mockito.Mockito.verify;
     new Expectations() {{
       mNetworkInfo.getType();
       result = connectivityManagerType;
+    }};
+  }
+
+  private void givenNullNetwork() {
+    new Expectations() {{
+      mConnectivityManager.getActiveNetworkInfo();
+      result = null;
     }};
   }
 

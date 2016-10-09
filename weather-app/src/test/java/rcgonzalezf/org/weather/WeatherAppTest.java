@@ -15,6 +15,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import rcgonzalezf.org.weather.common.analytics.AnalyticsManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -95,6 +96,30 @@ import static org.junit.Assert.assertTrue;
     whenCreatingTheOkHttpClient();
 
     thenShouldNotHaveInterceptors();
+  }
+
+  @Test public void shouldCreateNewAnalyticsManagerIfNoInstance(
+      @SuppressWarnings("UnusedParameters") @Mocked
+      AnalyticsManager analyticsManager) {
+    givenAnalyticsManagerInstance();
+
+    whenGettingAnalyticsManager();
+
+    thenShouldCreateNewInstance();
+  }
+
+  private void givenAnalyticsManagerInstance() {
+    WeatherApp.getAnalyticsManager();
+  }
+
+  private void thenShouldCreateNewInstance() {
+    new Verifications() {{
+      new AnalyticsManager(withAny(WeatherApp.getInstance()));
+    }};
+  }
+
+  private void whenGettingAnalyticsManager() {
+    WeatherApp.getAnalyticsManager();
   }
 
   private void thenCrittercismShouldBeInitialized() {
