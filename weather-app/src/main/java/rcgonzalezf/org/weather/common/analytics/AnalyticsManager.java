@@ -1,29 +1,39 @@
 package rcgonzalezf.org.weather.common.analytics;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
+import java.util.HashSet;
+import java.util.Set;
 import rcgonzalezf.org.weather.BuildConfig;
 import rcgonzalezf.org.weather.utils.WeatherUtils;
 
 public class AnalyticsManager {
-  public static final String ANDROID_VERSION = "ANDROID_VERSION";
-  public static final String APP_VERSION = "APP_VERSION";
-  public static final String NETWORK = "NETWORK";
-  public static final String MULTIPANE = "MULTIPANE";
+  @VisibleForTesting static final String ANDROID_VERSION = "ANDROID_VERSION";
+  @VisibleForTesting static final String APP_VERSION = "APP_VERSION";
+  @VisibleForTesting static final String NETWORK = "NETWORK";
+  @VisibleForTesting static final String MULTIPANE = "MULTIPANE";
 
-  @VisibleForTesting
-  static String sAndroidVersion = Build.VERSION.RELEASE;
-  @VisibleForTesting
-  static String sAppVersion = BuildConfig.VERSION_NAME;
+  @VisibleForTesting static String sAndroidVersion = Build.VERSION.RELEASE;
+  @VisibleForTesting static String sAppVersion = BuildConfig.VERSION_NAME;
   private Context mContext;
+  private Set<AnalyticsObserver> mAnalyticsObservers = new HashSet<>();
+  private AnalyticsBaseData mAnalyticsBaseData;
+  private String mScreenName;
 
   public AnalyticsManager(Context context) {
     mContext = context;
+    mAnalyticsBaseData = new AnalyticsBaseData();
+    mAnalyticsBaseData.data().put(ANDROID_VERSION, sAndroidVersion);
+    mAnalyticsBaseData.data().put(APP_VERSION, sAppVersion);
+    mAnalyticsBaseData.data().put(MULTIPANE, Boolean.toString(isMultipane()));
   }
 
   public void addObserver(AnalyticsObserver analyticsObserver) {
-    
+    mAnalyticsObservers.add(analyticsObserver);
   }
 
   public boolean isMultipane() {
@@ -31,18 +41,46 @@ public class AnalyticsManager {
   }
 
   public void notifyOnScreenLoad(String screenName) {
+    mScreenName = screenName;
+    addBaseData();
 
+    for (AnalyticsObserver analyticsObserver : mAnalyticsObservers) {
+      analyticsObserver.onScreen(screenName, mAnalyticsBaseData);
+    }
   }
 
-  public String getNetworkType() {
-    return null;
+  @NonNull private NetworkType getNetworkType() {
+    ConnectivityManager connectivityManager =
+        (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+    NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+    NetworkType networkType;
+
+    if (activeNetwork != null) {
+      if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
+        networkType = NetworkType.Wifi;
+      } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
+        networkType = NetworkType.Mobile;
+      } else {
+        networkType = NetworkType.Unknown;
+      }
+    } else {
+      networkType = NetworkType.None;
+    }
+    return networkType;
   }
 
   public void removeObserver(AnalyticsObserver analyticsObserver) {
-
+    mAnalyticsObservers.remove(analyticsObserver);
   }
 
-  public void notifyOnAction(String action) {
+  public void notifyOnAction(AnalyticsEvent analyticsEvent) {
+    addBaseData();
+    for (AnalyticsObserver analyticsObserver : mAnalyticsObservers) {
+      analyticsObserver.onAction(analyticsEvent, mScreenName, mAnalyticsBaseData);
+    }
+  }
 
+  private void addBaseData() {
+    mAnalyticsBaseData.data().put(NETWORK, getNetworkType().name());
   }
 }

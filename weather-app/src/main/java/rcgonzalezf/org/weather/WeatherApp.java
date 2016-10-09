@@ -13,13 +13,6 @@ public class WeatherApp extends WeatherLibApp {
   @VisibleForTesting static boolean sIsDebugMode = BuildConfig.DEBUG;
   private static AnalyticsManager sAnalyticsManagerInstance;
 
-  public static AnalyticsManager getAnalyticsManager() {
-    if (sAnalyticsManagerInstance == null) {
-      sAnalyticsManagerInstance = new AnalyticsManager(getInstance());
-    }
-    return sAnalyticsManagerInstance;
-  }
-
   @Override public void onCreate() {
     super.onCreate();
 
@@ -41,5 +34,12 @@ public class WeatherApp extends WeatherLibApp {
     }
 
     return okHttpBuilder.build();
+  }
+
+  public static AnalyticsManager getAnalyticsManager() {
+    if (sAnalyticsManagerInstance == null) {
+      sAnalyticsManagerInstance = new AnalyticsManager(getInstance());
+    }
+    return sAnalyticsManagerInstance;
   }
 }

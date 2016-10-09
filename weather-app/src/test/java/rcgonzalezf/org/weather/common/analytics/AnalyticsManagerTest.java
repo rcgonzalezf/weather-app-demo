@@ -1,13 +1,19 @@
 package rcgonzalezf.org.weather.common.analytics;
 
+import android.content.Context;
+import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import com.facebook.stetho.Stetho;
 import mockit.Expectations;
+import mockit.Mocked;
 import mockit.Tested;
 import mockit.integration.junit4.JMockit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import rcgonzalezf.org.weather.WeatherApp;
+import rcgonzalezf.org.weather.utils.WeatherUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -18,11 +24,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@RunWith(JMockit.class)
-public class AnalyticsManagerTest {
+@RunWith(JMockit.class) public class AnalyticsManagerTest {
 
   @Tested
   private AnalyticsManager uut;
+
+  @Mocked private Stetho mStetho;
+  @Mocked private ConnectivityManager mConnectivityManager;
+  @Mocked private Configuration mConfiguration;
+  @Mocked private Context mContext;
+  @Mocked private NetworkInfo mNetworkInfo;
 
   private boolean mHandlingOnScreen;
   private boolean mHandlingOnAction;
@@ -42,18 +53,24 @@ public class AnalyticsManagerTest {
       mScreen = screenName;
     }
 
-    @Override public void onAction(AnalyticsEvent analyticsEvent, String screenName, AnalyticsBaseData analyticsBaseData) {
+    @Override public void onAction(AnalyticsEvent analyticsEvent, String screenName,
+        AnalyticsBaseData analyticsBaseData) {
       mHandlingOnAction = true;
       mSomeAnalyticsEvent = analyticsEvent;
       mScreen = screenName;
     }
   };
 
-  @Before public void initAnalyticsManager() {
-    uut = WeatherApp.getAnalyticsManager();
-    uut.addObserver(mAnalyticsTestObserver);
+  @Before public void initWeatherApp() {
+    new Expectations() {{
+      mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+      result = mConnectivityManager;
+    }};
+
     mOriginalAndroidVersion = AnalyticsManager.sAndroidVersion;
     mOriginalAppVersion = AnalyticsManager.sAppVersion;
+    uut = new AnalyticsManager(mContext);
+    uut.addObserver(mAnalyticsTestObserver);
   }
 
   @After public void resetValues() {
@@ -61,11 +78,12 @@ public class AnalyticsManagerTest {
     AnalyticsManager.sAppVersion = mOriginalAppVersion;
   }
 
-  @Test public void shouldContainBaseData() {
+  @Test public void shouldContainBaseData(@Mocked WeatherUtils weatherUtils) {
     givenAndroidVersion("6.0");
     givenAppVersion("0.4");
-    givenNetwork("Wifi");
-    givenIsMultipane(true);
+    givenIsMultipane(true, weatherUtils);
+    givenNetwork(ConnectivityManager.TYPE_WIFI);
+    givenUut();
 
     whenNotifyOnScreen("test");
 
@@ -76,7 +94,7 @@ public class AnalyticsManagerTest {
   }
 
   @Test public void shouldNotifyMultipleObservers() {
-    givenCleanObserver();
+    givenPreviousObserverRemoval();
     givenObserver();
     givenSecondObserver();
 
@@ -90,6 +108,8 @@ public class AnalyticsManagerTest {
   @Test public void shouldNotifyOnAction() {
     givenAction("buttonPressed");
     givenAndroidVersion("5.0");
+    givenUut();
+    givenScreenNotified("test");
 
     whenNotifyingOnAction();
 
@@ -98,11 +118,20 @@ public class AnalyticsManagerTest {
     thenOnActionNotified();
   }
 
+  private void givenScreenNotified(String screenName) {
+    uut.notifyOnScreenLoad(screenName);
+  }
+
+  private void givenUut() {
+    uut = new AnalyticsManager(mContext);
+    uut.addObserver(mAnalyticsTestObserver);
+  }
+
   private void thenScreenNotEmpty() {
     assertNotNull(mScreen);
   }
 
-  private void givenCleanObserver() {
+  private void givenPreviousObserverRemoval() {
     uut.removeObserver(mAnalyticsTestObserver);
   }
 
@@ -115,7 +144,9 @@ public class AnalyticsManagerTest {
   }
 
   private void whenNotifyingOnAction() {
-    uut.notifyOnAction(mAction);
+    AnalyticsEvent analyticsEvent = new AnalyticsEvent();
+    analyticsEvent.name = mAction;
+    uut.notifyOnAction(analyticsEvent);
   }
 
   private void givenAction(String action) {
@@ -139,15 +170,17 @@ public class AnalyticsManagerTest {
     uut.notifyOnScreenLoad(screenName);
   }
 
-  private void givenIsMultipane(final boolean isMultipane) {
+  private void givenIsMultipane(final boolean isMultipane, final WeatherUtils weatherUtils) {
     new Expectations() {{
-      uut.isMultipane(); result = isMultipane;
+      weatherUtils.isXLargeTablet(mContext);
+      result = isMultipane;
     }};
   }
 
-  private void givenNetwork(final String networkType) {
+  private void givenNetwork(final int connectivityManagerType) {
     new Expectations() {{
-      uut.getNetworkType(); result = networkType;
+      mNetworkInfo.getType();
+      result = connectivityManagerType;
     }};
   }
 
@@ -163,5 +196,4 @@ public class AnalyticsManagerTest {
   private void givenObserver() {
     uut.addObserver(mAnalyticsTestObserver);
   }
-
 }
