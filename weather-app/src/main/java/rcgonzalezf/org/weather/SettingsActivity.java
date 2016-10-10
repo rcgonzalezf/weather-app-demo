@@ -6,11 +6,17 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.SwitchPreference;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 import java.util.List;
+import rcgonzalezf.org.weather.common.analytics.Analytics;
+import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent;
 import rcgonzalezf.org.weather.utils.WeatherUtils;
+
+import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.SettingsActivity.ON_NAME;
+import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.SettingsActivity.TEMP_UNITS_TOGGLE;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -111,7 +117,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
    * This fragment shows general preferences only. It is used when the
    * activity is showing a two-pane settings UI.
    */
-  public static class GeneralPreferenceFragment extends PreferenceFragment {
+  public static class GeneralPreferenceFragment extends PreferenceFragment
+      implements Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
+
+    private SwitchPreference mTemperatureUnitsPreference;
+    private Preference mUsernameToDisplay;
 
     @Override public void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
@@ -122,7 +132,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
       // to their values. When their values change, their summaries are
       // updated to reflect the new value, per the Android Design
       // guidelines.
-      bindPreferenceSummaryToValue(findPreference(USER_NAME_TO_DISPLAY));
+      mUsernameToDisplay = findPreference(USER_NAME_TO_DISPLAY);
+      bindPreferenceSummaryToValue(mUsernameToDisplay);
+
+      mTemperatureUnitsPreference = (SwitchPreference) findPreference(PREF_TEMPERATURE_UNITS);
+      mTemperatureUnitsPreference.setOnPreferenceChangeListener(this);
+      mUsernameToDisplay.setOnPreferenceClickListener(this);
     }
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
@@ -132,6 +147,22 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         return true;
       }
       return super.onOptionsItemSelected(item);
+    }
+
+    @Override public boolean onPreferenceChange(Preference preference, Object newValue) {
+      boolean newBooleanValue = newValue.equals(Boolean.TRUE);
+      Boolean fromValue = !newBooleanValue;
+
+      new Analytics().trackOnActionEvent(
+          new AnalyticsEvent(TEMP_UNITS_TOGGLE,
+              fromValue.toString()));
+      return newBooleanValue;
+    }
+
+    @Override public boolean onPreferenceClick(Preference preference) {
+      new Analytics().trackOnActionEvent(
+          new AnalyticsEvent(ON_NAME, null));
+      return false;
     }
   }
 }

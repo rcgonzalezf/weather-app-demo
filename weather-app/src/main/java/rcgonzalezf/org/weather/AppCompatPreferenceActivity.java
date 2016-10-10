@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatDelegate;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import rcgonzalezf.org.weather.common.analytics.Analytics;
 
 /**
  * A {@link android.preference.PreferenceActivity} which implements and proxies the necessary calls
@@ -21,6 +22,7 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity {
   @Override protected void onCreate(Bundle savedInstanceState) {
     getDelegate().installViewFactory();
     getDelegate().onCreate(savedInstanceState);
+    trackOnScreen();
     super.onCreate(savedInstanceState);
   }
 
@@ -87,5 +89,9 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity {
       mDelegate = AppCompatDelegate.create(this, null);
     }
     return mDelegate;
+  }
+
+  public void trackOnScreen() {
+    new Analytics().trackOnScreen(this.getClass().getSimpleName());
   }
 }

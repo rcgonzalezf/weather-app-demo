@@ -360,6 +360,7 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
 
   private void givenUserInput(final Editable editable) {
     new Expectations() {{
+      //noinspection ResultOfMethodCallIgnored
       editable.toString();
       result = "someInput";
     }};

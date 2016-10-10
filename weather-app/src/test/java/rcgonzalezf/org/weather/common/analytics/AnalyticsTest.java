@@ -15,7 +15,7 @@ public class AnalyticsTest {
 
   @Tested
   private Analytics uut;
-  @Mocked AnalyticsManager mAnalyticsManager;
+  @SuppressWarnings("unused") @Mocked private AnalyticsManager mAnalyticsManager;
   private String mScreenName;
   private AnalyticsEvent mAnalyticsEvent;
 
