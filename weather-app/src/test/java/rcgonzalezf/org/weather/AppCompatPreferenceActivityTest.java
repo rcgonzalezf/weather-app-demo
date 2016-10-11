@@ -12,6 +12,7 @@ import mockit.integration.junit4.JMockit;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import rcgonzalezf.org.weather.common.analytics.Analytics;
 
 @RunWith(JMockit.class) public class AppCompatPreferenceActivityTest {
 
@@ -95,6 +96,23 @@ import org.junit.runner.RunWith;
     whenInvalidatingOptionsMenu();
 
     thenDelegateShouldInvalidateOptionsMenu();
+  }
+
+  @Test public void shouldDelegateOnTrackingScreen(
+      @SuppressWarnings("UnusedParameters") @Mocked Analytics analytics) {
+    whenTrackingScreen();
+
+    thenDelegateShouldTrackScreen();
+  }
+
+  private void thenDelegateShouldTrackScreen() {
+    new Verifications() {{
+      new Analytics().trackOnScreen(withAny("string"));
+    }};
+  }
+
+  private void whenTrackingScreen() {
+    uut.trackOnScreen();
   }
 
   private void thenDelegateShouldInvalidateOptionsMenu() {

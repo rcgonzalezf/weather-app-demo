@@ -20,6 +20,9 @@ public class WeatherLibAppTest {
         return mock(OkHttpClient.class);
       }
 
+      @Override public void addAnalyticsObservers() {
+      }
+
       @Override public File getCacheDir() {
         throw new RuntimeException("Testing");
       }

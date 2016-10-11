@@ -17,6 +17,7 @@ import mockit.integration.junit4.JMockit;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import rcgonzalezf.org.weather.common.analytics.AnalyticsManager;
 
 import static org.junit.Assert.assertEquals;
 
@@ -26,6 +27,7 @@ import static org.junit.Assert.assertEquals;
 
   @SuppressWarnings("unused") @Mocked private PreferenceActivity mPreferenceActivity;
   @SuppressWarnings("unused") @Mocked private AppCompatDelegate mAppCompatDelegate;
+  @SuppressWarnings("unused") @Mocked private AnalyticsManager mAnalyticsManager;
   private boolean mOnMenuItemSelected;
   private boolean mIsMultiPane;
 

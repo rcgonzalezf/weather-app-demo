@@ -44,6 +44,8 @@ import org.junit.runner.RunWith;
 import org.rcgonzalezf.weather.common.models.Forecast;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
+import rcgonzalezf.org.weather.common.analytics.Analytics;
+import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent;
 import rcgonzalezf.org.weather.location.LocationManager;
 import rcgonzalezf.org.weather.utils.WeatherUtils;
 
@@ -52,6 +54,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static rcgonzalezf.org.weather.common.BaseActivity.FORECASTS;
+import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.MANUAL_SEARCH;
 import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
 
 @RunWith(JMockit.class) public class BaseActivityTest {
@@ -69,9 +72,9 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
   @SuppressWarnings("unused") @Mocked private SharedPreferences mSharedPreferences;
   @SuppressWarnings("unused") @Mocked private PreferenceManager mPreferenceManager;
   @SuppressWarnings("unused") @Mocked private FloatingActionButton mFloatingActionButton;
+  @SuppressWarnings("unused") @Mocked private Analytics mAnalytics;
 
   private boolean mRetrievingFromCache;
-  private boolean mSearchingByLocation;
   private boolean mSearchingByQuery;
   private boolean mSuperOnOptionsItemSelectedCalled;
   private boolean mIsNullUserDisplayName;
@@ -86,6 +89,7 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
   private NavigationView.OnNavigationItemSelectedListener mNavigationListener;
 
   @Before public void setUp() {
+    //noinspection unused
     mView = new MockUp<View>() {
       @Mock View inflate(Context context, int resource, ViewGroup root) {
         return mEditText;
@@ -124,7 +128,6 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
       }
 
       @Override public void searchByLocation(double lat, double lon) {
-        mSearchingByLocation = true;
       }
 
       @Override public void loadOldData(List<Forecast> forecastList) {
@@ -309,29 +312,34 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
     thenShouldPerformFabAction();
   }
 
-  @Test public void shouldCancelDialogOnCancel(@Mocked DialogInterface dialog) {
+  @Test public void shouldCancelDialogOnCancel(@Mocked DialogInterface dialog,
+      @SuppressWarnings("UnusedParameters") @Mocked AnalyticsEvent analyticsEvent) {
     givenCancelClickListener();
 
     whenClickingDialog(dialog);
 
     thenShouldCancel(dialog);
+    thenShouldTrackEvent(MANUAL_SEARCH, "CANCEL");
   }
 
   @SuppressWarnings("UnusedParameters") @Test
   public void shouldSearchByManualInputOnDialogOk(@Mocked DialogInterface dialog,
-      @Mocked Editable editable, @Mocked WeatherUtils weatherUtils, @Mocked Toast toast) {
+      @Mocked Editable editable, @Mocked WeatherUtils weatherUtils, @Mocked Toast toast,
+      @Mocked AnalyticsEvent analyticsEvent) {
     givenHasInternet(true);
+    givenUserInput(editable);
     givenOkClickListener(editable);
 
     whenClickingDialog(dialog);
 
+    thenShouldTrackEvent(MANUAL_SEARCH, editable.toString());
     thenShouldSearchByManualInput(editable);
   }
 
-  @Test
-  public void shouldNavigateToSettingsWhenSelectingFromDrawer(@Mocked MenuItem item, @Mocked Intent intent) {
+  @Test public void shouldNavigateToSettingsWhenSelectingFromDrawer(@Mocked MenuItem item,
+      @Mocked Intent intent) {
     givenNavigationListener();
-    givenMenuItemId(item,R.id.drawer_settings );
+    givenMenuItemId(item, R.id.drawer_settings);
 
     whenNavigationItemSelected(item);
 
@@ -339,7 +347,8 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
   }
 
   @Test
-  public void shouldHandleHomePressedWhenSelectingFromDrawerNotKnownItem(@Mocked MenuItem item, @Mocked Snackbar snackbar) {
+  public void shouldHandleHomePressedWhenSelectingFromDrawerNotKnownItem(@Mocked MenuItem item,
+      @SuppressWarnings("UnusedParameters") @Mocked Snackbar snackbar) {
     givenActivityCreated();
     givenNavigationListener();
     givenMenuItemId(item, -1);
@@ -347,6 +356,21 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
     whenNavigationItemSelected(item);
 
     thenShouldHandleHomePressed(item);
+  }
+
+  private void givenUserInput(final Editable editable) {
+    new Expectations() {{
+      //noinspection ResultOfMethodCallIgnored
+      editable.toString();
+      result = "someInput";
+    }};
+  }
+
+  private void thenShouldTrackEvent(final String eventName, final String additionalDetails) {
+    new Verifications() {{
+      //noinspection WrongConstant
+      new AnalyticsEvent(withEqual(eventName), withEqual(additionalDetails));
+    }};
   }
 
   private void thenShouldHandleHomePressed(final MenuItem item) {

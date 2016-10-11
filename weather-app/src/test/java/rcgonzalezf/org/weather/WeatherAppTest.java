@@ -15,6 +15,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import rcgonzalezf.org.weather.common.analytics.AnalyticsManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -30,6 +31,7 @@ import static org.junit.Assert.assertTrue;
   private boolean stethoInitialized;
   private boolean isDebugModeOriginal;
   private OkHttpClient okHttpClient;
+  @SuppressWarnings("unused") @Mocked AnalyticsManager analyticsManager;
 
   @Before public void setUpApplication() throws Exception {
 
@@ -64,7 +66,7 @@ import static org.junit.Assert.assertTrue;
   }
 
   @Test public void shouldInitializeCrittercismOnCreatingTheAppOnNonDebugMode(
-      @Mocked Crittercism crittercism) {
+      @SuppressWarnings("UnusedParameters") @Mocked Crittercism crittercism) {
     givenNonDebugMode();
 
     whenCreatingTheApplication();
@@ -95,6 +97,26 @@ import static org.junit.Assert.assertTrue;
     whenCreatingTheOkHttpClient();
 
     thenShouldNotHaveInterceptors();
+  }
+
+  @Test public void shouldCreateNewAnalyticsManagerIfNoInstance() {
+    givenAnalyticsManagerInstance();
+
+    whenGettingAnalyticsManager();
+
+    thenShouldCreateNewInstance();
+  }
+
+  private void givenAnalyticsManagerInstance() {
+    WeatherApp.getAnalyticsManager();
+  }
+
+  private void thenShouldCreateNewInstance() {
+    assertNotNull(WeatherApp.getAnalyticsManager());
+  }
+
+  private void whenGettingAnalyticsManager() {
+    WeatherApp.getAnalyticsManager();
   }
 
   private void thenCrittercismShouldBeInitialized() {
