@@ -18,10 +18,10 @@ public class AnalyticsManager {
   static final String NONE = "None";
   static final String WIFI = "Wifi";
 
-  @VisibleForTesting static final String ANDROID_VERSION = "ANDROID_VERSION";
-  @VisibleForTesting static final String APP_VERSION = "APP_VERSION";
-  @VisibleForTesting static final String NETWORK = "NETWORK";
-  @VisibleForTesting static final String MULTIPANE = "MULTIPANE";
+  public static final String ANDROID_VERSION = "ANDROID_VERSION";
+  public static final String APP_VERSION = "APP_VERSION";
+  public static final String NETWORK = "NETWORK";
+  public static final String MULTIPANE = "MULTIPANE";
 
   @VisibleForTesting static String sAndroidVersion = Build.VERSION.RELEASE;
   @VisibleForTesting static String sAppVersion = BuildConfig.VERSION_NAME;

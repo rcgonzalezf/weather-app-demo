@@ -7,6 +7,7 @@ import com.facebook.stetho.okhttp3.StethoInterceptor;
 import okhttp3.OkHttpClient;
 import org.rcgonzalezf.weather.WeatherLibApp;
 import rcgonzalezf.org.weather.common.analytics.AnalyticsManager;
+import rcgonzalezf.org.weather.common.analytics.observer.GoogleAnalyticsObserver;
 import rcgonzalezf.org.weather.common.analytics.observer.LogcatAnalyticsObserver;
 
 public class WeatherApp extends WeatherLibApp {
@@ -40,6 +41,7 @@ public class WeatherApp extends WeatherLibApp {
     if (sIsDebugMode) {
       getAnalyticsManager().addObserver(new LogcatAnalyticsObserver());
     }
+    getAnalyticsManager().addObserver(new GoogleAnalyticsObserver());
   }
 
   public static AnalyticsManager getAnalyticsManager() {
