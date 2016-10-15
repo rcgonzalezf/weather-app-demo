@@ -5,9 +5,11 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.Layout;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -29,13 +31,43 @@ public class WeatherListActivity extends BaseActivity
 
   private static final String TAG = WeatherListActivity.class.getSimpleName();
   private RecyclerView mRecyclerView;
+  private SwipeRefreshLayout mSwipeToRefreshLayout;
   private ModelAdapter<Forecast> mAdapter;
   private OpenWeatherApiCallback mOpenWeatherApiCallback;
+  private List<Forecast> mForecast;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mOpenWeatherApiCallback = new OpenWeatherApiCallback(this);
+    mSwipeToRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeToRefreshLayout);
     setupRecyclerView();
+
+    mSwipeToRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+      @Override
+      public void onRefresh() {
+        refreshList();
+      }
+    });
+  }
+
+  private void setForecastList(List<Forecast> forecastList) {
+    this.mForecast = forecastList;
+  }
+
+  private List<Forecast> getForecastList() {
+    return mForecast;
+  }
+
+  void refreshList() {
+    loadOldData(getForecastList());
+  }
+
+
+
+  void onItemsLoadComplete() {
+    if(mSwipeToRefreshLayout.isRefreshing()) {
+      mSwipeToRefreshLayout.setRefreshing(false);
+    }
   }
 
   @Override public void onEnterAnimationComplete() {
@@ -54,11 +86,14 @@ public class WeatherListActivity extends BaseActivity
       notifyAdapter(forecastList);
     } else {
       Log.d(TAG, "No data even in offline mode :(");
+      //cancel swipe to refresh loading
+      onItemsLoadComplete();
     }
   }
 
   @Override public void updateList(List<Forecast> forecastList) {
     notifyAdapter(forecastList);
+    setForecastList(forecastList);
   }
 
   @Override public void onError(String error) {
@@ -110,6 +145,7 @@ public class WeatherListActivity extends BaseActivity
   private void notifyAdapter(final List<Forecast> forecastList) {
     saveForecastList(forecastList);
     runOnUiThread(createNotifyRunnable(forecastList));
+    onItemsLoadComplete();
   }
 
   @VisibleForTesting
