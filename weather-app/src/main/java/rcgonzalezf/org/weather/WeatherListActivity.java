@@ -39,9 +39,9 @@ public class WeatherListActivity extends BaseActivity
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mOpenWeatherApiCallback = new OpenWeatherApiCallback(this);
-    mSwipeToRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeToRefreshLayout);
     setupRecyclerView();
 
+    mSwipeToRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeToRefreshLayout);
     mSwipeToRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
       @Override
       public void onRefresh() {
@@ -49,12 +49,12 @@ public class WeatherListActivity extends BaseActivity
       }
     });
   }
-
-  private void setForecastList(List<Forecast> forecastList) {
+//last changes
+  void setForecastList(List<Forecast> forecastList) {
     this.mForecast = forecastList;
   }
 
-  private List<Forecast> getForecastList() {
+   List<Forecast> getForecastList() {
     return mForecast;
   }
 
@@ -63,7 +63,7 @@ public class WeatherListActivity extends BaseActivity
   }
 
 
-
+  @VisibleForTesting
   void onItemsLoadComplete() {
     if(mSwipeToRefreshLayout.isRefreshing()) {
       mSwipeToRefreshLayout.setRefreshing(false);

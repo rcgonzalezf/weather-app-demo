@@ -1,15 +1,22 @@
 package rcgonzalezf.org.weather;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 import mockit.Expectations;
+import mockit.Mock;
+import mockit.MockUp;
 import mockit.Mocked;
 import mockit.Tested;
 import mockit.Verifications;
@@ -36,6 +43,7 @@ import static org.mockito.Mockito.mock;
   @SuppressWarnings("unused") @Mocked private RecyclerView mRecyclerView;
   @SuppressWarnings("unused") @Mocked private ModelAdapter<Forecast> mAdapter;
   @SuppressWarnings("unused") @Mocked private OpenWeatherApiCallback mOpenWeatherApiCallback;
+  @SuppressWarnings("unused") @Mocked private SwipeRefreshLayout mSwipeToRefreshLayout;
 
   @SuppressWarnings("unused") @Mocked
   private OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder
@@ -44,12 +52,34 @@ import static org.mockito.Mockito.mock;
   private WeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback>
       mWeatherRepository;
   @SuppressWarnings("unused") @Mocked private ServiceConfig mServiceConfig;
+
+  private View mView;
   private List<Forecast> mForecastList;
   private String mQuery;
   private Runnable mNotifyAdapterRunnable;
 
+
   @Before public void setUp() throws Exception {
     uut = new WeatherListActivity();
+
+    mView = new MockUp<View>() {
+      @Mock View findViewById(int id) {
+        return mSwipeToRefreshLayout;
+      }
+    }.getMockInstance();
+    new MockUp<AppCompatActivity>() {
+      @SuppressWarnings("unused")
+      @Mock
+      View findViewById(@IdRes int id) {
+        View view = mView;
+        if (id == R.id.swipeToRefreshLayout) {
+          view = mSwipeToRefreshLayout;
+        }else if(id == R.id.main_recycler_view) {
+          view = mRecyclerView;
+        }
+        return view;
+      }
+    };
   }
 
   @Test public void shouldSetUpRecyclerViewOnCreation() {
@@ -58,6 +88,12 @@ import static org.mockito.Mockito.mock;
 
     thenAdapterShouldBeInitialized();
     thenRecyclerViewShouldBeInitialized();
+  }
+
+  private void givenSwipeToRefreshLayout() {
+    new Expectations() {{
+      mBaseActivity.findViewById(R.id.swipeToRefreshLayout); result = mSwipeToRefreshLayout;
+    }};
   }
 
   @Test public void shouldScheduleLayoutAnimationOnAnimationComplete() {
@@ -77,6 +113,7 @@ import static org.mockito.Mockito.mock;
   }
 
   @Test public void shouldLoadOldData() {
+    givenActivityCreated();
     givenForecastList();
     givenForecastElement();
 
@@ -88,6 +125,7 @@ import static org.mockito.Mockito.mock;
 
   @Test
   public void shouldNotLoadOldForNullList(@SuppressWarnings("UnusedParameters") @Mocked Log log) {
+    givenActivityCreated();
     whenLoadingOldData();
 
     thenLogDataShouldBeWritten("No data even in offline mode :(");
@@ -95,6 +133,7 @@ import static org.mockito.Mockito.mock;
 
   @Test
   public void shouldNotLoadOldForEmptyList(@SuppressWarnings("UnusedParameters") @Mocked Log log) {
+    givenActivityCreated();
     givenForecastList();
 
     whenLoadingOldData();
@@ -103,6 +142,7 @@ import static org.mockito.Mockito.mock;
   }
 
   @Test public void shouldNotifyAdapterOnUpdatingList() {
+    givenActivityCreated();
     givenForecastList();
     givenForecastElement();
 
@@ -196,7 +236,6 @@ import static org.mockito.Mockito.mock;
   private void thenBuilderShouldAddCityName() {
     new Verifications() {{
       mOpenWeatherApiRequestBuilder.withCityName(withEqual(mQuery));
-      mOpenWeatherApiRequestBuilder.build();
     }};
   }
 
@@ -210,6 +249,7 @@ import static org.mockito.Mockito.mock;
 
   private void whenUpdatingList() {
     uut.updateList(mForecastList);
+    uut.setForecastList(mForecastList);
   }
 
   private void thenLogDataShouldBeWritten(final String message) {
