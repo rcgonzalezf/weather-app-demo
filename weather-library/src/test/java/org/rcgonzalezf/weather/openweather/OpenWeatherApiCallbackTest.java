@@ -1,5 +1,6 @@
 package org.rcgonzalezf.weather.openweather;
 
+import android.support.annotation.NonNull;
 import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +22,7 @@ public class OpenWeatherApiCallbackTest {
   private boolean mOnErrorCalled;
   private OnUpdateWeatherListListener mOnUpdateWeatherListListener = new OnUpdateWeatherListListener() {
 
-    @Override public void updateList(List<Forecast> forecastList) {
+    @Override public void updateList(@NonNull List<Forecast> forecastList) {
       mListUpdated = true;
     }
 
