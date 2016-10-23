@@ -10,22 +10,26 @@
     tools:context=".WeatherListActivity"
     >
 
+
   <android.support.design.widget.CoordinatorLayout
       android:id="@+id/content"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:orientation="vertical"
       >
+
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/main_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/progress_bar"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         >
 
     </android.support.v7.widget.RecyclerView>
 
-    <android.support.design.widget.AppBarLayout
+     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -49,6 +53,13 @@
         style="@style/FabStyle"/>
 
   </android.support.design.widget.CoordinatorLayout>
+
+    <ProgressBar
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
 
   <android.support.design.widget.NavigationView
       android:id="@+id/navigation_view"
