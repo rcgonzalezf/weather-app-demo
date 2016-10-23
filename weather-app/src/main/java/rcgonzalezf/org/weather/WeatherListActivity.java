@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import com.google.gson.Gson;
 import java.util.ArrayList;
@@ -40,10 +41,12 @@ public class WeatherListActivity extends BaseActivity
   private RecyclerView mRecyclerView;
   private ModelAdapter<Forecast> mAdapter;
   private OpenWeatherApiCallback mOpenWeatherApiCallback;
+  private ProgressBar mProgress;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mOpenWeatherApiCallback = new OpenWeatherApiCallback(this);
+    mProgress = (ProgressBar) findViewById(R.id.progress_bar);
     setupRecyclerView();
   }
 
@@ -87,6 +90,7 @@ public class WeatherListActivity extends BaseActivity
     weatherRepository.findWeather(new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder()
         .withCityName(query)
         .build(), mOpenWeatherApiCallback);
+      mProgress.setVisibility(View.VISIBLE);
 
     Toast.makeText(this, getString(R.string.searching) + " " + userInput + "...",
         Toast.LENGTH_SHORT).show();
@@ -156,6 +160,7 @@ public class WeatherListActivity extends BaseActivity
       @Override public void run() {
         mAdapter.setItems(forecastList);
         mAdapter.notifyDataSetChanged();
+        mProgress.setVisibility(View.GONE);
       }
     };
   }
