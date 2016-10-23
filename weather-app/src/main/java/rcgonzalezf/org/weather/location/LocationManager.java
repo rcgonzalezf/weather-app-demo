@@ -2,6 +2,7 @@ package rcgonzalezf.org.weather.location;
 
 import android.Manifest;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.Snackbar;
@@ -18,6 +19,7 @@ public class LocationManager implements LocationRetrieverListener {
   private final WeakReference<BaseActivity> baseActivityWeakReference;
   private final WeakReference<View> mContentWeakReference;
   private final LocationRetriever mLocationRetriever;
+  private final int DELAY = 5000;
   @VisibleForTesting PermissionChecker mPermissionChecker;
 
   public LocationManager(@NonNull BaseActivity baseActivity, View content) {
@@ -87,12 +89,20 @@ public class LocationManager implements LocationRetrieverListener {
     }
   }
 
-  @VisibleForTesting void onEmptyLocation(BaseActivity baseActivity, View content) {
+  @VisibleForTesting void onEmptyLocation(final BaseActivity baseActivity, View content) {
     if (baseActivity != null && content != null) {
       Snackbar.make(content, baseActivity.getString(R.string.location_off_msg),
           Snackbar.LENGTH_SHORT).show();
+      //After 5 seconds the activity will be recharged
+        new Handler().postDelayed(new Runnable(){
+        public void run(){
+          baseActivity.finish();
+          baseActivity.startActivity(baseActivity.getIntent());
+        };
+      }, DELAY);
     }
   }
+
 
   @VisibleForTesting void onLocationFound(BaseActivity baseActivity, double lat, double lon) {
     if (baseActivity != null) {
