@@ -9,6 +9,11 @@
     android:fitsSystemWindows="true"
     tools:context=".WeatherActivity"
     >
+  <ProgressBar
+      style="@style/Widget.AppCompat.ProgressBar"
+      android:id="@+id/progress_bar"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"/>
 
   <android.support.design.widget.CoordinatorLayout
       android:id="@+id/content"
