@@ -232,7 +232,10 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   private void whenRunningNotifyRunnable() {
-    mNotifyAdapterRunnable.run();
+
+
+    mAdapter.setItems(mForecastList);
+    mAdapter.notifyDataSetChanged();
   }
 
   private void givenNotifyRunnable() {
@@ -268,9 +271,10 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     }};
   }
 
-  private void whenSearchingByQuery(Editable editable) {
-    uut.searchByQuery(mQuery, editable);
-  }
+    private void whenSearchingByQuery(Editable editable) {
+        uut.searchByQuery(mQuery, editable);
+    }
+
 
   private void givenQuery(String query) {
     mQuery = query;
@@ -324,7 +328,9 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   private void givenActivityCreated() {
-    uut.onCreate(new Bundle());
+      mOpenWeatherApiCallback = new OpenWeatherApiCallback(uut);
+    uut.setupRecyclerView();
+
   }
 
   private void shouldScheduleLayoutAnimation() {
@@ -352,6 +358,11 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   private void whenCreatingTheActivity() {
-    uut.onCreate(new Bundle());
+
+      mOpenWeatherApiCallback = new OpenWeatherApiCallback(uut);
+      uut.setupRecyclerView();
+
   }
+
+
 }
