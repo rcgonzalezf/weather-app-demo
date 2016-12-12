@@ -46,8 +46,8 @@ public class WeatherListActivity extends BaseActivity
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mOpenWeatherApiCallback = new OpenWeatherApiCallback(this);
-    mProgress = (ProgressBar) findViewById(R.id.progress_bar);
-    setupRecyclerView();
+   setupProgressBar();
+   setupRecyclerView();
   }
 
   @Override public void onEnterAnimationComplete() {
@@ -90,7 +90,6 @@ public class WeatherListActivity extends BaseActivity
     weatherRepository.findWeather(new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder()
         .withCityName(query)
         .build(), mOpenWeatherApiCallback);
-      mProgress.setVisibility(View.VISIBLE);
 
     Toast.makeText(this, getString(R.string.searching) + " " + userInput + "...",
         Toast.LENGTH_SHORT).show();
@@ -141,13 +140,18 @@ public class WeatherListActivity extends BaseActivity
     }).start();
   }
 
-  private void setupRecyclerView() {
+
+  public void setupRecyclerView() {
     mAdapter = new ModelAdapter<>(new ArrayList<Forecast>(), this);
     mAdapter.setOnItemClickListener(this);
 
     mRecyclerView = (RecyclerView) findViewById(R.id.main_recycler_view);
     mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
     mRecyclerView.setAdapter(mAdapter);
+  }
+
+  public void setupProgressBar() {
+    mProgress = (ProgressBar) findViewById(R.id.progress_bar);
   }
 
   private void notifyAdapter(final List<Forecast> forecastList) {
@@ -162,6 +166,8 @@ public class WeatherListActivity extends BaseActivity
         mAdapter.notifyDataSetChanged();
         mProgress.setVisibility(View.GONE);
       }
+
     };
+
   }
 }
