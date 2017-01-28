@@ -51,7 +51,7 @@ public abstract class BaseActivity extends AppCompatActivity
   private View mContent;
   private LocationManager mLocationManager;
 
-  protected abstract void searchByQuery(String query, Editable userInput);
+  protected abstract void searchByQuery(String query, CharSequence userInput);
 
   public abstract void searchByLocation(double lat, double lon);
 
@@ -153,7 +153,7 @@ public abstract class BaseActivity extends AppCompatActivity
     mLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
   }
 
-  @VisibleForTesting protected void searchByManualInput(Editable userInput) {
+  @VisibleForTesting protected void searchByManualInput(CharSequence userInput) {
     String query;
     try {
       query = URLEncoder.encode(userInput.toString(), "UTF-8");
@@ -207,7 +207,7 @@ public abstract class BaseActivity extends AppCompatActivity
   @VisibleForTesting @NonNull
   NavigationView.OnNavigationItemSelectedListener getNavigationListener() {
     return new NavigationView.OnNavigationItemSelectedListener() {
-      @Override public boolean onNavigationItemSelected(MenuItem menuItem) {
+      @Override public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         if (menuItem.getItemId() == R.id.drawer_settings) {
           navigateToSettings();
         } else {

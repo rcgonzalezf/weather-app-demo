@@ -123,7 +123,7 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
     };
 
     uut = new BaseActivity() {
-      @Override protected void searchByQuery(String query, Editable userInput) {
+      @Override protected void searchByQuery(String query, CharSequence userInput) {
         mSearchingByQuery = true;
       }
 

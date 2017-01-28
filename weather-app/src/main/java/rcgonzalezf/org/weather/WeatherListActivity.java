@@ -43,7 +43,7 @@ public class WeatherListActivity extends BaseActivity
   private SwipeRefreshLayout mSwipeToRefreshLayout;
   private ModelAdapter<Forecast> mAdapter;
   private OpenWeatherApiCallback mOpenWeatherApiCallback;
-  private Editable mCityNameToSearchOnSwipe;
+  private CharSequence mCityNameToSearchOnSwipe;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -51,8 +51,7 @@ public class WeatherListActivity extends BaseActivity
     setupRecyclerView();
 
     if (savedInstanceState != null) {
-      mCityNameToSearchOnSwipe = Editable.Factory.getInstance()
-          .newEditable(savedInstanceState.getCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE));
+      mCityNameToSearchOnSwipe = savedInstanceState.getCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE);
     }
 
     mSwipeToRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
@@ -111,7 +110,7 @@ public class WeatherListActivity extends BaseActivity
     trackOnActionEvent(new AnalyticsEvent(SEARCH_COMPLETED, "error: " + error));
   }
 
-  @Override protected void searchByQuery(String query, Editable userInput) {
+  @Override protected void searchByQuery(String query, CharSequence userInput) {
     WeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback> weatherRepository =
         ServiceConfig.getInstance().getWeatherRepository();
 
