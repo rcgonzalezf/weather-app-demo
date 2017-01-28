@@ -8,6 +8,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.test.FlakyTest;
 import android.text.Editable;
 import android.util.Log;
 import android.view.View;
@@ -22,6 +23,7 @@ import mockit.Mocked;
 import mockit.Tested;
 import mockit.Verifications;
 import mockit.integration.junit4.JMockit;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -86,6 +88,13 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     };
   }
 
+  @After public void clearEverything() {
+    uut = null;
+    mForecastList = null;
+    mNotifyAdapterRunnable = null;
+    mBaseActivity = null;
+  }
+
   @Test public void shouldSetUpRecyclerViewOnCreation() {
 
     whenCreatingTheActivity();
@@ -142,7 +151,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenShouldTrackEvent(NO_NETWORK_SEARCH, "EMPTY");
   }
 
-  @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity() {
+  @FlakyTest(tolerance = 3) @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity() {
     givenActivityCreated(null);
     givenForecastList();
     givenForecastElement("someCity");
