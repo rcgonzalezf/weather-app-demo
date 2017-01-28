@@ -12,7 +12,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
-import android.text.Layout;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -39,41 +38,40 @@ public class WeatherListActivity extends BaseActivity
     implements ModelAdapter.OnItemClickListener, OnUpdateWeatherListListener {
 
   private static final String TAG = WeatherListActivity.class.getSimpleName();
+  public static final String CITY_NAME_TO_SEARCH_ON_SWIPE = "mCityNameToSearchOnSwipe";
   private RecyclerView mRecyclerView;
   private SwipeRefreshLayout mSwipeToRefreshLayout;
   private ModelAdapter<Forecast> mAdapter;
   private OpenWeatherApiCallback mOpenWeatherApiCallback;
-  private List<Forecast> mForecast;
+  private Editable mCityNameToSearchOnSwipe;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mOpenWeatherApiCallback = new OpenWeatherApiCallback(this);
     setupRecyclerView();
 
+    if (savedInstanceState != null) {
+      mCityNameToSearchOnSwipe = Editable.Factory.getInstance().newEditable(savedInstanceState.getCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE));
+    }
+
     mSwipeToRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeToRefreshLayout);
+    mSwipeToRefreshLayout.setEnabled(mCityNameToSearchOnSwipe != null);
     mSwipeToRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
       @Override
       public void onRefresh() {
-        refreshList();
+        searchByManualInput(mCityNameToSearchOnSwipe);
       }
     });
   }
-//last changes
-  void setForecastList(List<Forecast> forecastList) {
-    this.mForecast = forecastList;
-  }
 
-   List<Forecast> getForecastList() {
-    return mForecast;
+  @Override public void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    outState.putCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE, mCityNameToSearchOnSwipe);
   }
-
-  void refreshList() {
-    loadOldData(getForecastList());
-  }
-
 
   @VisibleForTesting
   void onItemsLoadComplete() {
+    mSwipeToRefreshLayout.setEnabled(mCityNameToSearchOnSwipe != null);
     if(mSwipeToRefreshLayout.isRefreshing()) {
       mSwipeToRefreshLayout.setRefreshing(false);
     }
@@ -106,7 +104,6 @@ public class WeatherListActivity extends BaseActivity
     String cityName = forecastList.isEmpty() ? "" : forecastList.get(0).getCityName();
     trackOnActionEvent(new AnalyticsEvent(SEARCH_COMPLETED, "cityName: " + cityName));
     notifyAdapter(forecastList);
-    setForecastList(forecastList);
   }
 
   @Override public void onError(String error) {
@@ -125,6 +122,7 @@ public class WeatherListActivity extends BaseActivity
 
     Toast.makeText(this, getString(R.string.searching) + " " + userInput + "...",
         Toast.LENGTH_SHORT).show();
+    updateCityNameForSwipeToRefresh(userInput);
   }
 
   @Override public void searchByLocation(double lat, double lon) {
@@ -144,7 +142,12 @@ public class WeatherListActivity extends BaseActivity
               .build(), mOpenWeatherApiCallback);
 
       trackOnActionEvent(new AnalyticsEvent(LOCATION_SEARCH, cityName));
+      updateCityNameForSwipeToRefresh(cityName);
     }
+  }
+
+  private void updateCityNameForSwipeToRefresh(CharSequence cityName) {
+    this.mCityNameToSearchOnSwipe = Editable.Factory.getInstance().newEditable(cityName);
   }
 
   private @Nullable String cityNameFromLatLon(double lat, double lon) {
@@ -184,7 +187,6 @@ public class WeatherListActivity extends BaseActivity
   private void notifyAdapter(final List<Forecast> forecastList) {
     saveForecastList(forecastList);
     runOnUiThread(createNotifyRunnable(forecastList));
-    onItemsLoadComplete();
   }
 
   @VisibleForTesting @NonNull Runnable createNotifyRunnable(final List<Forecast> forecastList) {
@@ -192,6 +194,7 @@ public class WeatherListActivity extends BaseActivity
       @Override public void run() {
         mAdapter.setItems(forecastList);
         mAdapter.notifyDataSetChanged();
+        onItemsLoadComplete();
       }
     };
   }
