@@ -11,7 +11,6 @@ import android.support.annotation.VisibleForTesting;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -145,7 +144,7 @@ public class WeatherListActivity extends BaseActivity
   }
 
   private void updateCityNameForSwipeToRefresh(CharSequence cityName) {
-    this.mCityNameToSearchOnSwipe = Editable.Factory.getInstance().newEditable(cityName);
+    this.mCityNameToSearchOnSwipe = cityName;
   }
 
   private @Nullable String cityNameFromLatLon(double lat, double lon) {
