@@ -202,7 +202,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
     thenBuilderShouldAddLatLon(givenLat, givenLon);
     thenWeatherRepositoryShouldFindWeather();
-    thenShouldTrackEvent(LOCATION_SEARCH, "GeoCoder Failure");
+    thenShouldTrackEvent(LOCATION_SEARCH, "Geocoder Failure");
   }
 
   @Test public void shouldNotifyDataSetChangeOnRunningTheNotifyRunnable() {
