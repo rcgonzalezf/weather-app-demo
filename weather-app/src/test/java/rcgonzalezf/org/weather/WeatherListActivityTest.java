@@ -100,7 +100,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   @Test public void shouldScheduleLayoutAnimationOnAnimationComplete() {
-    givenActivityCreated();
+    givenActivityCreated(null);
 
     whenEnteringAnimationComplete();
 
@@ -116,7 +116,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   @Test public void shouldLoadOldData() {
-    givenActivityCreated();
+    givenActivityCreated(null);
     givenForecastList();
     givenForecastElement("someCity");
 
@@ -129,7 +129,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   @Test
   public void shouldNotLoadOldForNullList(@SuppressWarnings("UnusedParameters") @Mocked Log log) {
-    givenActivityCreated();
+    givenActivityCreated(null);
     whenLoadingOldData();
 
     thenLogDataShouldBeWritten("No data even in offline mode :(");
@@ -138,7 +138,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   @Test
   public void shouldNotLoadOldForEmptyList(@SuppressWarnings("UnusedParameters") @Mocked Log log) {
-    givenActivityCreated();
+    givenActivityCreated(null);
     givenForecastList();
 
     whenLoadingOldData();
@@ -148,7 +148,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity() {
-    givenActivityCreated();
+    givenActivityCreated(null);
     givenForecastList();
     givenForecastElement("someCity");
 
@@ -203,7 +203,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   @Test public void shouldNotifyDataSetChangeOnRunningTheNotifyRunnable() {
-    givenActivityCreated();
+    givenActivityCreated(null);
     givenForecastList();
     givenNotifyRunnable();
 
@@ -357,8 +357,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     uut.onItemClick(mock(View.class), mock(WeatherViewModel.class));
   }
 
-  private void givenActivityCreated() {
-    uut.onCreate(new Bundle());
+  private void givenActivityCreated(Bundle savedInstanceState) {
+    uut.onCreate(savedInstanceState);
   }
 
   private void shouldScheduleLayoutAnimation() {
