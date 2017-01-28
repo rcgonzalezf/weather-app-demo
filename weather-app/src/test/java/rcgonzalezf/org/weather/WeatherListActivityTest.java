@@ -36,6 +36,7 @@ import rcgonzalezf.org.weather.common.BaseActivity;
 import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent;
 
 import static org.mockito.Mockito.mock;
+import static rcgonzalezf.org.weather.WeatherListActivity.CITY_NAME_TO_SEARCH_ON_SWIPE;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.LOCATION_SEARCH;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.NO_NETWORK_SEARCH;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.SEARCH_COMPLETED;
@@ -233,6 +234,23 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     whenRefreshing();
 
     thenShouldSearchByManualInput();
+  }
+
+  @Test public void shouldPutHelperVariablesOnSavingInstanceState(@Mocked Bundle outState) {
+
+    whenSavingTheInstanceState(outState);
+
+    thenVerifyIsSavingHelperVariables(outState);
+  }
+
+  private void thenVerifyIsSavingHelperVariables(final Bundle outState) {
+    new Verifications() {{
+      outState.putCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE, withAny(""));
+    }};
+  }
+
+  private void whenSavingTheInstanceState(Bundle outState) {
+    uut.onSaveInstanceState(outState);
   }
 
   private void thenShouldSearchByManualInput() {
