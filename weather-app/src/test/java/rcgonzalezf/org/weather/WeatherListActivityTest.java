@@ -58,7 +58,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   private WeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback>
       mWeatherRepository;
   @SuppressWarnings("unused") @Mocked private ServiceConfig mServiceConfig;
-  @SuppressWarnings("unused") @Mocked AnalyticsEvent mAnalyticsEvent;
+  @SuppressWarnings("unused") @Mocked private AnalyticsEvent mAnalyticsEvent;
   private View mView;
   private List<Forecast> mForecastList;
   private String mQuery;
@@ -69,7 +69,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     uut = new WeatherListActivity();
 
     mView = new MockUp<View>() {
-      @Mock View findViewById(int id) {
+      @SuppressWarnings("unused") @Mock View findViewById(int id) {
         return mSwipeToRefreshLayout;
       }
     }.getMockInstance();
@@ -92,13 +92,6 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
     thenAdapterShouldBeInitialized();
     thenRecyclerViewShouldBeInitialized();
-  }
-
-  private void givenSwipeToRefreshLayout() {
-    new Expectations() {{
-      mBaseActivity.findViewById(R.id.swipe_to_refresh_layout);
-      result = mSwipeToRefreshLayout;
-    }};
   }
 
   @Test public void shouldScheduleLayoutAnimationOnAnimationComplete() {
@@ -241,6 +234,31 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     whenSavingTheInstanceState(outState);
 
     thenVerifyIsSavingHelperVariables(outState);
+  }
+
+  @Test public void shouldStopRefreshingOnceTheItemLoadIsComplete() {
+    givenActivityCreated(new Bundle());
+    givenSwipeToRefreshLayoutIsRefreshing(true);
+
+    whenItemsLoadIsComplete();
+
+    thenShouldStopRefreshing();
+  }
+
+  private void thenShouldStopRefreshing() {
+    new Verifications() {{
+      mSwipeToRefreshLayout.setRefreshing(withEqual(false));
+    }};
+  }
+
+  private void whenItemsLoadIsComplete() {
+    uut.onItemsLoadComplete();
+  }
+
+  private void givenSwipeToRefreshLayoutIsRefreshing(final boolean isRefreshing) {
+    new Expectations() {{
+      mSwipeToRefreshLayout.isRefreshing(); result = isRefreshing;
+    }};
   }
 
   private void thenVerifyIsSavingHelperVariables(final Bundle outState) {
