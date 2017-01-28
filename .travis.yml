@@ -7,8 +7,19 @@ before_cache:
 
 cache:
   directories:
-    - $HOME/.gradle/caches/
+    - $HOME/.gradle/caches/2.14.1
     - $HOME/.gradle/wrapper/
+    - $HOME/.gradle/caches/jars-1
+    - $HOME/.gradle/daemon
+    - $HOME/.gradle/native
+    - $HOME/.gradle/wrapper
+
+addons:
+  apt_packages:
+    - pandoc
+  artifacts:
+    paths:
+      - $(git ls-files -o | grep build/outputs | tr "\n" ":")
 
 before_install:
   - chmod +x gradlew
@@ -40,8 +51,17 @@ android:
     # - sys-img-x86-android-17
 
 script:
-  - ./gradlew build jacocoTestReport assembleAndroidTest
-  - ./gradlew test
+  - ./gradlew clean
+  - ./gradlew build assembleAndroidTest test
+  - rm /home/travis/.gradle/caches/2.14.1/plugin-resolution/cache.properties.lock
 
 after_success:
+  - ./gradlew jacocoTestReport
   - bash <(curl -s https://codecov.io/bash)
+
+after_failure:
+  - wget http://imgur.com/tools/imgurbash.sh
+  - chmod a+x imgurbash.sh
+  - adb shell screencap -p | sed 's/\r$//' &gt; screen.png
+  - ./imgurbash.sh screen.png
+  - pandoc weather-app-demo/weather-app/build/reports/tests/release/index.html -t plain | sed -n '/^Failed tests/,/default-package/p'
