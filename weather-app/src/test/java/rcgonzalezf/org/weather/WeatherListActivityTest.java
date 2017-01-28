@@ -5,6 +5,7 @@ import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.test.FlakyTest;
 import android.text.Editable;
 import android.util.Log;
 import android.view.View;
@@ -113,6 +114,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenShouldTrackEvent(NO_NETWORK_SEARCH, "EMPTY");
   }
 
+  @FlakyTest(tolerance = 3)
   @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity() {
     givenForecastList();
     givenForecastElement("someCity");
