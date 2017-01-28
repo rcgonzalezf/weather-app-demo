@@ -245,6 +245,27 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenShouldStopRefreshing();
   }
 
+  @Test public void shouldEnableSwipeToRefreshLayoutIfThereIsACityName(@Mocked Bundle savedInstanceState) {
+    givenSavedInstanceStateWithCityName(savedInstanceState);
+    givenActivityCreated(savedInstanceState);
+
+    whenItemsLoadIsComplete();
+
+    thenSwipeToRefreshShouldBeEnabled();
+  }
+
+  private void givenSavedInstanceStateWithCityName(final Bundle savedInstanceState) {
+    new Expectations() {{
+      savedInstanceState.getCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE); result = "";
+    }};
+  }
+
+  private void thenSwipeToRefreshShouldBeEnabled() {
+    new Verifications() {{
+      mSwipeToRefreshLayout.setEnabled(withEqual(true));
+    }};
+  }
+
   private void thenShouldStopRefreshing() {
     new Verifications() {{
       mSwipeToRefreshLayout.setRefreshing(withEqual(false));

@@ -54,7 +54,7 @@ public class WeatherListActivity extends BaseActivity
     }
 
     mSwipeToRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
-    mSwipeToRefreshLayout.setEnabled(mCityNameToSearchOnSwipe != null);
+    enableSwipeToRefreshLayout();
     mSwipeToRefreshLayout.setOnRefreshListener(createSwipeToRefreshListener());
   }
 
@@ -64,7 +64,7 @@ public class WeatherListActivity extends BaseActivity
   }
 
   @VisibleForTesting void onItemsLoadComplete() {
-    mSwipeToRefreshLayout.setEnabled(mCityNameToSearchOnSwipe != null);
+    enableSwipeToRefreshLayout();
     if (mSwipeToRefreshLayout.isRefreshing()) {
       mSwipeToRefreshLayout.setRefreshing(false);
     }
@@ -198,5 +198,9 @@ public class WeatherListActivity extends BaseActivity
         searchByManualInput(mCityNameToSearchOnSwipe);
       }
     };
+  }
+
+  private void enableSwipeToRefreshLayout() {
+    mSwipeToRefreshLayout.setEnabled(mCityNameToSearchOnSwipe != null);
   }
 }
