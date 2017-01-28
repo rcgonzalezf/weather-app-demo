@@ -18,6 +18,7 @@ import mockit.Mocked;
 import mockit.Tested;
 import mockit.Verifications;
 import mockit.integration.junit4.JMockit;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,6 +60,13 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   @Before public void setUp() throws Exception {
     uut = new WeatherListActivity();
+  }
+
+  @After public void clearEverything() {
+    uut = null;
+    mForecastList = null;
+    mNotifyAdapterRunnable = null;
+    mBaseActivity = null;
   }
 
   @Test public void shouldSetUpRecyclerViewOnCreation() {
@@ -114,8 +122,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenShouldTrackEvent(NO_NETWORK_SEARCH, "EMPTY");
   }
 
-  @FlakyTest(tolerance = 3)
-  @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity() {
+  @FlakyTest(tolerance = 3) @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity() {
     givenForecastList();
     givenForecastElement("someCity");
 
