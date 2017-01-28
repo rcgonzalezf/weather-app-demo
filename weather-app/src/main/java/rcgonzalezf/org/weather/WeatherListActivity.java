@@ -55,11 +55,7 @@ public class WeatherListActivity extends BaseActivity
 
     mSwipeToRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
     mSwipeToRefreshLayout.setEnabled(mCityNameToSearchOnSwipe != null);
-    mSwipeToRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-      @Override public void onRefresh() {
-        searchByManualInput(mCityNameToSearchOnSwipe);
-      }
-    });
+    mSwipeToRefreshLayout.setOnRefreshListener(createSwipeToRefreshListener());
   }
 
   @Override public void onSaveInstanceState(Bundle outState) {
@@ -192,6 +188,14 @@ public class WeatherListActivity extends BaseActivity
         mAdapter.setItems(forecastList);
         mAdapter.notifyDataSetChanged();
         onItemsLoadComplete();
+      }
+    };
+  }
+
+  @VisibleForTesting @NonNull SwipeRefreshLayout.OnRefreshListener createSwipeToRefreshListener() {
+    return new SwipeRefreshLayout.OnRefreshListener() {
+      @Override public void onRefresh() {
+        searchByManualInput(mCityNameToSearchOnSwipe);
       }
     };
   }

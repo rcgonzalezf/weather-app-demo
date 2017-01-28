@@ -62,6 +62,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   private List<Forecast> mForecastList;
   private String mQuery;
   private Runnable mNotifyAdapterRunnable;
+  private SwipeRefreshLayout.OnRefreshListener mSwipeToRefreshListener;
 
   @Before public void setUp() throws Exception {
     uut = new WeatherListActivity();
@@ -224,6 +225,28 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenBuilderShouldAddCityName();
     thenWeatherRepositoryShouldFindWeather();
     thenShouldTrackEvent(LOCATION_SEARCH, mQuery);
+  }
+
+  @Test public void shouldSearchByManualInputOnRefresh() {
+    givenSwipeToRefreshListener();
+
+    whenRefreshing();
+
+    thenShouldSearchByManualInput();
+  }
+
+  private void thenShouldSearchByManualInput() {
+    new Verifications() {{
+      mBaseActivity.searchByManualInput(withAny(""));
+    }};
+  }
+
+  private void whenRefreshing() {
+    mSwipeToRefreshListener.onRefresh();
+  }
+
+  private void givenSwipeToRefreshListener() {
+    mSwipeToRefreshListener = uut.createSwipeToRefreshListener();
   }
 
   private void thenShouldTrackEvent(final String eventName, final String additionalDetails) {

@@ -153,7 +153,7 @@ public abstract class BaseActivity extends AppCompatActivity
     mLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
   }
 
-  @VisibleForTesting protected void searchByManualInput(CharSequence userInput) {
+  @VisibleForTesting public void searchByManualInput(CharSequence userInput) {
     String query;
     try {
       query = URLEncoder.encode(userInput.toString(), "UTF-8");
