@@ -1,7 +1,6 @@
 package rcgonzalezf.org.weather;
 
 import android.location.Address;
-import android.content.Context;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -12,7 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -65,7 +63,6 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   private String mQuery;
   private Runnable mNotifyAdapterRunnable;
 
-
   @Before public void setUp() throws Exception {
     uut = new WeatherListActivity();
 
@@ -75,13 +72,11 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
       }
     }.getMockInstance();
     new MockUp<AppCompatActivity>() {
-      @SuppressWarnings("unused")
-      @Mock
-      View findViewById(@IdRes int id) {
+      @SuppressWarnings("unused") @Mock View findViewById(@IdRes int id) {
         View view = mView;
-        if (id == R.id.swipeToRefreshLayout) {
+        if (id == R.id.swipe_to_refresh_layout) {
           view = mSwipeToRefreshLayout;
-        }else if(id == R.id.main_recycler_view) {
+        } else if (id == R.id.main_recycler_view) {
           view = mRecyclerView;
         }
         return view;
@@ -99,7 +94,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   private void givenSwipeToRefreshLayout() {
     new Expectations() {{
-      mBaseActivity.findViewById(R.id.swipeToRefreshLayout); result = mSwipeToRefreshLayout;
+      mBaseActivity.findViewById(R.id.swipe_to_refresh_layout);
+      result = mSwipeToRefreshLayout;
     }};
   }
 
@@ -316,7 +312,6 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   private void whenUpdatingList() {
     uut.updateList(mForecastList);
-    uut.setForecastList(mForecastList);
   }
 
   private void thenLogDataShouldBeWritten(final String message) {

@@ -51,14 +51,14 @@ public class WeatherListActivity extends BaseActivity
     setupRecyclerView();
 
     if (savedInstanceState != null) {
-      mCityNameToSearchOnSwipe = Editable.Factory.getInstance().newEditable(savedInstanceState.getCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE));
+      mCityNameToSearchOnSwipe = Editable.Factory.getInstance()
+          .newEditable(savedInstanceState.getCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE));
     }
 
-    mSwipeToRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeToRefreshLayout);
+    mSwipeToRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
     mSwipeToRefreshLayout.setEnabled(mCityNameToSearchOnSwipe != null);
     mSwipeToRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-      @Override
-      public void onRefresh() {
+      @Override public void onRefresh() {
         searchByManualInput(mCityNameToSearchOnSwipe);
       }
     });
@@ -69,10 +69,9 @@ public class WeatherListActivity extends BaseActivity
     outState.putCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE, mCityNameToSearchOnSwipe);
   }
 
-  @VisibleForTesting
-  void onItemsLoadComplete() {
+  @VisibleForTesting void onItemsLoadComplete() {
     mSwipeToRefreshLayout.setEnabled(mCityNameToSearchOnSwipe != null);
-    if(mSwipeToRefreshLayout.isRefreshing()) {
+    if (mSwipeToRefreshLayout.isRefreshing()) {
       mSwipeToRefreshLayout.setRefreshing(false);
     }
   }
