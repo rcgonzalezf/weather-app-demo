@@ -8,7 +8,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.test.FlakyTest;
 import android.text.Editable;
 import android.util.Log;
 import android.view.View;
@@ -151,7 +150,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenShouldTrackEvent(NO_NETWORK_SEARCH, "EMPTY");
   }
 
-  @FlakyTest(tolerance = 3) @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity() {
+  @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity() {
     givenActivityCreated(null);
     givenForecastList();
     givenForecastElement("someCity");
@@ -197,13 +196,13 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
       throws IOException {
     double givenLat = 1d;
     double givenLon = 1d;
-    givenGeocoderThrowsException(geocoder, givenLat, givenLon);
+    givenGeoCoderThrowsException(geocoder, givenLat, givenLon);
 
     whenSearchingByLocation(givenLat, givenLon);
 
     thenBuilderShouldAddLatLon(givenLat, givenLon);
     thenWeatherRepositoryShouldFindWeather();
-    thenShouldTrackEvent(LOCATION_SEARCH, "Geocoder Failure");
+    thenShouldTrackEvent(LOCATION_SEARCH, "GeoCoder Failure");
   }
 
   @Test public void shouldNotifyDataSetChangeOnRunningTheNotifyRunnable() {
@@ -216,12 +215,12 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenAdapterShouldNotifyDataSetChanges();
   }
 
-  @Test public void shouldBuildWithCityNameOnSearchingByLocationWithGeocoderCity(
+  @Test public void shouldBuildWithCityNameOnSearchingByLocationWithGeoCoderCity(
       @Mocked Geocoder geocoder, @Mocked Address address) throws IOException {
     double givenLat = 1d;
     double givenLon = 1d;
     givenQuery("Some City Name");
-    givenGeocoderCity(geocoder, address, givenLat, givenLon);
+    givenGeoCoderCity(geocoder, address, givenLat, givenLon);
 
     whenSearchingByLocation(givenLat, givenLon);
 
@@ -323,7 +322,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     }};
   }
 
-  private void givenGeocoderCity(final Geocoder geocoder, final Address address, final double lat,
+  private void givenGeoCoderCity(final Geocoder geocoder, final Address address, final double lat,
       final double lon) throws IOException {
     final List<Address> addresses = new ArrayList<>();
     addresses.add(address);
@@ -335,7 +334,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     }};
   }
 
-  private void givenGeocoderThrowsException(final Geocoder geocoder, final double lat,
+  private void givenGeoCoderThrowsException(final Geocoder geocoder, final double lat,
       final double lon) throws IOException {
     new Expectations() {{
       geocoder.getFromLocation(lat, lon, 1);
