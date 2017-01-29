@@ -16,7 +16,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,7 +50,7 @@ public abstract class BaseActivity extends AppCompatActivity
   private View mContent;
   private LocationManager mLocationManager;
 
-  protected abstract void searchByQuery(String query, Editable userInput);
+  protected abstract void searchByQuery(String query, CharSequence userInput);
 
   public abstract void searchByLocation(double lat, double lon);
 
@@ -153,7 +152,7 @@ public abstract class BaseActivity extends AppCompatActivity
     mLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
   }
 
-  @VisibleForTesting void searchByManualInput(Editable userInput) {
+  @VisibleForTesting public void searchByManualInput(CharSequence userInput) {
     String query;
     try {
       query = URLEncoder.encode(userInput.toString(), "UTF-8");
@@ -164,7 +163,7 @@ public abstract class BaseActivity extends AppCompatActivity
       return;
     }
 
-    if (!hasInternetConnection(BaseActivity.this)) {
+    if (!hasInternetConnection(this)) {
       informNoInternet();
     } else {
       searchByQuery(query, userInput);
@@ -195,7 +194,7 @@ public abstract class BaseActivity extends AppCompatActivity
   }
 
   @VisibleForTesting @NonNull DialogInterface.OnClickListener getOkClickListener(
-      final Editable userInput) {
+      final CharSequence userInput) {
     return new DialogInterface.OnClickListener() {
       public void onClick(DialogInterface dialog, int id) {
         trackOnActionEvent(new AnalyticsEvent(MANUAL_SEARCH, userInput.toString()));
@@ -207,7 +206,7 @@ public abstract class BaseActivity extends AppCompatActivity
   @VisibleForTesting @NonNull
   NavigationView.OnNavigationItemSelectedListener getNavigationListener() {
     return new NavigationView.OnNavigationItemSelectedListener() {
-      @Override public boolean onNavigationItemSelected(MenuItem menuItem) {
+      @Override public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         if (menuItem.getItemId() == R.id.drawer_settings) {
           navigateToSettings();
         } else {

@@ -4,9 +4,9 @@ import android.support.annotation.StringDef;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.SettingsActivity.TEMP_UNITS_TOGGLE;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.SettingsActivity.ON_LOAD;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.SettingsActivity.ON_NAME;
+import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.SettingsActivity.TEMP_UNITS_TOGGLE;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.LOCATION_SEARCH;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.MANUAL_SEARCH;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.NO_NETWORK_SEARCH;

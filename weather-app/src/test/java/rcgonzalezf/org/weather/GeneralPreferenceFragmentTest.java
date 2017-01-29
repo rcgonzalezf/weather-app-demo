@@ -1,5 +1,6 @@
 package rcgonzalezf.org.weather;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -51,7 +52,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Sett
     thenShouldBindPreference(USER_NAME_TO_DISPLAY);
   }
 
-  @Test public void shouldStartActivityOnPressingHome(@Mocked MenuItem menuItem) {
+  @Test public void shouldStartActivityOnPressingHome(@Mocked MenuItem menuItem,
+      @SuppressWarnings("UnusedParameters") @Mocked Fragment fragment) {
     givenMenuItemPressedIsHome(menuItem);
 
     whenHandlingOptionsItemSelected(menuItem);

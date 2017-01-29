@@ -19,6 +19,7 @@ local.properties
 *.iml
 *.iws
 *.ipr
+.DS_Store
 *~
 build
 weather-app/src/main/res/values/configuration.xml
