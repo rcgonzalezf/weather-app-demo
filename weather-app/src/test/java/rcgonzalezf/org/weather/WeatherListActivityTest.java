@@ -167,9 +167,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
     whenUpdatingList();
 
-    //thenBaseActivityShouldPostRunnableOnUiThread();
     thenNotifyAdapterRunnableShouldBeCreated();
-    //thenShouldTrackEvent(SEARCH_COMPLETED, "cityName: " + "");
+    thenShouldTrackEvent(SEARCH_COMPLETED, "cityName: " + "");
   }
 
   @Test public void shouldHandleError(@SuppressWarnings("UnusedParameters") @Mocked Log log) {
