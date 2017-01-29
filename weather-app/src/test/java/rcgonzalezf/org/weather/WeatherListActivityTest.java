@@ -167,8 +167,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
     whenUpdatingList();
 
-    thenBaseActivityShouldPostRunnableOnUiThread();
-    //thenNotifyAdapterRunnableShouldBeCreated();
+    //thenBaseActivityShouldPostRunnableOnUiThread();
+    thenNotifyAdapterRunnableShouldBeCreated();
     //thenShouldTrackEvent(SEARCH_COMPLETED, "cityName: " + "");
   }
 
