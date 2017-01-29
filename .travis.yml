@@ -14,13 +14,6 @@ cache:
     - $HOME/.gradle/native
     - $HOME/.gradle/wrapper
 
-addons:
-  apt_packages:
-    - pandoc
-  artifacts:
-    paths:
-      - $(git ls-files -o | grep build/outputs | tr "\n" ":")
-
 before_install:
   - chmod +x gradlew
   # - android list target
@@ -33,10 +26,10 @@ android:
     - tools
 
     # The BuildTools version used by the project
-    - build-tools-24.0.3
+    - build-tools-25.0.2
 
     # The SDK version used to compile the project
-    - android-24
+    - android-25
 
     # Additional components
     - extra-google-google_play_services
@@ -53,15 +46,14 @@ android:
 script:
   - ./gradlew clean
   - ./gradlew build assembleAndroidTest test
-  - rm /home/travis/.gradle/caches/2.14.1/plugin-resolution/cache.properties.lock
 
 after_success:
   - ./gradlew jacocoTestReport
   - bash <(curl -s https://codecov.io/bash)
 
-after_failure:
-  - wget http://imgur.com/tools/imgurbash.sh
-  - chmod a+x imgurbash.sh
-  - adb shell screencap -p | sed 's/\r$//' &gt; screen.png
-  - ./imgurbash.sh screen.png
-  - pandoc weather-app-demo/weather-app/build/reports/tests/release/index.html -t plain | sed -n '/^Failed tests/,/default-package/p'
+#after_failure:
+#  - wget http://imgur.com/tools/imgurbash.sh
+#  - chmod a+x imgurbash.sh
+#  - adb shell screencap -p | sed 's/\r$//' &gt; screen.png
+#  - ./imgurbash.sh screen.png
+#  - pandoc weather-app-demo/weather-app/build/reports/tests/release/index.html -t plain | sed -n '/^Failed tests/,/default-package/p'

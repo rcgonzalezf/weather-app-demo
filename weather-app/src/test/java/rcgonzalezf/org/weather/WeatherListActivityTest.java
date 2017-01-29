@@ -1,5 +1,6 @@
 package rcgonzalezf.org.weather;
 
+import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -8,7 +9,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -36,7 +36,6 @@ import rcgonzalezf.org.weather.adapters.ModelAdapter;
 import rcgonzalezf.org.weather.common.BaseActivity;
 import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent;
 
-import static org.mockito.Mockito.mock;
 import static rcgonzalezf.org.weather.WeatherListActivity.CITY_NAME_TO_SEARCH_ON_SWIPE;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.LOCATION_SEARCH;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.NO_NETWORK_SEARCH;
@@ -60,7 +59,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
       mWeatherRepository;
   @SuppressWarnings("unused") @Mocked private ServiceConfig mServiceConfig;
   @SuppressWarnings("unused") @Mocked private AnalyticsEvent mAnalyticsEvent;
-  private View mView;
+
   private List<Forecast> mForecastList;
   private String mQuery;
   private Runnable mNotifyAdapterRunnable;
@@ -69,14 +68,9 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   @Before public void setUp() throws Exception {
     uut = new WeatherListActivity();
 
-    mView = new MockUp<View>() {
-      @SuppressWarnings("unused") @Mock View findViewById(int id) {
-        return mSwipeToRefreshLayout;
-      }
-    }.getMockInstance();
     new MockUp<AppCompatActivity>() {
       @SuppressWarnings("unused") @Mock View findViewById(@IdRes int id) {
-        View view = mView;
+        View view = null;
         if (id == R.id.swipe_to_refresh_layout) {
           view = mSwipeToRefreshLayout;
         } else if (id == R.id.main_recycler_view) {
@@ -110,22 +104,23 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     shouldScheduleLayoutAnimation();
   }
 
-  @Test public void shouldHandleItemClick(@Mocked Toast toast) {
+  @Test public void shouldHandleItemClick(@Mocked Toast toast, @Mocked View view, @Mocked WeatherViewModel weatherViewModel) {
     givenStringResource();
 
-    whenClickingItem();
+    whenClickingItem(view, weatherViewModel);
 
     thenToastShouldMakeText(toast);
   }
 
-  @Test public void shouldLoadOldData() {
+  @Test
+  public void shouldLoadOldData(@SuppressWarnings("UnusedParameters") @Mocked Runnable runnable) {
     givenActivityCreated(null);
     givenForecastList();
     givenForecastElement("someCity");
 
     whenLoadingOldData();
 
-    thenBaseActivityShouldPostRunnableOnUiThread();
+    thenBaseActivityShouldPostRunnableOnUiThread(runnable);
     thenNotifyAdapterRunnableShouldBeCreated();
     thenShouldTrackEvent(NO_NETWORK_SEARCH, "someCity");
   }
@@ -150,25 +145,25 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenShouldTrackEvent(NO_NETWORK_SEARCH, "EMPTY");
   }
 
-  @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity() {
+  @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity(
+      @SuppressWarnings("UnusedParameters") @Mocked Runnable runnable) {
     givenActivityCreated(null);
     givenForecastList();
     givenForecastElement("someCity");
 
     whenUpdatingList();
 
-    thenBaseActivityShouldPostRunnableOnUiThread();
+    thenBaseActivityShouldPostRunnableOnUiThread(runnable);
     thenNotifyAdapterRunnableShouldBeCreated();
     thenShouldTrackEvent(SEARCH_COMPLETED, "cityName: " + "someCity");
   }
 
-  @Test public void shouldNotifyAdapterOnUpdatingListWithEmptyCityForEmptyList() {
+  @Test public void shouldNotifyAdapterOnUpdatingListWithEmptyCityForEmptyList(
+      @SuppressWarnings("UnusedParameters") @Mocked Runnable runnable) {
     givenForecastList();
 
     whenUpdatingList();
 
-    thenBaseActivityShouldPostRunnableOnUiThread();
-    thenNotifyAdapterRunnableShouldBeCreated();
     thenShouldTrackEvent(SEARCH_COMPLETED, "cityName: " + "");
   }
 
@@ -182,11 +177,12 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenShouldTrackEvent(SEARCH_COMPLETED, "error: " + givenErrorString);
   }
 
-  @Test public void shouldBuildWithCityNameOnSearchingByQuery(@Mocked Editable editable,
-      @SuppressWarnings("UnusedParameters") @Mocked Toast toast) {
+  @Test public void shouldBuildWithCityNameOnSearchingByQuery(
+      @SuppressWarnings("UnusedParameters") @Mocked Toast toast,
+      @SuppressWarnings("UnusedParameters") @Mocked Context context) {
     givenQuery("Some City Name");
 
-    whenSearchingByQuery(editable);
+    whenSearchingByQuery("Some City Name");
 
     thenBuilderShouldAddCityName();
     thenWeatherRepositoryShouldFindWeather();
@@ -253,7 +249,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenShouldStopRefreshing();
   }
 
-  @Test public void shouldEnableSwipeToRefreshLayoutIfThereIsACityName(@Mocked Bundle savedInstanceState) {
+  @Test public void shouldEnableSwipeToRefreshLayoutIfThereIsACityName(
+      @Mocked Bundle savedInstanceState) {
     givenSavedInstanceStateWithCityName(savedInstanceState);
     givenActivityCreated(savedInstanceState);
 
@@ -264,7 +261,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   private void givenSavedInstanceStateWithCityName(final Bundle savedInstanceState) {
     new Expectations() {{
-      savedInstanceState.getCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE); result = "";
+      savedInstanceState.getCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE);
+      result = "";
     }};
   }
 
@@ -286,7 +284,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   private void givenSwipeToRefreshLayoutIsRefreshing(final boolean isRefreshing) {
     new Expectations() {{
-      mSwipeToRefreshLayout.isRefreshing(); result = isRefreshing;
+      mSwipeToRefreshLayout.isRefreshing();
+      result = isRefreshing;
     }};
   }
 
@@ -379,7 +378,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   private void thenWeatherRepositoryShouldFindWeather() {
     new Verifications() {{
-      mWeatherRepository.findWeather(withAny(mock(OpenWeatherApiRequestParameters.class)),
+      mWeatherRepository.findWeather(withAny(new OpenWeatherApiRequestParameters()),
           withAny(mOpenWeatherApiCallback));
     }};
   }
@@ -390,8 +389,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     }};
   }
 
-  private void whenSearchingByQuery(Editable editable) {
-    uut.searchByQuery(mQuery, editable);
+  private void whenSearchingByQuery(CharSequence charSequence) {
+    uut.searchByQuery(mQuery, charSequence);
   }
 
   private void givenQuery(String query) {
@@ -408,9 +407,9 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     }};
   }
 
-  private void thenBaseActivityShouldPostRunnableOnUiThread() {
+  private void thenBaseActivityShouldPostRunnableOnUiThread(final Runnable runnable) {
     new Verifications() {{
-      mBaseActivity.runOnUiThread(withAny(mock(Runnable.class)));
+      mBaseActivity.runOnUiThread(withAny(runnable));
     }};
   }
 
@@ -441,8 +440,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     }};
   }
 
-  private void whenClickingItem() {
-    uut.onItemClick(mock(View.class), mock(WeatherViewModel.class));
+  private void whenClickingItem(View mView, WeatherViewModel mWeatherViewModel) {
+    uut.onItemClick(mView, mWeatherViewModel);
   }
 
   private void givenActivityCreated(Bundle savedInstanceState) {

@@ -16,7 +16,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -164,7 +163,7 @@ public abstract class BaseActivity extends AppCompatActivity
       return;
     }
 
-    if (!hasInternetConnection(BaseActivity.this)) {
+    if (!hasInternetConnection(this)) {
       informNoInternet();
     } else {
       searchByQuery(query, userInput);
@@ -195,7 +194,7 @@ public abstract class BaseActivity extends AppCompatActivity
   }
 
   @VisibleForTesting @NonNull DialogInterface.OnClickListener getOkClickListener(
-      final Editable userInput) {
+      final CharSequence userInput) {
     return new DialogInterface.OnClickListener() {
       public void onClick(DialogInterface dialog, int id) {
         trackOnActionEvent(new AnalyticsEvent(MANUAL_SEARCH, userInput.toString()));
