@@ -94,15 +94,16 @@ public class LocationManager implements LocationRetrieverListener {
       Snackbar.make(content, baseActivity.getString(R.string.location_off_msg),
           Snackbar.LENGTH_SHORT).show();
       //After 5 seconds the activity will be recharged
-        new Handler().postDelayed(new Runnable(){
-        public void run(){
+      new Handler().postDelayed(new Runnable() {
+        public void run() {
           baseActivity.finish();
           baseActivity.startActivity(baseActivity.getIntent());
-        };
+        }
+
+        ;
       }, DELAY);
     }
   }
-
 
   @VisibleForTesting void onLocationFound(BaseActivity baseActivity, double lat, double lon) {
     if (baseActivity != null) {

@@ -10,7 +10,6 @@
     tools:context=".WeatherListActivity"
     >
 
-
   <android.support.design.widget.CoordinatorLayout
       android:id="@+id/content"
       android:layout_width="match_parent"
@@ -31,7 +30,7 @@
           />
     </android.support.v4.widget.SwipeRefreshLayout>
 
-     <android.support.design.widget.AppBarLayout
+    <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -52,16 +51,17 @@
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/main_fab"
         android:layout_gravity="bottom|end"
-        style="@style/FabStyle"/>
+        style="@style/FabStyle"
+        />
 
   </android.support.design.widget.CoordinatorLayout>
 
-    <ProgressBar
-        style="@style/Widget.AppCompat.ProgressBar"
-        android:id="@+id/progress_bar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
+  <ProgressBar
+      style="@style/Widget.AppCompat.ProgressBar"
+      android:id="@+id/progress_bar"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      />
 
   <android.support.design.widget.NavigationView
       android:id="@+id/navigation_view"

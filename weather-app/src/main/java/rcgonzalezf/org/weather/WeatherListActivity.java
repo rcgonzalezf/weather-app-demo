@@ -49,8 +49,8 @@ public class WeatherListActivity extends BaseActivity
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mOpenWeatherApiCallback = new OpenWeatherApiCallback(this);
-   setupProgressBar();
-   setupRecyclerView();
+    setupProgressBar();
+    setupRecyclerView();
 
     if (savedInstanceState != null) {
       mCityNameToSearchOnSwipe = savedInstanceState.getCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE);
@@ -171,7 +171,6 @@ public class WeatherListActivity extends BaseActivity
     }).start();
   }
 
-
   public void setupRecyclerView() {
     mAdapter = new ModelAdapter<>(new ArrayList<Forecast>(), this);
     mAdapter.setOnItemClickListener(this);
@@ -198,7 +197,6 @@ public class WeatherListActivity extends BaseActivity
         onItemsLoadComplete();
         mProgress.setVisibility(View.GONE);
       }
-
     };
   }
 

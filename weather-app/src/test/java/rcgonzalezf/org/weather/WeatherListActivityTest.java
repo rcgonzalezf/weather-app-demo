@@ -2,6 +2,7 @@ package rcgonzalezf.org.weather;
 
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import mockit.Expectations;
 import mockit.Mock;
 import mockit.MockUp;
 import mockit.Mocked;
+import mockit.Tested;
 import mockit.Verifications;
 import mockit.integration.junit4.JMockit;
 import org.junit.After;
@@ -43,8 +45,10 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
 @RunWith(JMockit.class) public class WeatherListActivityTest {
 
-  private WeatherListActivity uut;
+  @Tested private WeatherListActivity uut;
   @SuppressWarnings("unused") @Mocked private ContextWrapper mContextWrapper;
+  @SuppressWarnings("unused") @Mocked private SharedPreferences.Editor sharedPreferencesEditor;
+  @SuppressWarnings("unused") @Mocked private SharedPreferences sharedPreferences;
   @SuppressWarnings("unused") @Mocked private BaseActivity mBaseActivity;
   @SuppressWarnings("unused") @Mocked private RecyclerView mRecyclerView;
   @SuppressWarnings("unused") @Mocked private ModelAdapter<Forecast> mAdapter;
@@ -112,7 +116,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     shouldScheduleLayoutAnimation();
   }
 
-  @Test public void shouldHandleItemClick(@Mocked Toast toast, @Mocked View view, @Mocked WeatherViewModel weatherViewModel) {
+  @Test public void shouldHandleItemClick(@Mocked Toast toast, @Mocked View view,
+      @Mocked WeatherViewModel weatherViewModel) {
     givenStringResource();
 
     whenClickingItem(view, weatherViewModel);
@@ -120,8 +125,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenToastShouldMakeText(toast);
   }
 
-  @Test
-  public void shouldLoadOldData() {
+  @Test public void shouldLoadOldData() {
     givenActivityCreated(null);
     givenForecastList();
     givenForecastElement("someCity");
@@ -362,7 +366,6 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   private void whenRunningNotifyRunnable() {
 
-
     mAdapter.setItems(mForecastList);
     mAdapter.notifyDataSetChanged();
   }
@@ -401,8 +404,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   private void whenSearchingByQuery(CharSequence charSequence) {
     uut.searchByQuery(mQuery, charSequence);
-    }
-
+  }
 
   private void givenQuery(String query) {
     mQuery = query;
@@ -457,9 +459,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   private void givenActivityCreated(Bundle savedInstanceState) {
     uut.onCreate(savedInstanceState);
-      mOpenWeatherApiCallback = new OpenWeatherApiCallback(uut);
+    mOpenWeatherApiCallback = new OpenWeatherApiCallback(uut);
     uut.setupRecyclerView();
-
   }
 
   private void shouldScheduleLayoutAnimation() {
@@ -488,10 +489,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   private void whenCreatingTheActivity() {
 
-      mOpenWeatherApiCallback = new OpenWeatherApiCallback(uut);
-      uut.setupRecyclerView();
-
+    mOpenWeatherApiCallback = new OpenWeatherApiCallback(uut);
+    uut.setupRecyclerView();
   }
-
-
 }
