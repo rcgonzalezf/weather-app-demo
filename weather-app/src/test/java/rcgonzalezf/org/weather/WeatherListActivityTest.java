@@ -36,7 +36,6 @@ import rcgonzalezf.org.weather.adapters.ModelAdapter;
 import rcgonzalezf.org.weather.common.BaseActivity;
 import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent;
 
-import static org.mockito.Mockito.mock;
 import static rcgonzalezf.org.weather.WeatherListActivity.CITY_NAME_TO_SEARCH_ON_SWIPE;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.LOCATION_SEARCH;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.NO_NETWORK_SEARCH;
@@ -105,22 +104,23 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     shouldScheduleLayoutAnimation();
   }
 
-  @Test public void shouldHandleItemClick(@Mocked Toast toast) {
+  @Test public void shouldHandleItemClick(@Mocked Toast toast, @Mocked View view, @Mocked WeatherViewModel weatherViewModel) {
     givenStringResource();
 
-    whenClickingItem();
+    whenClickingItem(view, weatherViewModel);
 
     thenToastShouldMakeText(toast);
   }
 
-  @Test public void shouldLoadOldData() {
+  @Test
+  public void shouldLoadOldData(@SuppressWarnings("UnusedParameters") @Mocked Runnable runnable) {
     givenActivityCreated(null);
     givenForecastList();
     givenForecastElement("someCity");
 
     whenLoadingOldData();
 
-    thenBaseActivityShouldPostRunnableOnUiThread();
+    thenBaseActivityShouldPostRunnableOnUiThread(runnable);
     thenNotifyAdapterRunnableShouldBeCreated();
     thenShouldTrackEvent(NO_NETWORK_SEARCH, "someCity");
   }
@@ -145,26 +145,26 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenShouldTrackEvent(NO_NETWORK_SEARCH, "EMPTY");
   }
 
-  @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity() {
+  @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity(
+      @SuppressWarnings("UnusedParameters") @Mocked Runnable runnable) {
     givenActivityCreated(null);
     givenForecastList();
     givenForecastElement("someCity");
 
     whenUpdatingList();
 
-    thenBaseActivityShouldPostRunnableOnUiThread();
+    thenBaseActivityShouldPostRunnableOnUiThread(runnable);
     thenNotifyAdapterRunnableShouldBeCreated();
     thenShouldTrackEvent(SEARCH_COMPLETED, "cityName: " + "someCity");
   }
 
-  @Test public void shouldNotifyAdapterOnUpdatingListWithEmptyCityForEmptyList()
-      throws InterruptedException {
-    givenActivityCreated(null);
+  @Test public void shouldNotifyAdapterOnUpdatingListWithEmptyCityForEmptyList(
+      @SuppressWarnings("UnusedParameters") @Mocked Runnable runnable) throws InterruptedException {
     givenForecastList();
 
     whenUpdatingList();
 
-    thenBaseActivityShouldPostRunnableOnUiThread();
+    thenBaseActivityShouldPostRunnableOnUiThread(runnable);
     thenNotifyAdapterRunnableShouldBeCreated();
     thenShouldTrackEvent(SEARCH_COMPLETED, "cityName: " + "");
   }
@@ -380,7 +380,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   private void thenWeatherRepositoryShouldFindWeather() {
     new Verifications() {{
-      mWeatherRepository.findWeather(withAny(mock(OpenWeatherApiRequestParameters.class)),
+      mWeatherRepository.findWeather(withAny(new OpenWeatherApiRequestParameters()),
           withAny(mOpenWeatherApiCallback));
     }};
   }
@@ -409,9 +409,9 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     }};
   }
 
-  private void thenBaseActivityShouldPostRunnableOnUiThread() {
+  private void thenBaseActivityShouldPostRunnableOnUiThread(final Runnable runnable) {
     new Verifications() {{
-      mBaseActivity.runOnUiThread(withAny(mock(Runnable.class)));
+      mBaseActivity.runOnUiThread(withAny(runnable));
     }};
   }
 
@@ -442,8 +442,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     }};
   }
 
-  private void whenClickingItem() {
-    uut.onItemClick(mock(View.class), mock(WeatherViewModel.class));
+  private void whenClickingItem(View mView, WeatherViewModel mWeatherViewModel) {
+    uut.onItemClick(mView, mWeatherViewModel);
   }
 
   private void givenActivityCreated(Bundle savedInstanceState) {
