@@ -45,10 +45,9 @@ android:
 
 script:
   - ./gradlew clean
-  - ./gradlew build assembleAndroidTest test
+  - ./gradlew build jacocoTestReport assembleAndroidTest test
 
 after_success:
-  - ./gradlew jacocoTestReport
   - bash <(curl -s https://codecov.io/bash)
 
 #after_failure:
