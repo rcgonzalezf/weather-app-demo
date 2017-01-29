@@ -1,9 +1,12 @@
 package rcgonzalezf.org.weather.common;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.design.widget.FloatingActionButton;
@@ -35,7 +38,6 @@ import mockit.FullVerifications;
 import mockit.Mock;
 import mockit.MockUp;
 import mockit.Mocked;
-import mockit.Tested;
 import mockit.Verifications;
 import mockit.integration.junit4.JMockit;
 import org.junit.Before;
@@ -55,12 +57,14 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static rcgonzalezf.org.weather.common.BaseActivity.FORECASTS;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.MANUAL_SEARCH;
-import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
 
 @RunWith(JMockit.class) public class BaseActivityTest {
 
-  @Tested private BaseActivity uut;
+  private BaseActivity uut;
 
+  @SuppressWarnings("unused") @Mocked private Activity mActivity;
+  @SuppressWarnings("unused") @Mocked private ContextWrapper mContextWrapper;
+  @SuppressWarnings("unused") @Mocked private Context mContext;
   @SuppressWarnings("unused") @Mocked private FragmentActivity mFragmentActivity;
   @SuppressWarnings("unused") @Mocked private AppCompatDelegate mDelegate;
 
@@ -78,19 +82,18 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
   private boolean mSearchingByQuery;
   private boolean mSuperOnOptionsItemSelectedCalled;
   private boolean mIsNullUserDisplayName;
-  private View mView;
   private String mStoredData;
   private int mRequestCode;
   private String[] mPermissions;
   private int[] mGrantResults;
-  private Editable mUserInput;
+  private CharSequence mUserInput;
   private View.OnClickListener mFabClickListener;
   private DialogInterface.OnClickListener mDialogClickListener;
   private NavigationView.OnNavigationItemSelectedListener mNavigationListener;
 
   @Before public void setUp() {
     //noinspection unused
-    mView = new MockUp<View>() {
+    new MockUp<View>() {
       @Mock View inflate(Context context, int resource, ViewGroup root) {
         return mEditText;
       }
@@ -98,10 +101,10 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
       @Mock View findViewById(int id) {
         return mEditText;
       }
-    }.getMockInstance();
+    };
     new MockUp<AppCompatActivity>() {
       @SuppressWarnings("unused") @Mock View findViewById(@IdRes int id) {
-        View view = mView;
+        View view = null;
         if (id == R.id.toolbar) {
           view = mToolbar;
         } else if (id == R.id.drawer_layout) {
@@ -123,7 +126,7 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
     };
 
     uut = new BaseActivity() {
-      @Override protected void searchByQuery(String query, Editable userInput) {
+      @Override protected void searchByQuery(String query, CharSequence userInput) {
         mSearchingByQuery = true;
       }
 
@@ -137,11 +140,11 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
   }
 
   @Test public void shouldInitLocationManagerWhenCreatingTheActivity(
-      @SuppressWarnings("UnusedParameters") @Mocked LocationManager mLocationManager) {
+      @SuppressWarnings("UnusedParameters") @Mocked LocationManager mLocationManager, @Mocked View view) {
 
     whenCreatingTheActivity();
 
-    thenLocationManagerShouldBeInstantiated();
+    thenLocationManagerShouldBeInstantiated(view);
   }
 
   @Test public void shouldConnectLocationManagerOnStart(@Mocked LocationManager mLocationManager) {
@@ -259,8 +262,7 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
   }
 
   @SuppressWarnings("UnusedParameters") @Test
-  public void shouldSearchByQuery(@Mocked Toast toast, @Mocked Editable editable,
-      @Mocked WeatherUtils weatherUtils) {
+  public void shouldSearchByQuery(@Mocked Toast toast, @Mocked Editable editable) {
     givenValidEditableInput(editable);
     givenHasInternet(true);
 
@@ -270,9 +272,8 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
   }
 
   @SuppressWarnings("UnusedParameters") @Test
-  public void shouldInformNoInternetIfSearchByQueryAndLostConnectivity(@Mocked Toast toast,
-      @Mocked Editable editable, @Mocked WeatherUtils weatherUtils) {
-    givenValidEditableInput(editable);
+  public void shouldInformNoInternetIfSearchByQueryAndLostConnectivity(@Mocked Toast toast) {
+    givenValidEditableInput("");
     givenHasInternet(false);
 
     whenSearchingByManualInput();
@@ -309,7 +310,7 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
 
     whenClickingTheFab();
 
-    thenShouldPerformFabAction();
+    thenShouldCreateDialogToSearch();
   }
 
   @Test public void shouldCancelDialogOnCancel(@Mocked DialogInterface dialog,
@@ -323,17 +324,15 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
   }
 
   @SuppressWarnings("UnusedParameters") @Test
-  public void shouldSearchByManualInputOnDialogOk(@Mocked DialogInterface dialog,
-      @Mocked Editable editable, @Mocked WeatherUtils weatherUtils, @Mocked Toast toast,
-      @Mocked AnalyticsEvent analyticsEvent) {
+  public void shouldSearchByManualInputOnDialogOk(@Mocked DialogInterface dialog, @Mocked Toast toast,
+      @Mocked AnalyticsEvent analyticsEvent, @Mocked ConnectivityManager connectivityManager) {
+    givenOkClickListener("someInput");
     givenHasInternet(true);
-    givenUserInput(editable);
-    givenOkClickListener(editable);
 
     whenClickingDialog(dialog);
 
-    thenShouldTrackEvent(MANUAL_SEARCH, editable.toString());
-    thenShouldSearchByManualInput(editable);
+    thenShouldTrackEvent(MANUAL_SEARCH, "someInput");
+    thenShouldSearchByManualInput("someInput");
   }
 
   @Test public void shouldNavigateToSettingsWhenSelectingFromDrawer(@Mocked MenuItem item,
@@ -358,14 +357,6 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
     thenShouldHandleHomePressed(item);
   }
 
-  private void givenUserInput(final Editable editable) {
-    new Expectations() {{
-      //noinspection ResultOfMethodCallIgnored
-      editable.toString();
-      result = "someInput";
-    }};
-  }
-
   private void thenShouldTrackEvent(final String eventName, final String additionalDetails) {
     new Verifications() {{
       //noinspection WrongConstant
@@ -387,13 +378,13 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
     mNavigationListener = uut.getNavigationListener();
   }
 
-  private void thenShouldSearchByManualInput(final Editable editable) {
-    new Expectations() {{
-      uut.searchByManualInput(editable);
+  private void thenShouldSearchByManualInput(final CharSequence editable) {
+    new Verifications() {{
+      uut.searchByManualInput(withAny(editable));
     }};
   }
 
-  private void givenOkClickListener(Editable editable) {
+  private void givenOkClickListener(CharSequence editable) {
     mDialogClickListener = uut.getOkClickListener(editable);
   }
 
@@ -411,9 +402,9 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
     mDialogClickListener = uut.getCancelListener();
   }
 
-  private void thenShouldPerformFabAction() {
-    new Expectations() {{
-      uut.performFabAction();
+  private void thenShouldCreateDialogToSearch() {
+    new Verifications() {{
+      new AlertDialog.Builder(withInstanceLike(uut));
     }};
   }
 
@@ -459,13 +450,16 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
   }
 
   private void givenHasInternet(final boolean hasInternet) {
-    new Expectations() {{
-      hasInternetConnection(withAny(mFragmentActivity));
-      result = hasInternet;
-    }};
+    //noinspection unused
+    new MockUp<WeatherUtils>() {
+      @Mock
+      boolean hasInternetConnection(Context context) {
+        return hasInternet;
+      }
+    };
   }
 
-  private void givenValidEditableInput(Editable editable) {
+  private void givenValidEditableInput(CharSequence editable) {
     mUserInput = editable;
   }
 
@@ -619,9 +613,9 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
     uut.onStart();
   }
 
-  private void thenLocationManagerShouldBeInstantiated() {
+  private void thenLocationManagerShouldBeInstantiated(final View view) {
     new Verifications() {{
-      new LocationManager(uut, withAny(mView));
+      new LocationManager(uut, withAny(view));
     }};
   }
 

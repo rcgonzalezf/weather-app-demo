@@ -8,9 +8,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -38,9 +38,12 @@ public class WeatherListActivity extends BaseActivity
     implements ModelAdapter.OnItemClickListener, OnUpdateWeatherListListener {
 
   private static final String TAG = WeatherListActivity.class.getSimpleName();
+  public static final String CITY_NAME_TO_SEARCH_ON_SWIPE = "mCityNameToSearchOnSwipe";
   private RecyclerView mRecyclerView;
+  private SwipeRefreshLayout mSwipeToRefreshLayout;
   private ModelAdapter<Forecast> mAdapter;
   private OpenWeatherApiCallback mOpenWeatherApiCallback;
+  private CharSequence mCityNameToSearchOnSwipe;
   private ProgressBar mProgress;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,26 @@ public class WeatherListActivity extends BaseActivity
     mOpenWeatherApiCallback = new OpenWeatherApiCallback(this);
    setupProgressBar();
    setupRecyclerView();
+
+    if (savedInstanceState != null) {
+      mCityNameToSearchOnSwipe = savedInstanceState.getCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE);
+    }
+
+    mSwipeToRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
+    enableSwipeToRefreshLayout();
+    mSwipeToRefreshLayout.setOnRefreshListener(createSwipeToRefreshListener());
+  }
+
+  @Override public void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    outState.putCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE, mCityNameToSearchOnSwipe);
+  }
+
+  @VisibleForTesting void onItemsLoadComplete() {
+    enableSwipeToRefreshLayout();
+    if (mSwipeToRefreshLayout.isRefreshing()) {
+      mSwipeToRefreshLayout.setRefreshing(false);
+    }
   }
 
   @Override public void onEnterAnimationComplete() {
@@ -68,6 +91,8 @@ public class WeatherListActivity extends BaseActivity
     } else {
       Log.d(TAG, "No data even in offline mode :(");
       trackOnActionEvent(new AnalyticsEvent(NO_NETWORK_SEARCH, "EMPTY"));
+      //cancel swipe to refresh loading
+      onItemsLoadComplete();
     }
   }
 
@@ -83,7 +108,7 @@ public class WeatherListActivity extends BaseActivity
     trackOnActionEvent(new AnalyticsEvent(SEARCH_COMPLETED, "error: " + error));
   }
 
-  @Override protected void searchByQuery(String query, Editable userInput) {
+  @Override protected void searchByQuery(String query, CharSequence userInput) {
     WeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback> weatherRepository =
         ServiceConfig.getInstance().getWeatherRepository();
 
@@ -93,6 +118,7 @@ public class WeatherListActivity extends BaseActivity
 
     Toast.makeText(this, getString(R.string.searching) + " " + userInput + "...",
         Toast.LENGTH_SHORT).show();
+    updateCityNameForSwipeToRefresh(userInput);
   }
 
   @Override public void searchByLocation(double lat, double lon) {
@@ -112,7 +138,12 @@ public class WeatherListActivity extends BaseActivity
               .build(), mOpenWeatherApiCallback);
 
       trackOnActionEvent(new AnalyticsEvent(LOCATION_SEARCH, cityName));
+      updateCityNameForSwipeToRefresh(cityName);
     }
+  }
+
+  private void updateCityNameForSwipeToRefresh(CharSequence cityName) {
+    this.mCityNameToSearchOnSwipe = cityName;
   }
 
   private @Nullable String cityNameFromLatLon(double lat, double lon) {
@@ -164,10 +195,22 @@ public class WeatherListActivity extends BaseActivity
       @Override public void run() {
         mAdapter.setItems(forecastList);
         mAdapter.notifyDataSetChanged();
+        onItemsLoadComplete();
         mProgress.setVisibility(View.GONE);
       }
 
     };
+  }
 
+  @VisibleForTesting @NonNull SwipeRefreshLayout.OnRefreshListener createSwipeToRefreshListener() {
+    return new SwipeRefreshLayout.OnRefreshListener() {
+      @Override public void onRefresh() {
+        searchByManualInput(mCityNameToSearchOnSwipe);
+      }
+    };
+  }
+
+  private void enableSwipeToRefreshLayout() {
+    mSwipeToRefreshLayout.setEnabled(mCityNameToSearchOnSwipe != null);
   }
 }

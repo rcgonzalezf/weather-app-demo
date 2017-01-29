@@ -19,9 +19,9 @@ import org.rcgonzalezf.weather.common.models.WeatherViewModel;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
 
+import static rcgonzalezf.org.weather.utils.WeatherArtUtils.getArtResourceForWeatherCondition;
 import static rcgonzalezf.org.weather.utils.WeatherUtils.formatDate;
 import static rcgonzalezf.org.weather.utils.WeatherUtils.formatTemperature;
-import static rcgonzalezf.org.weather.utils.WeatherArtUtils.getArtResourceForWeatherCondition;
 import static rcgonzalezf.org.weather.utils.WeatherUtils.getDayName;
 import static rcgonzalezf.org.weather.utils.WeatherWindUtils.getFormattedWind;
 
