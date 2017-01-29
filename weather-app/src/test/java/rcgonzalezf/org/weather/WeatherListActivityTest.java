@@ -159,13 +159,11 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   @Test public void shouldNotifyAdapterOnUpdatingListWithEmptyCityForEmptyList(
-      @SuppressWarnings("UnusedParameters") @Mocked Runnable runnable) throws InterruptedException {
+      @SuppressWarnings("UnusedParameters") @Mocked Runnable runnable) {
     givenForecastList();
 
     whenUpdatingList();
 
-    thenBaseActivityShouldPostRunnableOnUiThread(runnable);
-    thenNotifyAdapterRunnableShouldBeCreated();
     thenShouldTrackEvent(SEARCH_COMPLETED, "cityName: " + "");
   }
 
