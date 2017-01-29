@@ -163,6 +163,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   @Test public void shouldNotifyAdapterOnUpdatingListWithEmptyCityForEmptyList() {
+    givenActivityCreated(null);
     givenForecastList();
 
     whenUpdatingList();
