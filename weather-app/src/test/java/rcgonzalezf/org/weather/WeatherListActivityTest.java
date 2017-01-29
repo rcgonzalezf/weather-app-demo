@@ -1,6 +1,7 @@
 package rcgonzalezf.org.weather;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -19,12 +20,10 @@ import mockit.Expectations;
 import mockit.Mock;
 import mockit.MockUp;
 import mockit.Mocked;
-import mockit.Tested;
 import mockit.Verifications;
 import mockit.integration.junit4.JMockit;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.rcgonzalezf.weather.common.ServiceConfig;
@@ -44,8 +43,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
 @RunWith(JMockit.class) public class WeatherListActivityTest {
 
-  @Tested private WeatherListActivity uut;
-
+  private WeatherListActivity uut;
+  @SuppressWarnings("unused") @Mocked private ContextWrapper mContextWrapper;
   @SuppressWarnings("unused") @Mocked private BaseActivity mBaseActivity;
   @SuppressWarnings("unused") @Mocked private RecyclerView mRecyclerView;
   @SuppressWarnings("unused") @Mocked private ModelAdapter<Forecast> mAdapter;
@@ -65,6 +64,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   private String mQuery;
   private Runnable mNotifyAdapterRunnable;
   private SwipeRefreshLayout.OnRefreshListener mSwipeToRefreshListener;
+  private Runnable runnable;
+  private boolean mIsPerformingAction;
 
   @Before public void setUp() throws Exception {
     uut = new WeatherListActivity();
@@ -78,6 +79,12 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
           view = mRecyclerView;
         }
         return view;
+      }
+    };
+
+    runnable = new Runnable() {
+      @Override public void run() {
+        mIsPerformingAction = true;
       }
     };
   }
@@ -114,7 +121,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   @Test
-  public void shouldLoadOldData(@SuppressWarnings("UnusedParameters") @Mocked Runnable runnable) {
+  public void shouldLoadOldData() {
     givenActivityCreated(null);
     givenForecastList();
     givenForecastElement("someCity");
@@ -146,8 +153,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenShouldTrackEvent(NO_NETWORK_SEARCH, "EMPTY");
   }
 
-  @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity(
-      @SuppressWarnings("UnusedParameters") @Mocked Runnable runnable) {
+  @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity() {
     givenActivityCreated(null);
     givenForecastList();
     givenForecastElement("someCity");
@@ -159,9 +165,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenShouldTrackEvent(SEARCH_COMPLETED, "cityName: " + "someCity");
   }
 
-  @Ignore("Flaky test on TravisCI")
-  @Test public void shouldNotifyAdapterOnUpdatingListWithEmptyCityForEmptyList(
-      @SuppressWarnings("UnusedParameters") @Mocked Runnable runnable) {
+  //@Ignore("Flaky test on TravisCI")
+  @Test public void shouldNotifyAdapterOnUpdatingListWithEmptyCityForEmptyList() {
     givenForecastList();
 
     whenUpdatingList();
