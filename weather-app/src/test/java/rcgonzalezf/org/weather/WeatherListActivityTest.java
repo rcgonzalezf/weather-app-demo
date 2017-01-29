@@ -162,7 +162,9 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenShouldTrackEvent(SEARCH_COMPLETED, "cityName: " + "someCity");
   }
 
-  @Test public void shouldNotifyAdapterOnUpdatingListWithEmptyCityForEmptyList() {
+  @Test public void shouldNotifyAdapterOnUpdatingListWithEmptyCityForEmptyList()
+      throws InterruptedException {
+    Thread.sleep(150l);
     givenActivityCreated(null);
     givenForecastList();
 
