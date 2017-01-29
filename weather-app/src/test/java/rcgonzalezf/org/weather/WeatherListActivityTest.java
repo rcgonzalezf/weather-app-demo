@@ -171,8 +171,11 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     whenUpdatingList();
 
     thenBaseActivityShouldPostRunnableOnUiThread();
+    System.out.println("thenBaseActivityShouldPostRunnableOnUiThread passed" );
     thenNotifyAdapterRunnableShouldBeCreated();
+    System.out.println("thenNotifyAdapterRunnableShouldBeCreated passed" );
     thenShouldTrackEvent(SEARCH_COMPLETED, "cityName: " + "");
+    System.out.println("thenShouldTrackEvent passed" );
   }
 
   @Test public void shouldHandleError(@SuppressWarnings("UnusedParameters") @Mocked Log log) {
