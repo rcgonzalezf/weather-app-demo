@@ -13,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import com.google.gson.Gson;
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ public class WeatherListActivity extends BaseActivity
   private ModelAdapter<Forecast> mAdapter;
   private OpenWeatherApiCallback mOpenWeatherApiCallback;
   private CharSequence mCityNameToSearchOnSwipe;
+  private ProgressBar mProgress;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -53,6 +55,7 @@ public class WeatherListActivity extends BaseActivity
       mCityNameToSearchOnSwipe = savedInstanceState.getCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE);
     }
 
+    mProgress = (ProgressBar) findViewById(R.id.progress_bar);
     mSwipeToRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
     enableSwipeToRefreshLayout();
     mSwipeToRefreshLayout.setOnRefreshListener(createSwipeToRefreshListener());
@@ -64,10 +67,16 @@ public class WeatherListActivity extends BaseActivity
   }
 
   @VisibleForTesting void onItemsLoadComplete() {
+    toggleProgressIndicator();
     enableSwipeToRefreshLayout();
     if (mSwipeToRefreshLayout.isRefreshing()) {
       mSwipeToRefreshLayout.setRefreshing(false);
     }
+  }
+
+  private void toggleProgressIndicator() {
+    if (mProgress.getVisibility() == View.VISIBLE) mProgress.setVisibility(View.GONE);
+    else mProgress.setVisibility(View.VISIBLE);
   }
 
   @Override public void onEnterAnimationComplete() {
@@ -101,11 +110,15 @@ public class WeatherListActivity extends BaseActivity
 
   @Override public void onError(String error) {
     // TODO implement error handling
+    toggleProgressIndicator();
+
     Log.d(TAG, error);
     trackOnActionEvent(new AnalyticsEvent(SEARCH_COMPLETED, "error: " + error));
   }
 
   @Override protected void searchByQuery(String query, CharSequence userInput) {
+    toggleProgressIndicator();
+
     WeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback> weatherRepository =
         ServiceConfig.getInstance().getWeatherRepository();
 
@@ -119,6 +132,8 @@ public class WeatherListActivity extends BaseActivity
   }
 
   @Override public void searchByLocation(double lat, double lon) {
+    toggleProgressIndicator();
+
     WeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback> weatherRepository =
         ServiceConfig.getInstance().getWeatherRepository();
 

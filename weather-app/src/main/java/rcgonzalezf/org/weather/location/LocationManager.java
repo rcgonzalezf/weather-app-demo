@@ -87,7 +87,7 @@ public class LocationManager implements LocationRetrieverListener {
     }
   }
 
-  @VisibleForTesting void onEmptyLocation(BaseActivity baseActivity, View content) {
+  @VisibleForTesting void onEmptyLocation(final BaseActivity baseActivity, View content) {
     if (baseActivity != null && content != null) {
       Snackbar.make(content, baseActivity.getString(R.string.location_off_msg),
           Snackbar.LENGTH_SHORT).show();

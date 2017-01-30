@@ -2,6 +2,7 @@ package rcgonzalezf.org.weather;
 
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -12,14 +13,17 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import mockit.Deencapsulation;
 import mockit.Expectations;
 import mockit.Mock;
 import mockit.MockUp;
 import mockit.Mocked;
+import mockit.Tested;
 import mockit.Verifications;
 import mockit.integration.junit4.JMockit;
 import org.junit.After;
@@ -43,9 +47,12 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
 @RunWith(JMockit.class) public class WeatherListActivityTest {
 
-  private WeatherListActivity uut;
+  @Tested private WeatherListActivity uut;
   @SuppressWarnings("unused") @Mocked private ContextWrapper mContextWrapper;
+  @SuppressWarnings("unused") @Mocked private SharedPreferences.Editor sharedPreferencesEditor;
+  @SuppressWarnings("unused") @Mocked private SharedPreferences sharedPreferences;
   @SuppressWarnings("unused") @Mocked private BaseActivity mBaseActivity;
+  @SuppressWarnings("unused") @Mocked private ProgressBar mProgress;
   @SuppressWarnings("unused") @Mocked private RecyclerView mRecyclerView;
   @SuppressWarnings("unused") @Mocked private ModelAdapter<Forecast> mAdapter;
   @SuppressWarnings("unused") @Mocked private OpenWeatherApiCallback mOpenWeatherApiCallback;
@@ -77,6 +84,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
           view = mSwipeToRefreshLayout;
         } else if (id == R.id.main_recycler_view) {
           view = mRecyclerView;
+        } else if (id == R.id.progress_bar) {
+          view = mProgress;
         }
         return view;
       }
@@ -112,7 +121,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     shouldScheduleLayoutAnimation();
   }
 
-  @Test public void shouldHandleItemClick(@Mocked Toast toast, @Mocked View view, @Mocked WeatherViewModel weatherViewModel) {
+  @Test public void shouldHandleItemClick(@Mocked Toast toast, @Mocked View view,
+      @Mocked WeatherViewModel weatherViewModel) {
     givenStringResource();
 
     whenClickingItem(view, weatherViewModel);
@@ -120,8 +130,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenToastShouldMakeText(toast);
   }
 
-  @Test
-  public void shouldLoadOldData() {
+  @Test public void shouldLoadOldData(@Mocked Thread thread) {
     givenActivityCreated(null);
     givenForecastList();
     givenForecastElement("someCity");
@@ -136,6 +145,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   @Test
   public void shouldNotLoadOldForNullList(@SuppressWarnings("UnusedParameters") @Mocked Log log) {
     givenActivityCreated(null);
+
     whenLoadingOldData();
 
     thenLogDataShouldBeWritten("No data even in offline mode :(");
@@ -153,7 +163,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenShouldTrackEvent(NO_NETWORK_SEARCH, "EMPTY");
   }
 
-  @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity() {
+  @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity(@Mocked Thread thread) {
     givenActivityCreated(null);
     givenForecastList();
     givenForecastElement("someCity");
@@ -166,7 +176,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   //@Ignore("Flaky test on TravisCI")
-  @Test public void shouldNotifyAdapterOnUpdatingListWithEmptyCityForEmptyList() {
+  @Test public void shouldNotifyAdapterOnUpdatingListWithEmptyCityForEmptyList(@Mocked Thread thread) {
     givenForecastList();
 
     whenUpdatingList();
@@ -175,7 +185,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   @Test public void shouldHandleError(@SuppressWarnings("UnusedParameters") @Mocked Log log) {
-
+    givenActivityCreated(null);
     final String givenErrorString = "Some Error String";
 
     whenHandlingError(givenErrorString);
@@ -187,6 +197,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   @Test public void shouldBuildWithCityNameOnSearchingByQuery(
       @SuppressWarnings("UnusedParameters") @Mocked Toast toast,
       @SuppressWarnings("UnusedParameters") @Mocked Context context) {
+    givenActivityCreated(null);
     givenQuery("Some City Name");
 
     whenSearchingByQuery("Some City Name");
@@ -197,6 +208,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   @Test public void shouldBuildWithLatLonOnSearchingByLocation(@Mocked Geocoder geocoder)
       throws IOException {
+    givenActivityCreated(null);
     double givenLat = 1d;
     double givenLon = 1d;
     givenGeoCoderThrowsException(geocoder, givenLat, givenLon);
@@ -220,6 +232,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   @Test public void shouldBuildWithCityNameOnSearchingByLocationWithGeoCoderCity(
       @Mocked Geocoder geocoder, @Mocked Address address) throws IOException {
+    givenActivityCreated(null);
     double givenLat = 1d;
     double givenLon = 1d;
     givenQuery("Some City Name");
@@ -264,6 +277,32 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     whenItemsLoadIsComplete();
 
     thenSwipeToRefreshShouldBeEnabled();
+  }
+
+  @Test public void shouldShowProgressIndicatorIfToggleAndNotVisible() {
+    givenActivityCreated(null);
+    givenProgressBarNotVisible();
+
+    whenToggleProgressBar();
+
+    thenShouldSetVisible();
+  }
+
+  private void thenShouldSetVisible() {
+    new Verifications() {{
+      //noinspection WrongConstant
+      mProgress.setVisibility(withEqual(View.VISIBLE));
+    }};
+  }
+
+  private void whenToggleProgressBar() {
+    Deencapsulation.invoke(uut, "toggleProgressIndicator");
+  }
+
+  private void givenProgressBarNotVisible() {
+    new Expectations() {{
+      mProgress.getVisibility(); result = View.GONE;
+    }};
   }
 
   private void givenSavedInstanceStateWithCityName(final Bundle savedInstanceState) {
@@ -480,6 +519,6 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   private void whenCreatingTheActivity() {
-    uut.onCreate(new Bundle());
+    uut.onCreate(null);
   }
 }
