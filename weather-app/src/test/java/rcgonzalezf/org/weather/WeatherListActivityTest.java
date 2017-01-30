@@ -129,7 +129,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenToastShouldMakeText(toast);
   }
 
-  @Test public void shouldLoadOldData() {
+  @Test public void shouldLoadOldData(@Mocked Thread thread) {
     givenActivityCreated(null);
     givenForecastList();
     givenForecastElement("someCity");
@@ -161,7 +161,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenShouldTrackEvent(NO_NETWORK_SEARCH, "EMPTY");
   }
 
-  @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity() {
+  @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity(@Mocked Thread thread) {
     givenActivityCreated(null);
     givenForecastList();
     givenForecastElement("someCity");
@@ -174,7 +174,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   //@Ignore("Flaky test on TravisCI")
-  @Test public void shouldNotifyAdapterOnUpdatingListWithEmptyCityForEmptyList() {
+  @Test public void shouldNotifyAdapterOnUpdatingListWithEmptyCityForEmptyList(@Mocked Thread thread) {
     givenForecastList();
 
     whenUpdatingList();
