@@ -18,6 +18,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import mockit.Deencapsulation;
 import mockit.Expectations;
 import mockit.Mock;
 import mockit.MockUp;
@@ -144,6 +145,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   @Test
   public void shouldNotLoadOldForNullList(@SuppressWarnings("UnusedParameters") @Mocked Log log) {
     givenActivityCreated(null);
+
     whenLoadingOldData();
 
     thenLogDataShouldBeWritten("No data even in offline mode :(");
@@ -277,6 +279,32 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenSwipeToRefreshShouldBeEnabled();
   }
 
+  @Test public void shouldShowProgressIndicatorIfToggleAndNotVisible() {
+    givenActivityCreated(null);
+    givenProgressBarNotVisible();
+
+    whenToggleProgressBar();
+
+    thenShouldSetVisible();
+  }
+
+  private void thenShouldSetVisible() {
+    new Verifications() {{
+      //noinspection WrongConstant
+      mProgress.setVisibility(withEqual(View.VISIBLE));
+    }};
+  }
+
+  private void whenToggleProgressBar() {
+    Deencapsulation.invoke(uut, "toggleProgressIndicator");
+  }
+
+  private void givenProgressBarNotVisible() {
+    new Expectations() {{
+      mProgress.getVisibility(); result = View.GONE;
+    }};
+  }
+
   private void givenSavedInstanceStateWithCityName(final Bundle savedInstanceState) {
     new Expectations() {{
       savedInstanceState.getCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE);
@@ -372,9 +400,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   private void whenRunningNotifyRunnable() {
-
-    mAdapter.setItems(mForecastList);
-    mAdapter.notifyDataSetChanged();
+    mNotifyAdapterRunnable.run();
   }
 
   private void givenNotifyRunnable() {
