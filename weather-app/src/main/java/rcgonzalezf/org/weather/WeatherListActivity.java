@@ -49,13 +49,13 @@ public class WeatherListActivity extends BaseActivity
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mOpenWeatherApiCallback = new OpenWeatherApiCallback(this);
-    setupProgressBar();
     setupRecyclerView();
 
     if (savedInstanceState != null) {
       mCityNameToSearchOnSwipe = savedInstanceState.getCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE);
     }
 
+    mProgress = (ProgressBar) findViewById(R.id.progress_bar);
     mSwipeToRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
     enableSwipeToRefreshLayout();
     mSwipeToRefreshLayout.setOnRefreshListener(createSwipeToRefreshListener());
@@ -67,10 +67,16 @@ public class WeatherListActivity extends BaseActivity
   }
 
   @VisibleForTesting void onItemsLoadComplete() {
+    toggleProgressIndicator();
     enableSwipeToRefreshLayout();
     if (mSwipeToRefreshLayout.isRefreshing()) {
       mSwipeToRefreshLayout.setRefreshing(false);
     }
+  }
+
+  private void toggleProgressIndicator() {
+    if (mProgress.getVisibility() == View.VISIBLE) mProgress.setVisibility(View.GONE);
+    else mProgress.setVisibility(View.VISIBLE);
   }
 
   @Override public void onEnterAnimationComplete() {
@@ -104,11 +110,15 @@ public class WeatherListActivity extends BaseActivity
 
   @Override public void onError(String error) {
     // TODO implement error handling
+    toggleProgressIndicator();
+
     Log.d(TAG, error);
     trackOnActionEvent(new AnalyticsEvent(SEARCH_COMPLETED, "error: " + error));
   }
 
   @Override protected void searchByQuery(String query, CharSequence userInput) {
+    toggleProgressIndicator();
+
     WeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback> weatherRepository =
         ServiceConfig.getInstance().getWeatherRepository();
 
@@ -122,6 +132,8 @@ public class WeatherListActivity extends BaseActivity
   }
 
   @Override public void searchByLocation(double lat, double lon) {
+    toggleProgressIndicator();
+
     WeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback> weatherRepository =
         ServiceConfig.getInstance().getWeatherRepository();
 
@@ -171,17 +183,13 @@ public class WeatherListActivity extends BaseActivity
     }).start();
   }
 
-  public void setupRecyclerView() {
+  private void setupRecyclerView() {
     mAdapter = new ModelAdapter<>(new ArrayList<Forecast>(), this);
     mAdapter.setOnItemClickListener(this);
 
     mRecyclerView = (RecyclerView) findViewById(R.id.main_recycler_view);
     mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
     mRecyclerView.setAdapter(mAdapter);
-  }
-
-  public void setupProgressBar() {
-    mProgress = (ProgressBar) findViewById(R.id.progress_bar);
   }
 
   private void notifyAdapter(final List<Forecast> forecastList) {
@@ -195,7 +203,6 @@ public class WeatherListActivity extends BaseActivity
         mAdapter.setItems(forecastList);
         mAdapter.notifyDataSetChanged();
         onItemsLoadComplete();
-        mProgress.setVisibility(View.GONE);
       }
     };
   }

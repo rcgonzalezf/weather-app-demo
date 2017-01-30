@@ -459,8 +459,6 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   private void givenActivityCreated(Bundle savedInstanceState) {
     uut.onCreate(savedInstanceState);
-    mOpenWeatherApiCallback = new OpenWeatherApiCallback(uut);
-    uut.setupRecyclerView();
   }
 
   private void shouldScheduleLayoutAnimation() {
@@ -488,8 +486,6 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   private void whenCreatingTheActivity() {
-
     mOpenWeatherApiCallback = new OpenWeatherApiCallback(uut);
-    uut.setupRecyclerView();
   }
 }

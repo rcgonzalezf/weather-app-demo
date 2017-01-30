@@ -16,6 +16,17 @@
       android:layout_height="match_parent"
       android:orientation="vertical"
       >
+
+    <ProgressBar
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:id="@+id/progress_bar"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        tools:visibility="visible"
+        />
+
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_to_refresh_layout"
         android:layout_width="match_parent"
@@ -28,6 +39,8 @@
           android:layout_height="match_parent"
           app:layout_behavior="@string/appbar_scrolling_view_behavior"
           />
+
+
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <android.support.design.widget.AppBarLayout
@@ -55,13 +68,6 @@
         />
 
   </android.support.design.widget.CoordinatorLayout>
-
-  <ProgressBar
-      style="@style/Widget.AppCompat.ProgressBar"
-      android:id="@+id/progress_bar"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      />
 
   <android.support.design.widget.NavigationView
       android:id="@+id/navigation_view"
