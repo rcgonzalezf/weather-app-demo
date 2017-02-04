@@ -152,16 +152,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     @Override public boolean onPreferenceChange(Preference preference, Object newValue) {
       boolean newBooleanValue = newValue.equals(Boolean.TRUE);
       Boolean fromValue = !newBooleanValue;
+      mTemperatureUnitsPreference.setChecked(newBooleanValue);
 
       new Analytics().trackOnActionEvent(
-          new AnalyticsEvent(TEMP_UNITS_TOGGLE,
-              fromValue.toString()));
+          new AnalyticsEvent(TEMP_UNITS_TOGGLE, fromValue.toString()));
       return newBooleanValue;
     }
 
     @Override public boolean onPreferenceClick(Preference preference) {
-      new Analytics().trackOnActionEvent(
-          new AnalyticsEvent(ON_NAME, null));
+      new Analytics().trackOnActionEvent(new AnalyticsEvent(ON_NAME, null));
       return false;
     }
   }

@@ -10,6 +10,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
 import android.view.MenuItem;
+import mockit.Deencapsulation;
 import mockit.Expectations;
 import mockit.Mocked;
 import mockit.Tested;
@@ -70,6 +71,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Sett
 
   @Test public void shouldTrackPreferenceChangeFromFalse(@Mocked Analytics analytics,
       @Mocked AnalyticsEvent analyticsEvent) {
+    givenTemperatureUnitPreference();
+
     whenPreferenceChange(Boolean.TRUE);
 
     thenShouldTrackEvent(TEMP_UNITS_TOGGLE, Boolean.FALSE, analytics, analyticsEvent);
@@ -77,6 +80,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Sett
 
   @Test public void shouldTrackPreferenceChangeFromTrue(@Mocked Analytics analytics,
       @Mocked AnalyticsEvent analyticsEvent) {
+    givenTemperatureUnitPreference();
+
     whenPreferenceChange(Boolean.FALSE);
 
     thenShouldTrackEvent(TEMP_UNITS_TOGGLE, Boolean.TRUE, analytics, analyticsEvent);
@@ -87,6 +92,10 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Sett
     whenPreferenceClick();
 
     thenShouldTrackEvent(ON_NAME, analytics, analyticsEvent);
+  }
+
+  private void givenTemperatureUnitPreference() {
+    Deencapsulation.setField(uut, "mTemperatureUnitsPreference", mTemperatureUnitsPreference);
   }
 
   private void whenPreferenceClick() {
