@@ -1,7 +1,7 @@
 package org.rcgonzalezf.weather.openweather.network;
 
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
-import com.facebook.stetho.okhttp3.StethoInterceptor;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -11,6 +11,7 @@ import org.rcgonzalezf.weather.WeatherLibApp;
 import org.rcgonzalezf.weather.common.models.ForecastData;
 import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
+import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback;
 import org.rcgonzalezf.weather.openweather.api.ForecastService;
 import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;
 import retrofit2.Call;
@@ -25,9 +26,11 @@ class OpenWeatherExecutor {
   private String mApiKey;
   private ApiCallback<OpenWeatherApiResponse, OpenWeatherApiError> mApiCallback;
   private static final String TAG = OpenWeatherExecutor.class.getSimpleName();
-  private ModelConverter mConverter;
+  private ModelConverter<OpenWeatherForecastData> mConverter;
+  @VisibleForTesting
+  WeatherLibApp mWeatherLibApp = WeatherLibApp.getInstance();
 
-  OpenWeatherExecutor(ApiCallback apiCallback, Executor executor, String apiKey) {
+  OpenWeatherExecutor(OpenWeatherApiCallback apiCallback, Executor executor, String apiKey) {
     mApiCallback = apiCallback;
     mExecutor = executor;
     mApiKey = apiKey;
@@ -37,8 +40,7 @@ class OpenWeatherExecutor {
 
     mExecutor.execute(new Runnable() {
       @Override public void run() {
-        OkHttpClient okClient =
-            new OkHttpClient.Builder().addNetworkInterceptor(new StethoInterceptor()).build();
+        OkHttpClient okClient = mWeatherLibApp.createOkHttpClient();
 
         ForecastService service =
             new Retrofit.Builder().baseUrl("http://api.openweathermap.org/data/2.5/")
@@ -69,15 +71,14 @@ class OpenWeatherExecutor {
 
   private void notifyOnError() {
     final OpenWeatherApiError error = new OpenWeatherApiError();
-    error.setMessage(WeatherLibApp.getInstance().getString(R.string.empty_result));
+    error.setMessage(mWeatherLibApp.getString(R.string.empty_result));
     error.setCode(ErrorCode.EMPTY);
     mApiCallback.onError(error);
   }
 
   private void convertToModel(OpenWeatherForecastData openWeatherForecastData) throws IOException {
-    //noinspection unchecked
+
     mConverter.fromPojo(openWeatherForecastData);
-    //noinspection unchecked
     List<ForecastData> forecastData = mConverter.getModel();
 
     if (forecastData != null && !forecastData.isEmpty()) {
@@ -89,8 +90,7 @@ class OpenWeatherExecutor {
     }
   }
 
-  void setModelConverter(
-      ModelConverter<Void, OpenWeatherForecastData> converter) {
+  void setModelConverter(ModelConverter<OpenWeatherForecastData> converter) {
     mConverter = converter;
   }
 }

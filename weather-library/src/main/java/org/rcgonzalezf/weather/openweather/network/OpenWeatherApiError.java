@@ -2,7 +2,7 @@ package org.rcgonzalezf.weather.openweather.network;
 
 import org.rcgonzalezf.weather.common.network.ApiError;
 
-class OpenWeatherApiError implements ApiError<String>{
+public class OpenWeatherApiError implements ApiError<String>{
 
   private String mMessage;
   private ErrorCode mCode;
@@ -19,5 +19,9 @@ class OpenWeatherApiError implements ApiError<String>{
   @Override
   public void setCode(ErrorCode code) {
     mCode = code;
+  }
+
+  public ErrorCode getCode() {
+    return mCode;
   }
 }

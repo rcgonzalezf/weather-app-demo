@@ -24,7 +24,7 @@ public class ForecastData {
   }
 
   @Override public String toString() {
-    return "ForecastData [name=" + getCity().getName() + ", count=" + mCount +"";
+    return "ForecastData [name=" + getCity().getName() + ", count=" + getCount() +"";
   }
 
   public City getCity() {

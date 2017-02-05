@@ -1,89 +1,78 @@
 package rcgonzalezf.org.weather.common;
 
-import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
-import org.rcgonzalezf.weather.common.ServiceConfig;
-import org.rcgonzalezf.weather.common.WeatherRepository;
-import org.rcgonzalezf.weather.common.network.ApiCallback;
-import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters;
+import org.rcgonzalezf.weather.common.models.Forecast;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
-import rcgonzalezf.org.weather.models.Forecast;
+import rcgonzalezf.org.weather.common.analytics.Analytics;
+import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent;
+import rcgonzalezf.org.weather.location.LocationManager;
 
 import static rcgonzalezf.org.weather.SettingsActivity.USER_NAME_TO_DISPLAY;
-import static rcgonzalezf.org.weather.utils.ForecastUtils.hasInternetConnection;
+import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.MANUAL_SEARCH;
+import static rcgonzalezf.org.weather.utils.WeatherUtils.hasInternetConnection;
 
 public abstract class BaseActivity extends AppCompatActivity
-    implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-    ApiCallback, OnOfflineLoader {
+    implements ActivityCompat.OnRequestPermissionsResultCallback, OnOfflineLoader {
 
   protected static final String OFFLINE_FILE = "OFFLINE_WEATHER";
   public static final String FORECASTS = "FORECASTS";
   private static final String TAG = BaseActivity.class.getSimpleName();
 
-  protected Location mLastLocation;
-  private GoogleApiClient mGoogleApiClient;
   private DrawerLayout mDrawerLayout;
   private View mContent;
+  private LocationManager mLocationManager;
+
+  protected abstract void searchByQuery(String query, CharSequence userInput);
+
+  public abstract void searchByLocation(double lat, double lon);
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.weather);
-    buildGoogleApiClient();
-
     initToolbar();
     setupDrawerLayout();
-    setupFabButton();
+    findViewById(R.id.main_fab).setOnClickListener(getFabClickListener());
 
     mContent = findViewById(R.id.content);
-  }
-
-  protected synchronized void buildGoogleApiClient() {
-    mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this)
-        .addOnConnectionFailedListener(this)
-        .addApi(LocationServices.API)
-        .build();
+    mLocationManager = new LocationManager(this, mContent);
+    trackOnScreen();
   }
 
   @Override protected void onStart() {
     super.onStart();
-    mGoogleApiClient.connect();
+    mLocationManager.connect();
   }
 
   @Override protected void onStop() {
-    mGoogleApiClient.disconnect();
+    mLocationManager.disconnect();
     super.onStop();
   }
 
@@ -104,32 +93,6 @@ public abstract class BaseActivity extends AppCompatActivity
     return super.onOptionsItemSelected(item);
   }
 
-  private void navigateToSettings() {
-    Intent intent = new Intent(BaseActivity.this, SettingsActivity.class);
-    startActivity(intent);
-  }
-
-  @Override public void onConnected(Bundle bundle) {
-    PermissionChecker permissionChecker =
-        new PermissionChecker(Manifest.permission.ACCESS_COARSE_LOCATION, this,
-            PermissionChecker.LOCATION, mContent, R.string.permissions_location_granted,
-            R.string.permissions_location_not_granted, R.string.permissions_location_rationale);
-
-    if (permissionChecker.hasPermission()) {
-      tryToUseLastKnownLocation();
-    } else {
-      permissionChecker.requestLocationPermission();
-    }
-  }
-
-  @Override public void onConnectionSuspended(int i) {
-    Log.d(TAG, "Google Location onConnectionSuspended " + i);
-  }
-
-  @Override public void onConnectionFailed(ConnectionResult connectionResult) {
-    Log.d(TAG, "Google Location onConnectionFailed " + connectionResult.getErrorMessage());
-  }
-
   protected void initToolbar() {
     final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
@@ -145,18 +108,7 @@ public abstract class BaseActivity extends AppCompatActivity
     mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
     NavigationView view = (NavigationView) findViewById(R.id.navigation_view);
-    view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-      @Override public boolean onNavigationItemSelected(MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.drawer_settings) {
-          navigateToSettings();
-        } else {
-          Snackbar.make(mContent, menuItem.getTitle() + " pressed", Snackbar.LENGTH_SHORT).show();
-          menuItem.setChecked(true);
-          mDrawerLayout.closeDrawers();
-        }
-        return true;
-      }
-    });
+    view.setNavigationItemSelectedListener(getNavigationListener());
 
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     TextView textView = (TextView) findViewById(R.id.user_display_name);
@@ -166,70 +118,19 @@ public abstract class BaseActivity extends AppCompatActivity
     }
   }
 
-  private void setupFabButton() {
-    findViewById(R.id.main_fab).setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View v) {
-        performFabAction(v);
-      }
-    });
-  }
-
-  protected void performFabAction(View view) {
-    LayoutInflater li = LayoutInflater.from(this);
-    View promptsView = li.inflate(R.layout.dialog_city_query, null);
-
-    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-
-    alertDialogBuilder.setView(promptsView);
-
+  protected void performFabAction() {
+    View promptsView = View.inflate(this, R.layout.dialog_city_query, null);
     final EditText userInput = (EditText) promptsView.findViewById(R.id.city_input_edit_text);
 
-    alertDialogBuilder.setCancelable(false)
-        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-          public void onClick(DialogInterface dialog, int id) {
-
-            String query = null;
-            try {
-              query = URLEncoder.encode(userInput.getText().toString(), "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-              Log.e(TAG, "Can't encode URL", e);
-              Toast.makeText(BaseActivity.this,
-                  getString(R.string.invalid_input) + ": " + userInput.getText() + "...",
-                  Toast.LENGTH_SHORT).show();
-              return;
-            }
-
-            if (!hasInternetConnection(BaseActivity.this)) {
-              informNoInternet();
-            } else {
-              searchByQuery(query, userInput);
-            }
-          }
-        })
-        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-          public void onClick(DialogInterface dialog, int id) {
-            dialog.cancel();
-          }
-        });
-
-    AlertDialog alertDialog = alertDialogBuilder.create();
-    alertDialog.show();
-  }
-
-  protected void searchByQuery(String query, EditText userInput) {
-    WeatherRepository<OpenWeatherApiRequestParameters> weatherRepository =
-        ServiceConfig.getInstance().getWeatherRepository();
-
-    weatherRepository.findWeather(new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder()
-        .withCityName(query)
-        .build(), BaseActivity.this);
-
-    Toast.makeText(BaseActivity.this,
-        getString(R.string.searching) + " " + userInput.getText() + "...", Toast.LENGTH_SHORT)
+    new AlertDialog.Builder(this).setView(promptsView)
+        .setCancelable(false)
+        .setPositiveButton("OK", getOkClickListener(userInput.getText()))
+        .setNegativeButton("Cancel", getCancelListener())
+        .create()
         .show();
   }
 
-  protected void informNoInternet() {
+  public void informNoInternet() {
     Toast.makeText(this, getString(R.string.no_internet_msg), Toast.LENGTH_SHORT).show();
     final List<Forecast> forecastList = getPreviousForecastList();
     loadOldData(forecastList);
@@ -240,36 +141,92 @@ public abstract class BaseActivity extends AppCompatActivity
     String serializedData = sharedPreferences.getString(FORECASTS, null);
     List<Forecast> storedData = null;
     if (serializedData != null) {
-      try {
-        ByteArrayInputStream input =
-            new ByteArrayInputStream(Base64.decode(serializedData, Base64.DEFAULT));
-        ObjectInputStream inputStream = new ObjectInputStream(input);
-        storedData = (ArrayList<Forecast>) inputStream.readObject();
-      } catch (IOException | ClassNotFoundException | java.lang.IllegalArgumentException e) {
-        Log.e(TAG, "Can't retrive previous offline data", e);
-      }
+      storedData = new Gson().fromJson(serializedData, new TypeToken<List<Forecast>>() {
+      }.getType());
     }
-
     return storedData;
   }
 
-  // We are handling the potential missing permission
-  @SuppressWarnings("MissingPermission") void tryToUseLastKnownLocation() {
-    mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+  @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+      @NonNull int[] grantResults) {
+    mLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+  }
+
+  @VisibleForTesting public void searchByManualInput(CharSequence userInput) {
+    String query;
+    try {
+      query = URLEncoder.encode(userInput.toString(), "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      Log.e(TAG, "Can't encode URL", e);
+      Toast.makeText(BaseActivity.this,
+          getString(R.string.invalid_input) + ": " + userInput + "...", Toast.LENGTH_SHORT).show();
+      return;
+    }
+
     if (!hasInternetConnection(this)) {
       informNoInternet();
-    } else if (mLastLocation != null) {
-      WeatherRepository<OpenWeatherApiRequestParameters> weatherRepository =
-          ServiceConfig.getInstance().getWeatherRepository();
-
-      double lat = mLastLocation.getLatitude();
-      double lon = mLastLocation.getLongitude();
-
-      weatherRepository.findWeather(
-          new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withLatLon(lat, lon)
-              .build(), this);
     } else {
-      Snackbar.make(mContent, getString(R.string.location_off_msg), Snackbar.LENGTH_SHORT).show();
+      searchByQuery(query, userInput);
     }
+  }
+
+  @VisibleForTesting void homePressed(MenuItem menuItem) {
+    Snackbar.make(mContent, menuItem.getTitle() + " pressed", Snackbar.LENGTH_SHORT).show();
+    menuItem.setChecked(true);
+    mDrawerLayout.closeDrawers();
+  }
+
+  @VisibleForTesting @NonNull View.OnClickListener getFabClickListener() {
+    return new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        performFabAction();
+      }
+    };
+  }
+
+  @VisibleForTesting @NonNull DialogInterface.OnClickListener getCancelListener() {
+    return new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int id) {
+        trackOnActionEvent(new AnalyticsEvent(MANUAL_SEARCH, "CANCEL"));
+        dialog.cancel();
+      }
+    };
+  }
+
+  @VisibleForTesting @NonNull DialogInterface.OnClickListener getOkClickListener(
+      final CharSequence userInput) {
+    return new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int id) {
+        trackOnActionEvent(new AnalyticsEvent(MANUAL_SEARCH, userInput.toString()));
+        searchByManualInput(userInput);
+      }
+    };
+  }
+
+  @VisibleForTesting @NonNull
+  NavigationView.OnNavigationItemSelectedListener getNavigationListener() {
+    return new NavigationView.OnNavigationItemSelectedListener() {
+      @Override public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        if (menuItem.getItemId() == R.id.drawer_settings) {
+          navigateToSettings();
+        } else {
+          homePressed(menuItem);
+        }
+        return true;
+      }
+    };
+  }
+
+  private void navigateToSettings() {
+    Intent intent = new Intent(BaseActivity.this, SettingsActivity.class);
+    startActivity(intent);
+  }
+
+  public void trackOnScreen() {
+    new Analytics().trackOnScreen(this.getClass().getSimpleName());
+  }
+
+  public void trackOnActionEvent(@NonNull final AnalyticsEvent event) {
+    new Analytics().trackOnActionEvent(event);
   }
 }

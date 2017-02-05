@@ -1,9 +1,9 @@
-package rcgonzalezf.org.weather.models;
+package org.rcgonzalezf.weather.common.models;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.List;
-import org.rcgonzalezf.weather.common.models.ForecastData;
-import org.rcgonzalezf.weather.common.models.WeatherData;
 
 public class ForecastMapper {
 
@@ -12,16 +12,17 @@ public class ForecastMapper {
   // I've found that most cases the forecast consists of 40 items
   private static final int INITIAL_SIZE = 40;
 
-  public ForecastMapper withData(List<ForecastData> data) {
+  public ForecastMapper withData(@NonNull List<ForecastData> data) {
     mData = data;
     return this;
   }
 
-  public List<Forecast> map() {
+  public @NonNull List<Forecast> map() {
     return map(ALL);
   }
 
-  public List<Forecast> map(int howMany) {
+  @VisibleForTesting
+  @NonNull List<Forecast> map(int howMany) {
     int size = 10;
     if(howMany == ALL) {
       size = INITIAL_SIZE * mData.size();
@@ -48,7 +49,9 @@ public class ForecastMapper {
         if(counter == howMany) {
           return forecastList;
         }
+
       }
+
     }
     return forecastList;
   }

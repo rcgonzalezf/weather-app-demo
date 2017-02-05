@@ -1,4 +1,4 @@
-package rcgonzalezf.org.weather.models;
+package org.rcgonzalezf.weather.common.models;
 
 import android.os.Parcelable;
 import java.io.Serializable;

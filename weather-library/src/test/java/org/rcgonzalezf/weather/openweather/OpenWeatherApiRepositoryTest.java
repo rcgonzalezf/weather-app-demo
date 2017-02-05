@@ -22,27 +22,31 @@ import static org.mockito.Mockito.when;
 @RunWith(RobolectricTestRunner.class) @Config(constants = BuildConfig.class, sdk = 23, application = WeatherTestLibApp.class)
 public class OpenWeatherApiRepositoryTest {
 
-  private WeatherRepository<OpenWeatherApiRequestParameters> mWeatherRepository;
+  private WeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback> mWeatherRepository;
 
   private OpenWeatherApiRequestParameters mRequestParameters;
-  private ApiRequest mApiRequest;
   private boolean mRequestParametersAdded;
   private boolean mExecuted;
 
   @Before public void setUpServiceConfig() {
-    mWeatherRepository = spy(ServiceConfig.getInstance().getWeatherRepository());
+    mWeatherRepository = ServiceConfig.getInstance().getWeatherRepository();
+    mWeatherRepository = spy(mWeatherRepository);
   }
 
   @Test(expected = UnsupportedOperationException.class)
   public void shouldReturnExceptionThisRepositoryDoesNotAcceptSyncCalls() {
-    givenRequestParametersWithCityId(123456);
+    givenRequestParametersWithCityName("someCity");
+
     whenGettingWeather();
+
   }
 
   @Test public void shouldAddRequestParametersBeforeExecuting() {
-    givenRequestParametersWithCityId(123456);
+    givenRequestParametersWithCityName("someCity");
     givenApiRequest();
+
     whenGettingWeatherAsync();
+
     thenShouldHaveRequestParametersWhenExecuting();
   }
 
@@ -52,14 +56,7 @@ public class OpenWeatherApiRepositoryTest {
   }
 
   private void givenApiRequest() {
-    mApiRequest = new ApiRequest() {
-      @Override public String getBaseUrl() {
-        return null;
-      }
-
-      @Override public String getMethodName() {
-        return null;
-      }
+    ApiRequest mApiRequest = new ApiRequest() {
 
       @Override public void execute(ApiCallback apiCallback) {
         assertTrue(mRequestParametersAdded);
@@ -75,16 +72,16 @@ public class OpenWeatherApiRepositoryTest {
   }
 
   private void whenGettingWeatherAsync() {
-    mWeatherRepository.findWeather(mRequestParameters, mock(ApiCallback.class));
+    mWeatherRepository.findWeather(mRequestParameters, mock(OpenWeatherApiCallback.class));
   }
 
   private void whenGettingWeather() {
     mWeatherRepository.findWeather(mRequestParameters);
   }
 
-  private void givenRequestParametersWithCityId(Integer someCityId) {
+  private void givenRequestParametersWithCityName(String someCityName) {
     mRequestParameters =
-        new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withCityId(someCityId)
+        new OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withCityName(someCityName)
             .build();
   }
 }

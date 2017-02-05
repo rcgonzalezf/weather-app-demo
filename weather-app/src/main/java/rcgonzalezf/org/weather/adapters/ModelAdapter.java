@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+import android.support.annotation.VisibleForTesting;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,15 +15,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import java.util.List;
 import org.rcgonzalezf.weather.WeatherLibApp;
+import org.rcgonzalezf.weather.common.models.WeatherViewModel;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
-import rcgonzalezf.org.weather.models.WeatherViewModel;
 
-import static rcgonzalezf.org.weather.utils.ForecastUtils.formatDate;
-import static rcgonzalezf.org.weather.utils.ForecastUtils.formatTemperature;
-import static rcgonzalezf.org.weather.utils.ForecastUtils.getArtResourceForWeatherCondition;
-import static rcgonzalezf.org.weather.utils.ForecastUtils.getDayName;
-import static rcgonzalezf.org.weather.utils.ForecastUtils.getFormattedWind;
+import static rcgonzalezf.org.weather.utils.WeatherArtUtils.getArtResourceForWeatherCondition;
+import static rcgonzalezf.org.weather.utils.WeatherUtils.formatDate;
+import static rcgonzalezf.org.weather.utils.WeatherUtils.formatTemperature;
+import static rcgonzalezf.org.weather.utils.WeatherUtils.getDayName;
+import static rcgonzalezf.org.weather.utils.WeatherWindUtils.getFormattedWind;
 
 public class ModelAdapter<T extends WeatherViewModel>
     extends RecyclerView.Adapter<ModelAdapter.ModelViewHolder> implements View.OnClickListener {
@@ -56,20 +57,22 @@ public class ModelAdapter<T extends WeatherViewModel>
     holder.windSpeedTextView.setText(
         getFormattedWind(mContext, mainModel.getSpeed(), mainModel.getDeg()));
 
-    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-    boolean celsiusPreferred = prefs.getBoolean(SettingsActivity.PREF_TEMPERATURE_UNITS, true);
-    if (celsiusPreferred) {
-      holder.primaryTempTextView.setText(formatTemperature(mainModel.getTemperature(), false, "C"));
-      holder.secondaryTempTextView.setText(
-          formatTemperature(mainModel.getTemperature(), true, "F"));
-    } else {
-      holder.secondaryTempTextView.setText(
-          formatTemperature(mainModel.getTemperature(), false, "C"));
-      holder.primaryTempTextView.setText(formatTemperature(mainModel.getTemperature(), true, "F"));
-    }
+    populateTemperatureViews(holder, mainModel);
 
     holder.descriptionTextView.setText(mainModel.getDescription());
     holder.itemView.setTag(mainModel);
+  }
+
+  @VisibleForTesting void populateTemperatureViews(ModelAdapter.ModelViewHolder holder,
+      T mainModel) {
+    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+    boolean celsiusPreferred = prefs.getBoolean(SettingsActivity.PREF_TEMPERATURE_UNITS, true);
+
+    final String celsiusText = formatTemperature(mainModel.getTemperature(), true, "C");
+    final String fahrenheitText = formatTemperature(mainModel.getTemperature(), false, "F");
+
+    holder.primaryTempTextView.setText(celsiusPreferred ? celsiusText : fahrenheitText);
+    holder.secondaryTempTextView.setText(celsiusPreferred ? fahrenheitText : celsiusText);
   }
 
   @Override public int getItemCount() {
@@ -88,28 +91,32 @@ public class ModelAdapter<T extends WeatherViewModel>
   @Override public void onClick(@NonNull final View view) {
     // Give some time to the ripple to finish the effect
     if (onItemClickListener != null) {
-      new Handler().postDelayed(new Runnable() {
-        @Override public void run() {
-          onItemClickListener.onItemClick(view, (WeatherViewModel) view.getTag());
-        }
-      }, 200);
+      new Handler().postDelayed(createClickRunnable(view), 200);
     }
   }
 
-  public class ModelViewHolder extends RecyclerView.ViewHolder {
+  @VisibleForTesting @NonNull Runnable createClickRunnable(@NonNull final View view) {
+    return new Runnable() {
+      @Override public void run() {
+        onItemClickListener.onItemClick(view, (WeatherViewModel) view.getTag());
+      }
+    };
+  }
 
-    public TextView datetimeTextView;
-    public ImageView itemImage;
-    public TextView detailLocationNameTextView;
-    public TextView humidityTextView;
-    public TextView windSpeedTextView;
-    public TextView secondaryTempTextView;
-    public TextView primaryTempTextView;
-    public TextView dayTextView;
-    public TextView descriptionTextView;
-    public View itemView;
+  class ModelViewHolder extends RecyclerView.ViewHolder {
 
-    public ModelViewHolder(View itemView) {
+    TextView datetimeTextView;
+    ImageView itemImage;
+    TextView detailLocationNameTextView;
+    TextView humidityTextView;
+    TextView windSpeedTextView;
+    TextView secondaryTempTextView;
+    TextView primaryTempTextView;
+    TextView dayTextView;
+    TextView descriptionTextView;
+    View itemView;
+
+    ModelViewHolder(View itemView) {
       super(itemView);
       this.itemView = itemView;
       this.itemView.setOnClickListener(ModelAdapter.this);

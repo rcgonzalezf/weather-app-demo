@@ -1,0 +1,5 @@
+<resources>
+  <string name="permissions_location_granted">someGrantedMessage</string>
+  <string name="permissions_location_not_granted">someNotGrantedMessage</string>
+  <string name="permissions_location_rationale">somePermissionRationale</string>
+</resources>

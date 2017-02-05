@@ -10,9 +10,9 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(JUnit4.class) public class ServiceConfigTest {
 
+  private ServiceConfig uut;
   private WeatherRepository mWeatherRepository;
   private ServiceConfig mRealServiceConfig;
-  private ServiceConfig mServiceConfig;
   private WeatherProvider mDefaultProvider;
 
   @After public void rollbackServiceConfig() {
@@ -21,15 +21,17 @@ import static org.junit.Assert.assertNotNull;
 
   @Before public void createRepository() {
     mRealServiceConfig = ServiceConfig.getInstance();
-    mServiceConfig = new ServiceConfig();
-    ServiceConfig.setInstance(mServiceConfig);
-    mServiceConfig.setApiKey("someKey");
+    uut = new ServiceConfig();
+    ServiceConfig.setInstance(uut);
+    uut.setApiKey("someKey");
     mDefaultProvider = WeatherProvider.OpenWeather;
   }
 
   @Test(expected = IllegalStateException.class) public void shouldThrowExceptionIfNoApiKeyIsSet() {
     givenNullApiKey();
-    givenSomeProvider();
+
+    givenSomeKnownProvider();
+
     whenRetrievingRepository();
   }
 
@@ -39,8 +41,10 @@ import static org.junit.Assert.assertNotNull;
   }
 
   @Test public void shouldGetRepositoryInstanceForValidConfig() {
-    givenSomeProvider();
+    givenSomeKnownProvider();
+
     whenRetrievingRepository();
+
     thenShouldHaveRepositoryInstance();
   }
 
@@ -49,14 +53,14 @@ import static org.junit.Assert.assertNotNull;
   }
 
   private void whenRetrievingRepository() {
-    mWeatherRepository = mServiceConfig.getWeatherRepository();
+    mWeatherRepository = uut.getWeatherRepository();
   }
 
-  private void givenSomeProvider() {
-    mServiceConfig.setWeatherProvider(mDefaultProvider);
+  private void givenSomeKnownProvider() {
+    uut.setWeatherProvider(mDefaultProvider);
   }
 
   private void givenNullApiKey() {
-    mServiceConfig.setApiKey(null);
+    uut.setApiKey(null);
   }
 }

@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".WeatherActivity"
+    tools:context=".WeatherListActivity"
     >
 
   <android.support.design.widget.CoordinatorLayout
@@ -16,14 +16,31 @@
       android:layout_height="match_parent"
       android:orientation="vertical"
       >
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/main_recycler_view"
+
+    <ProgressBar
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:id="@+id/progress_bar"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        tools:visibility="visible"
+        />
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_to_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         >
 
-    </android.support.v7.widget.RecyclerView>
+      <android.support.v7.widget.RecyclerView
+          android:id="@+id/main_recycler_view"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          app:layout_behavior="@string/appbar_scrolling_view_behavior"
+          />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -46,7 +63,8 @@
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/main_fab"
         android:layout_gravity="bottom|end"
-        style="@style/FabStyle"/>
+        style="@style/FabStyle"
+        />
 
   </android.support.design.widget.CoordinatorLayout>
 

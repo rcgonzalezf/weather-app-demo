@@ -1,8 +1,8 @@
 package org.rcgonzalezf.weather;
 
 import android.app.Application;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
-import com.facebook.stetho.Stetho;
 import java.io.File;
 import okhttp3.OkHttpClient;
 import org.rcgonzalezf.weather.common.ServiceConfig;
@@ -22,7 +22,7 @@ public abstract class WeatherLibApp extends Application {
     mServiceConfig.setWeatherProvider(WeatherProvider.OpenWeather);
 
     enableHttpResponseCache();
-    Stetho.initializeWithDefaults(this);
+    addAnalyticsObservers();
   }
 
   public static WeatherLibApp getInstance() {
@@ -33,7 +33,8 @@ public abstract class WeatherLibApp extends Application {
     sAppInstance = appInstance;
   }
 
-  private void enableHttpResponseCache() {
+  @VisibleForTesting
+  void enableHttpResponseCache() {
     try {
       long httpCacheSize = 10 * 1024 * 1024; // 10 MiB
       File httpCacheDir = new File(getCacheDir(), "http");
@@ -46,4 +47,6 @@ public abstract class WeatherLibApp extends Application {
   }
 
   public abstract OkHttpClient createOkHttpClient();
+
+  public abstract void addAnalyticsObservers();
 }

@@ -1,82 +1,104 @@
 package rcgonzalezf.org.weather.common;
 
-import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
+import android.support.annotation.StringRes;
+import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import java.lang.ref.WeakReference;
 import rcgonzalezf.org.weather.R;
 
-public class PermissionChecker implements ActivityCompat.OnRequestPermissionsResultCallback{
+public class PermissionChecker implements ActivityCompat.OnRequestPermissionsResultCallback {
 
   public static final int LOCATION = 10;
 
-  private final WeakReference<Activity> weakContext;
-  private String permission;
-  private int requestCode;
-  private WeakReference<View> container;
-  private int permissionGrantedMessageId;
-  private int permissionsNotGrantedMessageId;
-  private int permissionRationaleMessageId;
+  private final WeakReference<BaseActivity> mWeakContext;
+  private String mPermission;
+  private int mRequestCode;
+  private WeakReference<View> mContainer;
+  private int mPermissionGrantedMessageId;
+  private int mPermissionsNotGrantedMessageId;
+  private int mPermissionRationaleMessageId;
+  private PermissionResultListener mPermissionResultListener;
 
-  public PermissionChecker(String permission, Activity activity, int requestCode, View container,
-      int permissionGrantedMessageId, int permissionsNotGrantedMessageId,
-      int permissionRationaleMessageId) {
-    this.weakContext = new WeakReference<>(activity);
-    this.permission = permission;
-    this.requestCode = requestCode;
-    this.container = new WeakReference<>(container);
-    this.permissionGrantedMessageId = permissionGrantedMessageId;
-    this.permissionsNotGrantedMessageId = permissionsNotGrantedMessageId;
-    this.permissionRationaleMessageId = permissionRationaleMessageId;
+  public PermissionChecker(@NonNull String permission, @NonNull BaseActivity activity,
+      int requestCode, @NonNull View container, @StringRes int permissionGrantedMessageId,
+      @StringRes int permissionsNotGrantedMessageId, @StringRes int permissionRationaleMessageId) {
+    this.mWeakContext = new WeakReference<>(activity);
+    this.mPermission = permission;
+    this.mRequestCode = requestCode;
+    this.mContainer = new WeakReference<>(container);
+    this.mPermissionGrantedMessageId = permissionGrantedMessageId;
+    this.mPermissionsNotGrantedMessageId = permissionsNotGrantedMessageId;
+    this.mPermissionRationaleMessageId = permissionRationaleMessageId;
   }
 
   public boolean hasPermission() {
-    return ActivityCompat.checkSelfPermission(weakContext.get(), permission)
+    return ActivityCompat.checkSelfPermission(mWeakContext.get(), mPermission)
         == PackageManager.PERMISSION_GRANTED;
   }
 
-  public void requestLocationPermission() {
+  public void requestPermission(PermissionResultListener permissionResultListener) {
+    this.mPermissionResultListener = permissionResultListener;
 
-    if (ActivityCompat.shouldShowRequestPermissionRationale(weakContext.get(),
-        permission)) {
+    if (ActivityCompat.shouldShowRequestPermissionRationale(mWeakContext.get(), mPermission)) {
 
-      Snackbar.make(container.get(), permissionRationaleMessageId,
-          Snackbar.LENGTH_INDEFINITE)
-          .setAction(R.string.ok, new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-              ActivityCompat.requestPermissions(weakContext.get(),
-                  new String[]{permission},
-                  requestCode);
-            }
-          })
+      Snackbar.make(mContainer.get(), mPermissionRationaleMessageId, Snackbar.LENGTH_INDEFINITE)
+          .setAction(R.string.ok, getSnackBarClickListener())
           .show();
     } else {
-      ActivityCompat.requestPermissions(weakContext.get(), new String[]{permission},
-          requestCode);
+      requestPermissions();
     }
   }
 
-  @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-      @NonNull int[] grantResults) {
-    if (this.requestCode == requestCode) {
-
-      if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-        Snackbar.make(container.get(), permissionGrantedMessageId,
-            Snackbar.LENGTH_SHORT).show();
-      } else {
-        Snackbar.make(container.get(), permissionsNotGrantedMessageId,
-            Snackbar.LENGTH_SHORT).show();
-
+  @VisibleForTesting @NonNull View.OnClickListener getSnackBarClickListener() {
+    return new View.OnClickListener() {
+      @Override public void onClick(View view) {
+        requestPermissions();
       }
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        weakContext.get().onRequestPermissionsResult(requestCode, permissions, grantResults);
+    };
+  }
+
+  void requestPermissions() {
+    ActivityCompat.requestPermissions(mWeakContext.get(), new String[] { mPermission },
+        mRequestCode);
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.M) @Override
+  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+      @NonNull int[] grantResults) {
+
+    if (this.mRequestCode == requestCode) {
+      int messageResId;
+      if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        messageResId = mPermissionGrantedMessageId;
+        handleGranted();
+      } else {
+        messageResId = mPermissionsNotGrantedMessageId;
+        handleRejected();
+      }
+      Snackbar.make(mContainer.get(), messageResId, Snackbar.LENGTH_SHORT)
+          .show();
+    } else {
+      mWeakContext.get().onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+  }
 
+  @VisibleForTesting
+  void handleRejected() {
+    if (mPermissionResultListener != null) {
+      mPermissionResultListener.onFailure();
+    }
+  }
 
+  @VisibleForTesting
+  void handleGranted() {
+    if (mPermissionResultListener != null) {
+      mPermissionResultListener.onSuccess();
+    }
   }
 }
