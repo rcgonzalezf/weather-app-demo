@@ -32,14 +32,12 @@ public class WeatherUtils {
     return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
   }
 
-
   public static String getDayName(Context context, String dateStr) {
     Date todayDate = new Date();
-   return getDayName(context, dateStr, todayDate);
+    return getDayName(context, dateStr, todayDate);
   }
 
-  @VisibleForTesting
-  static String getDayName(Context context, String dateStr, Date todayDate) {
+  @VisibleForTesting static String getDayName(Context context, String dateStr, Date todayDate) {
     SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
     try {
       Date inputDate = dateFormat.parse(dateStr);
@@ -64,11 +62,12 @@ public class WeatherUtils {
 
   /**
    * <p>Checks if two dates are on the same day ignoring time.</p>
-   * @param date1  the first date, not altered, not null
-   * @param date2  the second date, not altered, not null
+   *
+   * @param date1 the first date, not altered, not null
+   * @param date2 the second date, not altered, not null
    * @return true if they represent the same day
    */
-  private static boolean isSameDay(@NonNull Date date1, @NonNull  Date date2) {
+  private static boolean isSameDay(@NonNull Date date1, @NonNull Date date2) {
     Calendar cal1 = Calendar.getInstance();
     cal1.setTime(date1);
     Calendar cal2 = Calendar.getInstance();
@@ -78,13 +77,14 @@ public class WeatherUtils {
 
   /**
    * <p>Checks if two calendars represent the same day ignoring time.</p>
-   * @param cal1  the first calendar, not altered, not null
-   * @param cal2  the second calendar, not altered, not null
+   *
+   * @param cal1 the first calendar, not altered, not null
+   * @param cal2 the second calendar, not altered, not null
    * @return true if they represent the same day
    */
   private static boolean isSameDay(@NonNull Calendar cal1, @NonNull Calendar cal2) {
-    return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-        cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
+    return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR)
+        && cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
   }
 
   public static String formatDate(String dateStr) {
@@ -98,8 +98,8 @@ public class WeatherUtils {
     }
   }
 
-  public static String formatTemperature(double temperature, boolean isFahrenheit, String symbol) {
-    if (!isFahrenheit)
+  public static String formatTemperature(double temperature, boolean isCelsius, String symbol) {
+    if (!isCelsius)
     // Conversion of Kelvin to Fahrenheit temperature.
     {
       temperature = 1.8 * (temperature - 273) + 32;
