@@ -63,19 +63,16 @@ public class ModelAdapter<T extends WeatherViewModel>
     holder.itemView.setTag(mainModel);
   }
 
-  @VisibleForTesting
-  void populateTemperatureViews(ModelAdapter.ModelViewHolder holder, T mainModel) {
+  @VisibleForTesting void populateTemperatureViews(ModelAdapter.ModelViewHolder holder,
+      T mainModel) {
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
     boolean celsiusPreferred = prefs.getBoolean(SettingsActivity.PREF_TEMPERATURE_UNITS, true);
-    if (celsiusPreferred) {
-      holder.primaryTempTextView.setText(formatTemperature(mainModel.getTemperature(), false, "C"));
-      holder.secondaryTempTextView.setText(
-          formatTemperature(mainModel.getTemperature(), true, "F"));
-    } else {
-      holder.primaryTempTextView.setText(formatTemperature(mainModel.getTemperature(), true, "F"));
-      holder.secondaryTempTextView.setText(
-          formatTemperature(mainModel.getTemperature(), false, "C"));
-    }
+
+    final String celsiusText = formatTemperature(mainModel.getTemperature(), true, "C");
+    final String fahrenheitText = formatTemperature(mainModel.getTemperature(), false, "F");
+
+    holder.primaryTempTextView.setText(celsiusPreferred ? celsiusText : fahrenheitText);
+    holder.secondaryTempTextView.setText(celsiusPreferred ? fahrenheitText : celsiusText);
   }
 
   @Override public int getItemCount() {
@@ -98,8 +95,7 @@ public class ModelAdapter<T extends WeatherViewModel>
     }
   }
 
-  @VisibleForTesting
-  @NonNull Runnable createClickRunnable(@NonNull final View view) {
+  @VisibleForTesting @NonNull Runnable createClickRunnable(@NonNull final View view) {
     return new Runnable() {
       @Override public void run() {
         onItemClickListener.onItemClick(view, (WeatherViewModel) view.getTag());
