@@ -12,12 +12,13 @@ import org.rcgonzalezf.weather.common.models.ForecastData;
 import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
 import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback;
-import org.rcgonzalezf.weather.openweather.api.ForecastService;
+import org.rcgonzalezf.weather.openweather.api.OpenWeatherApiService;
 import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;
 import retrofit2.Call;
 import retrofit2.GsonConverterFactory;
 import retrofit2.Retrofit;
 
+import static org.rcgonzalezf.weather.openweather.api.OpenWeatherApiService.BASE_URL;
 import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder.LIKE;
 
 class OpenWeatherExecutor {
@@ -42,19 +43,19 @@ class OpenWeatherExecutor {
       @Override public void run() {
         OkHttpClient okClient = mWeatherLibApp.createOkHttpClient();
 
-        ForecastService service =
-            new Retrofit.Builder().baseUrl("http://api.openweathermap.org/data/2.5/")
+        OpenWeatherApiService service =
+            new Retrofit.Builder().baseUrl(BASE_URL)
                 .client(okClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
-                .create(ForecastService.class);
+                .create(OpenWeatherApiService.class);
 
         Call<OpenWeatherForecastData> forecastCall;
         if (mRequestParameters.getCityName() != null) {
-          forecastCall = service.findByQuery(mRequestParameters.getCityName(), LIKE, mApiKey);
+          forecastCall = service.findForecastFiveDaysByQuery(mRequestParameters.getCityName(), LIKE, mApiKey);
         } else {
           forecastCall =
-              service.findByLatLon(mRequestParameters.getLat(), mRequestParameters.getLon(),
+              service.findForecastFiveDaysByLatLon(mRequestParameters.getLat(), mRequestParameters.getLon(),
                   mApiKey);
         }
 
