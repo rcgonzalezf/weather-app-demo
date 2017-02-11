@@ -110,7 +110,11 @@ public class WeatherListActivity extends BaseActivity
 
   @Override public void onError(String error) {
     // TODO implement error handling
-    toggleProgressIndicator();
+    runOnUiThread(new Runnable() {
+      @Override public void run() {
+        toggleProgressIndicator();
+      }
+    });
 
     Log.d(TAG, error);
     trackOnActionEvent(new AnalyticsEvent(SEARCH_COMPLETED, "error: " + error));
