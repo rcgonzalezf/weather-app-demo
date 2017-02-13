@@ -6,7 +6,7 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 import org.rcgonzalezf.weather.common.listeners.OnUpdateWeatherListListener;
 import org.rcgonzalezf.weather.common.models.WeatherInfo;
-import org.rcgonzalezf.weather.common.models.ForecastMapper;
+import org.rcgonzalezf.weather.openweather.model.ForecastMapper;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiError;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiResponse;

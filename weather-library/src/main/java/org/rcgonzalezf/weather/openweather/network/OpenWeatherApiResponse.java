@@ -1,7 +1,7 @@
 package org.rcgonzalezf.weather.openweather.network;
 
 import java.util.List;
-import org.rcgonzalezf.weather.common.models.ForecastData;
+import org.rcgonzalezf.weather.openweather.model.ForecastData;
 import org.rcgonzalezf.weather.common.network.ApiResponse;
 
 public class OpenWeatherApiResponse implements ApiResponse {

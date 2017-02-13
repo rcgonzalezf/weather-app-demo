@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.rcgonzalezf.weather.BuildConfig;
 import org.rcgonzalezf.weather.common.listeners.OnUpdateWeatherListListener;
-import org.rcgonzalezf.weather.common.models.ForecastData;
+import org.rcgonzalezf.weather.openweather.model.ForecastData;
 import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback;
 import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;

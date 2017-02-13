@@ -8,7 +8,7 @@ import java.util.concurrent.Executor;
 import okhttp3.OkHttpClient;
 import org.rcgonzalezf.weather.R;
 import org.rcgonzalezf.weather.WeatherLibApp;
-import org.rcgonzalezf.weather.common.models.ForecastData;
+import org.rcgonzalezf.weather.openweather.model.ForecastData;
 import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
 import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback;

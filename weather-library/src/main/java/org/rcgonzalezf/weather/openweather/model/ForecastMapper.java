@@ -1,9 +1,10 @@
-package org.rcgonzalezf.weather.common.models;
+package org.rcgonzalezf.weather.openweather.model;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.List;
+import org.rcgonzalezf.weather.common.models.WeatherInfo;
 
 public class ForecastMapper {
 

@@ -1,9 +1,8 @@
-package org.rcgonzalezf.weather.common.models;
+package org.rcgonzalezf.weather.openweather.model;
 
 import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
-import org.rcgonzalezf.weather.openweather.model.City;
 
 public class ForecastData {
 

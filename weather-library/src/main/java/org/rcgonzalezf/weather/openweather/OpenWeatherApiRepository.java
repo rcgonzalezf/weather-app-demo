@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import java.util.List;
 import org.rcgonzalezf.weather.common.ServiceConfig;
 import org.rcgonzalezf.weather.common.WeatherRepository;
-import org.rcgonzalezf.weather.common.models.ForecastData;
+import org.rcgonzalezf.weather.openweather.model.ForecastData;
 import org.rcgonzalezf.weather.common.network.ApiRequest;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequest;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters;
