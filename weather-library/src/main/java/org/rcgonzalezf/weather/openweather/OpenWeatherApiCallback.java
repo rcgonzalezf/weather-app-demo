@@ -5,7 +5,7 @@ import android.util.Log;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import org.rcgonzalezf.weather.common.listeners.OnUpdateWeatherListListener;
-import org.rcgonzalezf.weather.common.models.Forecast;
+import org.rcgonzalezf.weather.common.models.WeatherInfo;
 import org.rcgonzalezf.weather.common.models.ForecastMapper;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiError;
@@ -33,9 +33,9 @@ public class OpenWeatherApiCallback
   void onSuccess(OpenWeatherApiResponse apiResponse,
       OnUpdateWeatherListListener onUpdateWeatherListListener) {
     if (onUpdateWeatherListListener != null) {
-      final List<Forecast> forecastList =
+      final List<WeatherInfo> weatherInfoList =
           new ForecastMapper().withData(apiResponse.getData()).map();
-      onUpdateWeatherListListener.updateList(forecastList);
+      onUpdateWeatherListListener.updateList(weatherInfoList);
     }
   }
 

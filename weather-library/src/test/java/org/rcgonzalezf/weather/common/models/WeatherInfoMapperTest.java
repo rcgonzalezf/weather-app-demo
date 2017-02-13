@@ -11,12 +11,12 @@ import org.rcgonzalezf.weather.openweather.model.City;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@RunWith(JUnit4.class) public class ForecastMapperTest {
+@RunWith(JUnit4.class) public class WeatherInfoMapperTest {
 
   ForecastMapper uut;
 
   private List<ForecastData> mData;
-  private List<Forecast> mDataMaped;
+  private List<WeatherInfo> mDataMaped;
 
   @Before public void initMapper() {
     uut = new ForecastMapper();

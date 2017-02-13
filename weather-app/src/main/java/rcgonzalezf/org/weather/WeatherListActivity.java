@@ -22,7 +22,7 @@ import java.util.Locale;
 import org.rcgonzalezf.weather.common.ServiceConfig;
 import org.rcgonzalezf.weather.common.WeatherRepository;
 import org.rcgonzalezf.weather.common.listeners.OnUpdateWeatherListListener;
-import org.rcgonzalezf.weather.common.models.Forecast;
+import org.rcgonzalezf.weather.common.models.WeatherInfo;
 import org.rcgonzalezf.weather.common.models.WeatherViewModel;
 import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters;
@@ -41,7 +41,7 @@ public class WeatherListActivity extends BaseActivity
   public static final String CITY_NAME_TO_SEARCH_ON_SWIPE = "mCityNameToSearchOnSwipe";
   private RecyclerView mRecyclerView;
   private SwipeRefreshLayout mSwipeToRefreshLayout;
-  private ModelAdapter<Forecast> mAdapter;
+  private ModelAdapter<WeatherInfo> mAdapter;
   private OpenWeatherApiCallback mOpenWeatherApiCallback;
   private CharSequence mCityNameToSearchOnSwipe;
   private ProgressBar mProgress;
@@ -90,10 +90,10 @@ public class WeatherListActivity extends BaseActivity
             viewModel.getDateTime(), viewModel.getDescription()), Toast.LENGTH_SHORT).show();
   }
 
-  @Override public void loadOldData(final List<Forecast> forecastList) {
-    if (forecastList != null && !forecastList.isEmpty()) {
-      notifyAdapter(forecastList);
-      trackOnActionEvent(new AnalyticsEvent(NO_NETWORK_SEARCH, forecastList.get(0).getCityName()));
+  @Override public void loadOldData(final List<WeatherInfo> weatherInfoList) {
+    if (weatherInfoList != null && !weatherInfoList.isEmpty()) {
+      notifyAdapter(weatherInfoList);
+      trackOnActionEvent(new AnalyticsEvent(NO_NETWORK_SEARCH, weatherInfoList.get(0).getCityName()));
     } else {
       Log.d(TAG, "No data even in offline mode :(");
       trackOnActionEvent(new AnalyticsEvent(NO_NETWORK_SEARCH, "EMPTY"));
@@ -102,10 +102,10 @@ public class WeatherListActivity extends BaseActivity
     }
   }
 
-  @Override public void updateList(@NonNull List<Forecast> forecastList) {
-    String cityName = forecastList.isEmpty() ? "" : forecastList.get(0).getCityName();
+  @Override public void updateList(@NonNull List<WeatherInfo> weatherInfoList) {
+    String cityName = weatherInfoList.isEmpty() ? "" : weatherInfoList.get(0).getCityName();
     trackOnActionEvent(new AnalyticsEvent(SEARCH_COMPLETED, "cityName: " + cityName));
-    notifyAdapter(forecastList);
+    notifyAdapter(weatherInfoList);
   }
 
   @Override public void onError(String error) {
@@ -176,19 +176,19 @@ public class WeatherListActivity extends BaseActivity
     return cityName;
   }
 
-  private void saveForecastList(final List<Forecast> forecastList) {
+  private void saveForecastList(final List<WeatherInfo> weatherInfoList) {
     new Thread(new Runnable() {
       @Override public void run() {
         SharedPreferences prefs = getSharedPreferences(OFFLINE_FILE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(FORECASTS, new Gson().toJson(forecastList));
+        editor.putString(FORECASTS, new Gson().toJson(weatherInfoList));
         editor.apply();
       }
     }).start();
   }
 
   private void setupRecyclerView() {
-    mAdapter = new ModelAdapter<>(new ArrayList<Forecast>(), this);
+    mAdapter = new ModelAdapter<>(new ArrayList<WeatherInfo>(), this);
     mAdapter.setOnItemClickListener(this);
 
     mRecyclerView = (RecyclerView) findViewById(R.id.main_recycler_view);
@@ -196,15 +196,15 @@ public class WeatherListActivity extends BaseActivity
     mRecyclerView.setAdapter(mAdapter);
   }
 
-  private void notifyAdapter(final List<Forecast> forecastList) {
-    saveForecastList(forecastList);
-    runOnUiThread(createNotifyRunnable(forecastList));
+  private void notifyAdapter(final List<WeatherInfo> weatherInfoList) {
+    saveForecastList(weatherInfoList);
+    runOnUiThread(createNotifyRunnable(weatherInfoList));
   }
 
-  @VisibleForTesting @NonNull Runnable createNotifyRunnable(final List<Forecast> forecastList) {
+  @VisibleForTesting @NonNull Runnable createNotifyRunnable(final List<WeatherInfo> weatherInfoList) {
     return new Runnable() {
       @Override public void run() {
-        mAdapter.setItems(forecastList);
+        mAdapter.setItems(weatherInfoList);
         mAdapter.notifyDataSetChanged();
         onItemsLoadComplete();
       }

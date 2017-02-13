@@ -2,9 +2,9 @@ package org.rcgonzalezf.weather.common.models;
 
 import android.os.Parcel;
 
-public final class Forecast implements WeatherViewModel {
+public final class WeatherInfo implements WeatherViewModel {
 
-  public Forecast() {
+  public WeatherInfo() {
   }
 
   private int mWeatherId;
@@ -35,17 +35,17 @@ public final class Forecast implements WeatherViewModel {
     dest.writeString(getDescription());
   }
 
-  public static final Creator<Forecast> CREATOR = new Creator<Forecast>() {
-    public Forecast createFromParcel(Parcel in) {
-      return new Forecast(in);
+  public static final Creator<WeatherInfo> CREATOR = new Creator<WeatherInfo>() {
+    public WeatherInfo createFromParcel(Parcel in) {
+      return new WeatherInfo(in);
     }
 
-    public Forecast[] newArray(int size) {
-      return new Forecast[size];
+    public WeatherInfo[] newArray(int size) {
+      return new WeatherInfo[size];
     }
   };
 
-  private Forecast(Parcel in) {
+  private WeatherInfo(Parcel in) {
     mCityId = in.readInt();
     mCityName = in.readString();
     mSpeed = in.readDouble();
@@ -142,23 +142,23 @@ public final class Forecast implements WeatherViewModel {
     if (this == other) return true;
     if (other == null || getClass() != other.getClass()) return false;
 
-    Forecast forecast = (Forecast) other;
+    WeatherInfo weatherInfo = (WeatherInfo) other;
 
-    if (mWeatherId != forecast.mWeatherId) return false;
-    if (mCityId != forecast.mCityId) return false;
-    if (Double.compare(forecast.mSpeed, mSpeed) != 0) return false;
-    if (Double.compare(forecast.mTemp, mTemp) != 0) return false;
-    if (Double.compare(forecast.mDeg, mDeg) != 0) return false;
-    if (!mCityName.equals(forecast.mCityName)) return false;
-    if (mHumidity != null ? !mHumidity.equals(forecast.mHumidity) : forecast.mHumidity != null) {
+    if (mWeatherId != weatherInfo.mWeatherId) return false;
+    if (mCityId != weatherInfo.mCityId) return false;
+    if (Double.compare(weatherInfo.mSpeed, mSpeed) != 0) return false;
+    if (Double.compare(weatherInfo.mTemp, mTemp) != 0) return false;
+    if (Double.compare(weatherInfo.mDeg, mDeg) != 0) return false;
+    if (!mCityName.equals(weatherInfo.mCityName)) return false;
+    if (mHumidity != null ? !mHumidity.equals(weatherInfo.mHumidity) : weatherInfo.mHumidity != null) {
       return false;
     }
-    if (mDateTime != null ? !mDateTime.equals(forecast.mDateTime) : forecast.mDateTime != null) {
+    if (mDateTime != null ? !mDateTime.equals(weatherInfo.mDateTime) : weatherInfo.mDateTime != null) {
       return false;
     }
-    if (!mCountry.equals(forecast.mCountry)) return false;
-    return mDescription != null ? mDescription.equals(forecast.mDescription)
-        : forecast.mDescription == null;
+    if (!mCountry.equals(weatherInfo.mCountry)) return false;
+    return mDescription != null ? mDescription.equals(weatherInfo.mDescription)
+        : weatherInfo.mDescription == null;
   }
 
   @Override public int hashCode() {

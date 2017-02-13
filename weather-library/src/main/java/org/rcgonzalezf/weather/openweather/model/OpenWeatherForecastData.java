@@ -2,7 +2,7 @@ package org.rcgonzalezf.weather.openweather.model;
 
 import com.google.gson.annotations.SerializedName;
 import org.rcgonzalezf.weather.openweather.converter.Data;
-// Gson
+
 @SuppressWarnings("unused")
 public class OpenWeatherForecastData implements Data {
 

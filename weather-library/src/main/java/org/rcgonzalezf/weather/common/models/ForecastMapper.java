@@ -17,42 +17,42 @@ public class ForecastMapper {
     return this;
   }
 
-  public @NonNull List<Forecast> map() {
+  public @NonNull List<WeatherInfo> map() {
     return map(ALL);
   }
 
   @VisibleForTesting
-  @NonNull List<Forecast> map(int howMany) {
+  @NonNull List<WeatherInfo> map(int howMany) {
     int size = 10;
     if(howMany == ALL) {
       size = INITIAL_SIZE * mData.size();
     }
     int counter = 0;
-    List<Forecast> forecastList = new ArrayList<>(size);
+    List<WeatherInfo> weatherInfoList = new ArrayList<>(size);
     for (ForecastData forecastData : mData) {
 
       for (WeatherData weather : forecastData.getWeatherList()) {
-        Forecast forecast = new Forecast();
-        forecast.setCityId(forecastData.getCity().getId());
-        forecast.setCityName(forecastData.getCity().getName());
-        forecast.setSpeed(weather.getSpeed());
-        forecast.setTemperature(weather.getTemp());
-        forecast.setHumidity(String.valueOf(weather.getHumidity()));
-        forecast.setDateTime(weather.getDateTime());
-        forecast.setWeatherId(weather.getWeatherId());
-        forecast.setCountry(forecastData.getCity().getCountry());
-        forecast.setDeg(weather.getDeg());
-        forecast.setDescription(weather.getDescription());
+        WeatherInfo weatherInfo = new WeatherInfo();
+        weatherInfo.setCityId(forecastData.getCity().getId());
+        weatherInfo.setCityName(forecastData.getCity().getName());
+        weatherInfo.setSpeed(weather.getSpeed());
+        weatherInfo.setTemperature(weather.getTemp());
+        weatherInfo.setHumidity(String.valueOf(weather.getHumidity()));
+        weatherInfo.setDateTime(weather.getDateTime());
+        weatherInfo.setWeatherId(weather.getWeatherId());
+        weatherInfo.setCountry(forecastData.getCity().getCountry());
+        weatherInfo.setDeg(weather.getDeg());
+        weatherInfo.setDescription(weather.getDescription());
 
-        forecastList.add(forecast);
+        weatherInfoList.add(weatherInfo);
         ++counter;
         if(counter == howMany) {
-          return forecastList;
+          return weatherInfoList;
         }
 
       }
 
     }
-    return forecastList;
+    return weatherInfoList;
   }
 }

@@ -32,7 +32,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.rcgonzalezf.weather.common.ServiceConfig;
 import org.rcgonzalezf.weather.common.WeatherRepository;
-import org.rcgonzalezf.weather.common.models.Forecast;
+import org.rcgonzalezf.weather.common.models.WeatherInfo;
 import org.rcgonzalezf.weather.common.models.WeatherViewModel;
 import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters;
@@ -54,7 +54,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   @SuppressWarnings("unused") @Mocked private BaseActivity mBaseActivity;
   @SuppressWarnings("unused") @Mocked private ProgressBar mProgress;
   @SuppressWarnings("unused") @Mocked private RecyclerView mRecyclerView;
-  @SuppressWarnings("unused") @Mocked private ModelAdapter<Forecast> mAdapter;
+  @SuppressWarnings("unused") @Mocked private ModelAdapter<WeatherInfo> mAdapter;
   @SuppressWarnings("unused") @Mocked private OpenWeatherApiCallback mOpenWeatherApiCallback;
   @SuppressWarnings("unused") @Mocked private SwipeRefreshLayout mSwipeToRefreshLayout;
 
@@ -67,7 +67,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   @SuppressWarnings("unused") @Mocked private ServiceConfig mServiceConfig;
   @SuppressWarnings("unused") @Mocked private AnalyticsEvent mAnalyticsEvent;
 
-  private List<Forecast> mForecastList;
+  private List<WeatherInfo> mWeatherInfoList;
   private String mQuery;
   private Runnable mNotifyAdapterRunnable;
   private SwipeRefreshLayout.OnRefreshListener mSwipeToRefreshListener;
@@ -100,7 +100,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   @After public void clearEverything() {
     uut = null;
-    mForecastList = null;
+    mWeatherInfoList = null;
     mNotifyAdapterRunnable = null;
     mBaseActivity = null;
   }
@@ -389,7 +389,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   private void thenNotifyAdapterRunnableShouldBeCreated() {
     new Verifications() {{
-      uut.createNotifyRunnable(withAny(mForecastList));
+      uut.createNotifyRunnable(withAny(mWeatherInfoList));
     }};
   }
 
@@ -404,7 +404,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   private void givenNotifyRunnable() {
-    mNotifyAdapterRunnable = uut.createNotifyRunnable(mForecastList);
+    mNotifyAdapterRunnable = uut.createNotifyRunnable(mWeatherInfoList);
   }
 
   private void thenBuilderShouldAddLatLon(final double givenLat, final double givenLon) {
@@ -444,7 +444,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   private void whenUpdatingList() {
-    uut.updateList(mForecastList);
+    uut.updateList(mWeatherInfoList);
   }
 
   private void thenLogDataShouldBeWritten(final String message) {
@@ -460,17 +460,17 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   private void whenLoadingOldData() {
-    uut.loadOldData(mForecastList);
+    uut.loadOldData(mWeatherInfoList);
   }
 
   private void givenForecastElement(String cityName) {
-    Forecast forecast = new Forecast();
-    forecast.setCityName(cityName);
-    mForecastList.add(forecast);
+    WeatherInfo weatherInfo = new WeatherInfo();
+    weatherInfo.setCityName(cityName);
+    mWeatherInfoList.add(weatherInfo);
   }
 
   private void givenForecastList() {
-    mForecastList = new ArrayList<>();
+    mWeatherInfoList = new ArrayList<>();
   }
 
   private void givenStringResource() {
@@ -513,7 +513,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   private void thenAdapterShouldBeInitialized() {
     new Verifications() {{
-      new ModelAdapter<>(new ArrayList<Forecast>(), uut);
+      new ModelAdapter<>(new ArrayList<WeatherInfo>(), uut);
       mAdapter.setOnItemClickListener(uut);
     }};
   }
