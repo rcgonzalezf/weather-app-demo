@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.LinkedList;
 import java.util.List;
+import org.rcgonzalezf.weather.common.models.converter.Data;
 import org.rcgonzalezf.weather.openweather.model.ForecastData;
 import org.rcgonzalezf.weather.openweather.model.ForecastDataBuilder;
 import org.rcgonzalezf.weather.openweather.model.WeatherData;
@@ -21,16 +22,16 @@ public class OpenWeatherApiModelConverter implements ModelConverter<OpenWeatherF
     mOpenWeatherForecastData = pojo;
   }
 
-  @Override public List<ForecastData> getModel() throws IOException {
+  @Override public List<Data> getModel() throws IOException {
 
-    List<ForecastData> forecastData = new LinkedList<>();
+    List<Data> forecastData = new LinkedList<>();
     if (mOpenWeatherForecastData != null) {
       forecastData = populateFromPojo(forecastData);
     }
     return forecastData;
   }
 
-  private @Nullable List<ForecastData> populateFromPojo(List<ForecastData> forecastData) {
+  private @Nullable List<Data> populateFromPojo(List<Data> forecastData) {
 
     if (mOpenWeatherForecastData.getWeatherList() != null
         && mOpenWeatherForecastData.getWeatherList().size() > 0) {

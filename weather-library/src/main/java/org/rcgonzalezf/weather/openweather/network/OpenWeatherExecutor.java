@@ -8,6 +8,7 @@ import java.util.concurrent.Executor;
 import okhttp3.OkHttpClient;
 import org.rcgonzalezf.weather.R;
 import org.rcgonzalezf.weather.WeatherLibApp;
+import org.rcgonzalezf.weather.common.models.converter.Data;
 import org.rcgonzalezf.weather.openweather.model.ForecastData;
 import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
@@ -80,7 +81,7 @@ class OpenWeatherExecutor {
   private void convertToModel(OpenWeatherForecastData openWeatherForecastData) throws IOException {
 
     mConverter.fromPojo(openWeatherForecastData);
-    List<ForecastData> forecastData = mConverter.getModel();
+    List<Data> forecastData = mConverter.getModel();
 
     if (forecastData != null && !forecastData.isEmpty()) {
       final OpenWeatherApiResponse response = new OpenWeatherApiResponse();

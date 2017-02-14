@@ -7,15 +7,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.rcgonzalezf.weather.common.models.WeatherInfo;
+import org.rcgonzalezf.weather.common.models.converter.Data;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(JUnit4.class) public class WeatherInfoMapperTest {
 
-  ForecastMapper uut;
+  private ForecastMapper uut;
 
-  private List<ForecastData> mData;
+  private List<Data> mData;
   private List<WeatherInfo> mDataMaped;
 
   @Before public void initMapper() {
@@ -68,7 +69,7 @@ import static org.junit.Assert.assertNotNull;
   private void givenWeatherData(int times) {
     for (int i = 0; i < times; ++i) {
       WeatherData weatherData = new WeatherData();
-      mData.get(0).addWeatherItem(weatherData);
+      ((ForecastData) mData.get(0)).addWeatherItem(weatherData);
     }
   }
 

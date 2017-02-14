@@ -11,9 +11,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.rcgonzalezf.weather.BuildConfig;
 import org.rcgonzalezf.weather.R;
+import org.rcgonzalezf.weather.common.models.converter.Data;
 import org.rcgonzalezf.weather.openweather.model.ForecastData;
-import org.rcgonzalezf.weather.openweather.model.WeatherData;
 import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;
+import org.rcgonzalezf.weather.openweather.model.WeatherData;
 import org.rcgonzalezf.weather.tests.ConverterHelperTest;
 import org.rcgonzalezf.weather.tests.WeatherTestLibApp;
 import org.robolectric.RobolectricTestRunner;
@@ -29,7 +30,7 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
 
   private OpenWeatherApiModelConverter uut;
   private OpenWeatherForecastData openWeatherForecastData;
-  private List<ForecastData> mModel;
+  private List<Data> mModel;
   private ForecastData mForecastData;
   private WeatherData mWeatherData;
 
@@ -202,7 +203,7 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
 
   private void thenShouldHaveFortyForecastDataElements() {
     assertEquals(40, mModel.size());
-    mForecastData = mModel.get(0);
+    mForecastData = (ForecastData) mModel.get(0);
   }
 
   private void whenGenerateModel() throws IOException {
