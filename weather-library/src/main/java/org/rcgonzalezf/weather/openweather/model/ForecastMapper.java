@@ -5,16 +5,15 @@ import android.support.annotation.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.List;
 import org.rcgonzalezf.weather.common.models.WeatherInfo;
-import org.rcgonzalezf.weather.common.models.converter.Data;
 
 public class ForecastMapper {
 
   private static final int ALL = -1;
-  private List<Data> mData;
+  private List<ForecastData> mData;
   // I've found that most cases the forecast consists of 40 items
   private static final int INITIAL_SIZE = 40;
 
-  public ForecastMapper withData(@NonNull List<Data> data) {
+  public ForecastMapper withData(@NonNull List<ForecastData> data) {
     mData = data;
     return this;
   }
@@ -30,8 +29,7 @@ public class ForecastMapper {
     }
     int counter = 0;
     List<WeatherInfo> weatherInfoList = new ArrayList<>(size);
-    for (Data data : mData) {
-      ForecastData forecastData = (ForecastData) data;
+    for (ForecastData forecastData : mData) {
 
       for (WeatherData weather : forecastData.getWeatherList()) {
         WeatherInfo weatherInfo = new WeatherInfo();

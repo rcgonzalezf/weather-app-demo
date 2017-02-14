@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.rcgonzalezf.weather.BuildConfig;
 import org.rcgonzalezf.weather.R;
-import org.rcgonzalezf.weather.common.models.converter.Data;
 import org.rcgonzalezf.weather.openweather.model.ForecastData;
 import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;
 import org.rcgonzalezf.weather.openweather.model.WeatherData;
@@ -30,7 +29,7 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
 
   private OpenWeatherApiModelConverter uut;
   private OpenWeatherForecastData openWeatherForecastData;
-  private List<Data> mModel;
+  private List<ForecastData> mModel;
   private ForecastData mForecastData;
   private WeatherData mWeatherData;
 
@@ -203,12 +202,12 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
 
   private void thenShouldHaveFortyForecastDataElements() {
     assertEquals(40, mModel.size());
-    mForecastData = (ForecastData) mModel.get(0);
+    mForecastData = mModel.get(0);
   }
 
   private void whenGenerateModel() throws IOException {
     uut.fromPojo(openWeatherForecastData);
-    mModel = uut.getModel();
+    mModel = uut.getForecastModel();
   }
 
   private void givenInputStreamByCityIdMoscow() throws IOException {

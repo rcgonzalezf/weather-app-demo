@@ -4,15 +4,15 @@ import java.util.List;
 import org.rcgonzalezf.weather.common.models.converter.Data;
 import org.rcgonzalezf.weather.common.network.ApiResponse;
 
-public class OpenWeatherApiResponse implements ApiResponse {
+public class OpenWeatherApiResponse<D extends Data> implements ApiResponse<D> {
 
-  private List<Data> mForecastData;
+  private List<D> mForecastData;
 
-  @Override public List<Data> getData() {
+  @Override public List<D> getData() {
     return mForecastData;
   }
 
-  public void setData(List<Data> data) {
+  public void setData(List<D> data) {
     mForecastData = data;
   }
 }

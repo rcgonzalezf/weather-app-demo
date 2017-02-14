@@ -7,12 +7,13 @@ import java.util.List;
 import org.rcgonzalezf.weather.common.listeners.OnUpdateWeatherListListener;
 import org.rcgonzalezf.weather.common.models.WeatherInfo;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
+import org.rcgonzalezf.weather.openweather.model.ForecastData;
 import org.rcgonzalezf.weather.openweather.model.ForecastMapper;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiError;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiResponse;
 
 public class OpenWeatherApiCallback
-    implements ApiCallback<OpenWeatherApiResponse, OpenWeatherApiError> {
+    implements ApiCallback<OpenWeatherApiResponse<ForecastData>, OpenWeatherApiError> {
 
   private static final String TAG = OpenWeatherApiCallback.class.getSimpleName();
 
@@ -23,14 +24,14 @@ public class OpenWeatherApiCallback
         new WeakReference<>(onUpdateWeatherListListener);
   }
 
-  @Override public void onSuccess(OpenWeatherApiResponse apiResponse) {
+  @Override public void onSuccess(OpenWeatherApiResponse<ForecastData> apiResponse) {
     OnUpdateWeatherListListener onUpdateWeatherListListener =
         mOnUpdateWeatherListListenerWeakReference.get();
     onSuccess(apiResponse, onUpdateWeatherListListener);
   }
 
   @VisibleForTesting
-  void onSuccess(OpenWeatherApiResponse apiResponse,
+  void onSuccess(OpenWeatherApiResponse<ForecastData> apiResponse,
       OnUpdateWeatherListListener onUpdateWeatherListListener) {
     if (onUpdateWeatherListListener != null) {
       final List<WeatherInfo> weatherInfoList =

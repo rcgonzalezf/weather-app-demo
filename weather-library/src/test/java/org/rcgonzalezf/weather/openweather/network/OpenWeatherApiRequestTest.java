@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.rcgonzalezf.weather.BuildConfig;
 import org.rcgonzalezf.weather.common.listeners.OnUpdateWeatherListListener;
-import org.rcgonzalezf.weather.common.models.converter.Data;
 import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback;
 import org.rcgonzalezf.weather.openweather.model.ForecastData;
@@ -32,7 +31,7 @@ public class OpenWeatherApiRequestTest {
   private OpenWeatherApiCallback mTestApiCallback;
   private boolean mIsSuccess;
   private boolean mIsError;
-  @Mock private ModelConverter<OpenWeatherForecastData> mModelConverter;
+  @Mock private ModelConverter<OpenWeatherForecastData, ForecastData> mModelConverter;
 
   @Before public void createApiRequestBaseObject() {
     MockitoAnnotations.initMocks(this);
@@ -80,11 +79,11 @@ public class OpenWeatherApiRequestTest {
   }
 
   private void givenInvalidRequestReturningException() throws IOException {
-    when(mModelConverter.getModel()).thenThrow(new IOException("someExec"));
+    when(mModelConverter.getForecastModel()).thenThrow(new IOException("someExec"));
   }
 
   private void givenInvalidRequestReturningEmpty() throws IOException {
-    when(mModelConverter.getModel()).thenReturn(new ArrayList<Data>());
+    when(mModelConverter.getForecastModel()).thenReturn(new ArrayList<ForecastData>());
   }
 
   private void thenCallbackShouldBeError() {
@@ -92,7 +91,7 @@ public class OpenWeatherApiRequestTest {
   }
 
   private void givenInvalidRequestReturningNull() throws IOException {
-    when(mModelConverter.getModel()).thenReturn(null);
+    when(mModelConverter.getForecastModel()).thenReturn(null);
   }
 
   private void whenExecuting() {
@@ -104,7 +103,7 @@ public class OpenWeatherApiRequestTest {
   }
 
   private void givenValidRequestReturningModel() throws IOException {
-    when(mModelConverter.getModel()).thenReturn(new ArrayList<Data>() {{
+    when(mModelConverter.getForecastModel()).thenReturn(new ArrayList<ForecastData>() {{
       add(mock(ForecastData.class));
     }});
   }

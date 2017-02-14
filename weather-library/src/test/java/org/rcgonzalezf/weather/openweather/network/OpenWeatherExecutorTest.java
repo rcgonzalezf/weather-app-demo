@@ -9,6 +9,7 @@ import org.mockito.MockitoAnnotations;
 import org.rcgonzalezf.weather.BuildConfig;
 import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback;
+import org.rcgonzalezf.weather.openweather.model.ForecastData;
 import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;
 import org.rcgonzalezf.weather.tests.TestExecutor;
 import org.rcgonzalezf.weather.tests.WeatherTestLibApp;
@@ -29,7 +30,7 @@ public class OpenWeatherExecutorTest {
   private Executor mExecutor;
   private OpenWeatherApiRequestParameters mRequestParameters;
 
-  @Mock private ModelConverter<OpenWeatherForecastData> mModelConverter;
+  @Mock private ModelConverter<OpenWeatherForecastData, ForecastData> mModelConverter;
 
   @Before public void createOpenWeatherExecutor() {
     MockitoAnnotations.initMocks(this);

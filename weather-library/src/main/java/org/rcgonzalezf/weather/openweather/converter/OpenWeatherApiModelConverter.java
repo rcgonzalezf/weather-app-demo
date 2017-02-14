@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.LinkedList;
 import java.util.List;
-import org.rcgonzalezf.weather.common.models.converter.Data;
 import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.openweather.model.ForecastData;
 import org.rcgonzalezf.weather.openweather.model.ForecastDataBuilder;
@@ -14,7 +13,7 @@ import org.rcgonzalezf.weather.openweather.model.Weather;
 import org.rcgonzalezf.weather.openweather.model.WeatherData;
 import org.rcgonzalezf.weather.openweather.model.WeatherList;
 
-public class OpenWeatherApiModelConverter implements ModelConverter<OpenWeatherForecastData> {
+public class OpenWeatherApiModelConverter implements ModelConverter<OpenWeatherForecastData, ForecastData> {
 
   private OpenWeatherForecastData mOpenWeatherForecastData;
 
@@ -22,16 +21,16 @@ public class OpenWeatherApiModelConverter implements ModelConverter<OpenWeatherF
     mOpenWeatherForecastData = pojo;
   }
 
-  @Override public List<Data> getModel() throws IOException {
+  @Override public List<ForecastData> getForecastModel() throws IOException {
 
-    List<Data> forecastData = new LinkedList<>();
+    List<ForecastData> forecastData = new LinkedList<>();
     if (mOpenWeatherForecastData != null) {
       forecastData = populateFromPojo(forecastData);
     }
     return forecastData;
   }
 
-  private @Nullable List<Data> populateFromPojo(List<Data> forecastData) {
+  private @Nullable List<ForecastData> populateFromPojo(List<ForecastData> forecastData) {
 
     if (mOpenWeatherForecastData.getWeatherList() != null
         && mOpenWeatherForecastData.getWeatherList().size() > 0) {
