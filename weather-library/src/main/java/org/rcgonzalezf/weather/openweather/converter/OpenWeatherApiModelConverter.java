@@ -6,12 +6,12 @@ import java.net.HttpURLConnection;
 import java.util.LinkedList;
 import java.util.List;
 import org.rcgonzalezf.weather.common.models.converter.Data;
+import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.openweather.model.ForecastData;
 import org.rcgonzalezf.weather.openweather.model.ForecastDataBuilder;
-import org.rcgonzalezf.weather.openweather.model.WeatherData;
-import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;
 import org.rcgonzalezf.weather.openweather.model.Weather;
+import org.rcgonzalezf.weather.openweather.model.WeatherData;
 import org.rcgonzalezf.weather.openweather.model.WeatherList;
 
 public class OpenWeatherApiModelConverter implements ModelConverter<OpenWeatherForecastData> {
