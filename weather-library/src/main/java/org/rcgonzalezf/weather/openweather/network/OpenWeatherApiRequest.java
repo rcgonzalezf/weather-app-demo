@@ -8,13 +8,14 @@ import org.rcgonzalezf.weather.common.network.ApiRequest;
 import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback;
 import org.rcgonzalezf.weather.openweather.converter.OpenWeatherApiModelConverter;
 import org.rcgonzalezf.weather.openweather.model.ForecastData;
+import org.rcgonzalezf.weather.openweather.model.OpenWeatherCurrentData;
 import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;
 
 public class OpenWeatherApiRequest
     implements ApiRequest<OpenWeatherApiRequestParameters, OpenWeatherApiCallback> {
 
   private final String mApiKey;
-  private final ModelConverter<OpenWeatherForecastData, ForecastData> mModelConverter;
+  private final ModelConverter<OpenWeatherForecastData, ForecastData, OpenWeatherCurrentData> mModelConverter;
   private OpenWeatherApiRequestParameters mRequestParameters;
 
   public OpenWeatherApiRequest(String apiKey) {
@@ -22,7 +23,7 @@ public class OpenWeatherApiRequest
   }
 
   @VisibleForTesting OpenWeatherApiRequest(String apiKey,
-      ModelConverter<OpenWeatherForecastData, ForecastData> modelConverter) {
+      ModelConverter<OpenWeatherForecastData, ForecastData, OpenWeatherCurrentData> modelConverter) {
     mApiKey = apiKey;
     mModelConverter = modelConverter;
   }

@@ -1,5 +1,6 @@
 package org.rcgonzalezf.weather.openweather.api;
 
+import org.rcgonzalezf.weather.openweather.model.OpenWeatherCurrentData;
 import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -33,10 +34,10 @@ public interface OpenWeatherApiService {
    */
 
   // "http://api.openweathermap.org/data/2.5/weather?lon=139.0&lat=35.0&APPID=someApiKey",
-  @GET("weather") Call<OpenWeatherForecastData> findWeatherByLatLon(@Query(LAT) String lat,
+  @GET("weather") Call<OpenWeatherCurrentData> findWeatherByLatLon(@Query(LAT) String lat,
       @Query(LON) String lon, @Query(APP_ID) String appId);
 
   // "http://api.openweathermap.org/data/2.5/weather?q=London&type=like&APPID=someApiKey",
-  @GET("weather") Call<OpenWeatherForecastData> findWeatherByQuery(@Query("q") String query,
+  @GET("weather") Call<OpenWeatherCurrentData> findWeatherByQuery(@Query("q") String query,
       @Query(TYPE) String type, @Query(APP_ID) String appId);
 }

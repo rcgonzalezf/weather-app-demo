@@ -12,6 +12,7 @@ import org.rcgonzalezf.weather.common.listeners.OnUpdateWeatherListListener;
 import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback;
 import org.rcgonzalezf.weather.openweather.model.ForecastData;
+import org.rcgonzalezf.weather.openweather.model.OpenWeatherCurrentData;
 import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;
 import org.rcgonzalezf.weather.tests.TestExecutor;
 import org.rcgonzalezf.weather.tests.WeatherTestLibApp;
@@ -31,7 +32,7 @@ public class OpenWeatherApiRequestTest {
   private OpenWeatherApiCallback mTestApiCallback;
   private boolean mIsSuccess;
   private boolean mIsError;
-  @Mock private ModelConverter<OpenWeatherForecastData, ForecastData> mModelConverter;
+  @Mock private ModelConverter<OpenWeatherForecastData, ForecastData, OpenWeatherCurrentData> mModelConverter;
 
   @Before public void createApiRequestBaseObject() {
     MockitoAnnotations.initMocks(this);

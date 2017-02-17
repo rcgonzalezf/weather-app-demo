@@ -206,7 +206,7 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
   }
 
   private void whenGenerateModel() throws IOException {
-    uut.fromPojo(openWeatherForecastData);
+    uut.fromForecastPojo(openWeatherForecastData);
     mModel = uut.getForecastModel();
   }
 
