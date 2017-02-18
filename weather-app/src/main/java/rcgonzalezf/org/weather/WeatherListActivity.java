@@ -77,9 +77,12 @@ public class WeatherListActivity extends BaseActivity
     }
   }
 
-  private void toggleProgressIndicator() {
-    if (mProgress.getVisibility() == View.VISIBLE) mProgress.setVisibility(View.GONE);
-    else mProgress.setVisibility(View.VISIBLE);
+  @VisibleForTesting void toggleProgressIndicator() {
+    if (mProgress.getVisibility() == View.VISIBLE) {
+      mProgress.setVisibility(View.GONE);
+    } else {
+      mProgress.setVisibility(View.VISIBLE);
+    }
   }
 
   @Override public void onEnterAnimationComplete() {
@@ -96,7 +99,8 @@ public class WeatherListActivity extends BaseActivity
   @Override public void loadOldData(final List<WeatherInfo> weatherInfoList) {
     if (weatherInfoList != null && !weatherInfoList.isEmpty()) {
       notifyAdapter(weatherInfoList);
-      trackOnActionEvent(new AnalyticsEvent(NO_NETWORK_SEARCH, weatherInfoList.get(0).getCityName()));
+      trackOnActionEvent(
+          new AnalyticsEvent(NO_NETWORK_SEARCH, weatherInfoList.get(0).getCityName()));
     } else {
       Log.d(TAG, "No data even in offline mode :(");
       trackOnActionEvent(new AnalyticsEvent(NO_NETWORK_SEARCH, "EMPTY"));
@@ -113,11 +117,7 @@ public class WeatherListActivity extends BaseActivity
 
   @Override public void onError(String error) {
     // TODO implement error handling
-    runOnUiThread(new Runnable() {
-      @Override public void run() {
-        toggleProgressIndicator();
-      }
-    });
+    runOnUiThread(createRunnableToggleProgressIndicator());
 
     Log.d(TAG, error);
     trackOnActionEvent(new AnalyticsEvent(SEARCH_COMPLETED, "error: " + error));
@@ -204,7 +204,8 @@ public class WeatherListActivity extends BaseActivity
     runOnUiThread(createNotifyRunnable(weatherInfoList));
   }
 
-  @VisibleForTesting @NonNull Runnable createNotifyRunnable(final List<WeatherInfo> weatherInfoList) {
+  @VisibleForTesting @NonNull Runnable createNotifyRunnable(
+      final List<WeatherInfo> weatherInfoList) {
     return new Runnable() {
       @Override public void run() {
         mAdapter.setItems(weatherInfoList);
@@ -218,6 +219,14 @@ public class WeatherListActivity extends BaseActivity
     return new SwipeRefreshLayout.OnRefreshListener() {
       @Override public void onRefresh() {
         searchByManualInput(mCityNameToSearchOnSwipe);
+      }
+    };
+  }
+
+  @VisibleForTesting @NonNull Runnable createRunnableToggleProgressIndicator() {
+    return new Runnable() {
+      @Override public void run() {
+        toggleProgressIndicator();
       }
     };
   }

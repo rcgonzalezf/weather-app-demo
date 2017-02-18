@@ -298,6 +298,29 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenShouldSetVisible();
   }
 
+  @Test public void shouldToggleProgressIndicatorOnError() {
+    givenActivityCreated(null);
+    Runnable runnable = givenToggleRunnable();
+
+    whenRunningToggleRunnable(runnable);
+
+    thenShouldToggleProgressIndicator();
+  }
+
+  private void thenShouldToggleProgressIndicator() {
+    new Verifications() {{
+      uut.toggleProgressIndicator();
+    }};
+  }
+
+  private void whenRunningToggleRunnable(Runnable runnable) {
+    runnable.run();
+  }
+
+  private Runnable givenToggleRunnable() {
+    return uut.createRunnableToggleProgressIndicator();
+  }
+
   private void thenSharedPreferencesShouldSaveTheList() {
     new Verifications() {{
       mSharedPreferencesEditor.putString(withEqual(FORECASTS), withAny(""));
