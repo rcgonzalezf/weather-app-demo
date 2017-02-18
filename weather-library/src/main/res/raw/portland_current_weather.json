@@ -1,0 +1,44 @@
+{
+  coord: {
+    lon: -122.68,
+    lat: 45.52
+  },
+  weather: [
+    {
+      id: 500,
+      main: "Rain",
+      description: "light rain",
+      icon: "10n"
+    }
+  ],
+  base: "stations",
+  main: {
+    temp: 276.751,
+    pressure: 1003.22,
+    humidity: 100,
+    temp_min: 276.751,
+    temp_max: 276.751,
+    sea_level: 1039.21,
+    grnd_level: 1003.22
+  },
+  wind: {
+    speed: 2.21,
+    deg: 230.504
+  },
+  rain: {
+    3h: 1.08
+  },
+  clouds: {
+    all: 92
+  },
+  dt: 1486803395,
+  sys: {
+    message: 0.0111,
+    country: "US",
+    sunrise: 1486826243,
+    sunset: 1486863188
+  },
+  id: 5746545,
+  name: "Portland",
+  cod: 200
+}

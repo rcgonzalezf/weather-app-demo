@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.rcgonzalezf.weather.BuildConfig;
 import org.rcgonzalezf.weather.R;
 import org.rcgonzalezf.weather.openweather.model.ForecastData;
+import org.rcgonzalezf.weather.openweather.model.OpenWeatherCurrentData;
 import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;
 import org.rcgonzalezf.weather.openweather.model.WeatherData;
 import org.rcgonzalezf.weather.tests.ConverterHelperTest;
@@ -28,7 +29,8 @@ import static org.mockito.Mockito.spy;
 public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
 
   private OpenWeatherApiModelConverter uut;
-  private OpenWeatherForecastData openWeatherForecastData;
+  private OpenWeatherForecastData mOpenWeatherForecastData;
+  private OpenWeatherCurrentData mOpenWeatherCurrentData;
   private List<ForecastData> mModel;
   private ForecastData mForecastData;
   private WeatherData mWeatherData;
@@ -41,9 +43,9 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
   @Test public void shouldReturnModelWithOneCountryGivenInputStreamByCityIdMoscow()
       throws IOException {
     givenInputStreamByCityIdMoscow();
-    givenPojo();
+    givenForecastPojo();
 
-    whenGenerateModel();
+    whenGenerateForecastModel();
 
     thenShouldHaveFortyForecastDataElements();
   }
@@ -51,9 +53,9 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
   @Test public void shouldReturnModelWithValuesForGivenCountryInputStreamByCityIdMoscow()
       throws IOException {
     givenInputStreamByCityIdMoscow();
-    givenPojo();
+    givenForecastPojo();
 
-    whenGenerateModel();
+    whenGenerateForecastModel();
 
     thenShouldHaveFortyForecastDataElements();
     thenShouldHaveWeatherListCountOf(40);
@@ -69,9 +71,9 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
   @Test public void shouldReturnModelWithValuesForCountriesInputStreamFoundByName()
       throws IOException {
     givenInputStreamByCityNameLondon();
-    givenPojo();
+    givenForecastPojo();
 
-    whenGenerateModel();
+    whenGenerateForecastModel();
 
     thenShouldHaveFortyForecastDataElements();
     thenShouldHaveWeatherListCountOf(40);
@@ -87,9 +89,9 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
   @Test public void shouldReturnModelWithValuesForCountriesInputStreamFoundByLatLon()
       throws IOException {
     givenInputStreamByLatLon();
-    givenPojo();
+    givenForecastPojo();
 
-    whenGenerateModel();
+    whenGenerateForecastModel();
 
     thenShouldHaveFortyForecastDataElements();
     thenShouldHaveWeatherListCountOf(40);
@@ -103,48 +105,108 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
     thenToStringShouldContain("Shuzenji");
   }
 
-  @Test public void shouldReturnEmptyModelForError() throws IOException {
+  @Test public void shouldReturnEmptyForecastModelForError() throws IOException {
     givenInputStreamCityNotFound();
-    givenPojo();
+    givenForecastPojo();
 
-    whenGenerateModel();
+    whenGenerateForecastModel();
 
     thenModelShouldBeEmpty();
   }
 
-  @Test public void shouldReturnEmptyListForNullPojo() throws IOException {
+  @Test public void shouldReturnEmptyForecastListForNullPojo() throws IOException {
     givenInputStreamCityNotFound();
 
-    whenGenerateModel();
+    whenGenerateForecastModel();
 
     thenModelShouldBeEmpty();
   }
 
-  @Test public void shouldReturnEmptyListForEmptyListValidCity() throws IOException {
-    givenInputStreamCityWithEmptyList();
-    givenPojo();
+  @Test public void shouldReturnEmptyForecastListForEmptyListValidCity() throws IOException {
+    givenInputStreamCityWithEmptyForecastList();
+    givenForecastPojo();
 
-    whenGenerateModel();
-
-    thenModelShouldBeEmpty();
-  }
-
-  @Test public void shouldReturnEmptyListForHttp400ListValidCity() throws IOException {
-    givenInputStreamCityWithHttp400();
-    givenPojo();
-
-    whenGenerateModel();
+    whenGenerateForecastModel();
 
     thenModelShouldBeEmpty();
   }
 
-  private void givenInputStreamCityWithHttp400() {
+  @Test public void shouldReturnEmptyForecastListForHttp400ListValidCity() throws IOException {
+    givenInputStreamCityForecastWithHttp400();
+    givenForecastPojo();
+
+    whenGenerateForecastModel();
+
+    thenModelShouldBeEmpty();
+  }
+
+  @Test public void shouldReturnWeatherModelWithOneCountryGivenInputStreamByCityIdPortland()
+      throws IOException {
+    givenInputStreamWeatherByCityIdPortland();
+    givenWeatherPojo();
+
+    whenGenerateWeatherModel();
+
+    thenShouldHaveOneCurrentWeatherElement();
+  }
+
+  @Test public void shouldReturnEmptyCurrentWeatherListForNullPojo() throws IOException {
+    givenInputStreamCityNotFound();
+
+    whenGenerateWeatherModel();
+
+    thenModelShouldBeEmpty();
+  }
+
+  @Test public void shouldReturnEmptyListForHttp400CurrentWeatherListValidCity()
+      throws IOException {
+    givenInputStreamCityCurrentWeatherWithHttp400();
+    givenWeatherPojo();
+
+    whenGenerateWeatherModel();
+
+    thenModelShouldBeEmpty();
+  }
+
+  @Test public void shouldReturnEmptyListForEmptyCurrentWeatherListValidCity() throws IOException {
+    givenInputStreamCityWithCurrentWeatherEmptyList();
+    givenWeatherPojo();
+
+    whenGenerateWeatherModel();
+
+    thenModelShouldBeEmpty();
+  }
+
+  @Test public void shouldReturnEmptyCurrentWeatherModelForError() throws IOException {
+    givenInputStreamCityNotFound();
+    givenWeatherPojo();
+
+    whenGenerateWeatherModel();
+
+    thenModelShouldBeEmpty();
+  }
+
+  private void thenShouldHaveOneCurrentWeatherElement() {
+    assertEquals(1, mModel.size());
+    mForecastData = mModel.get(0);
+  }
+
+  private void givenInputStreamCityForecastWithHttp400() {
     givenJson(R.raw.moscow_forecast_non_http_400);
   }
 
-  private void givenInputStreamCityWithEmptyList() {
+  private void givenInputStreamCityCurrentWeatherWithHttp400() {
+    givenJson(R.raw.portland_current_weather_http_400);
+  }
+
+  private void givenInputStreamCityWithEmptyForecastList() {
     givenJson(R.raw.moscow_forecast_empty_list);
   }
+
+  private void givenInputStreamCityWithCurrentWeatherEmptyList() {
+    givenJson(R.raw.portland_current_weather_empty);
+  }
+
 
   private void thenToStringShouldContain(String expected) {
     assertTrue(mForecastData.toString().contains(expected));
@@ -205,19 +267,31 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
     mForecastData = mModel.get(0);
   }
 
-  private void whenGenerateModel() throws IOException {
-    uut.fromForecastPojo(openWeatherForecastData);
+  private void whenGenerateForecastModel() throws IOException {
+    uut.fromForecastPojo(mOpenWeatherForecastData);
     mModel = uut.getForecastModel();
+  }
+
+  private void whenGenerateWeatherModel() throws IOException {
+    uut.fromWeatherPojo(mOpenWeatherCurrentData);
+    mModel = uut.getWeatherModel();
   }
 
   private void givenInputStreamByCityIdMoscow() throws IOException {
     givenJson(R.raw.moscow_forecast);
   }
 
-  private void givenPojo() throws UnsupportedEncodingException {
-    Reader reader = new InputStreamReader(mInputStream,"UTF-8");
-    openWeatherForecastData = new Gson().fromJson(reader,
-        OpenWeatherForecastData.class);
+  private void givenInputStreamWeatherByCityIdPortland() throws IOException {
+    givenJson(R.raw.portland_current_weather);
   }
 
+  private void givenForecastPojo() throws UnsupportedEncodingException {
+    Reader reader = new InputStreamReader(mInputStream, "UTF-8");
+    mOpenWeatherForecastData = new Gson().fromJson(reader, OpenWeatherForecastData.class);
+  }
+
+  private void givenWeatherPojo() throws UnsupportedEncodingException {
+    Reader reader = new InputStreamReader(mInputStream, "UTF-8");
+    mOpenWeatherCurrentData = new Gson().fromJson(reader, OpenWeatherCurrentData.class);
+  }
 }
