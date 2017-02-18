@@ -169,6 +169,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     givenActivityCreated(null);
     givenForecastList();
     givenForecastElement("someCity");
+    givenTestExecutor();
 
     whenUpdatingList();
 
@@ -179,6 +180,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   @Test public void shouldNotifyAdapterOnUpdatingListWithEmptyCityForEmptyList() {
     givenForecastList();
+    givenTestExecutor();
 
     whenUpdatingList();
 
