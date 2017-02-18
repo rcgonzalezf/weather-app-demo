@@ -19,6 +19,8 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import org.rcgonzalezf.weather.common.ServiceConfig;
 import org.rcgonzalezf.weather.common.WeatherRepository;
 import org.rcgonzalezf.weather.common.listeners.OnUpdateWeatherListListener;
@@ -45,6 +47,7 @@ public class WeatherListActivity extends BaseActivity
   private OpenWeatherApiCallback mOpenWeatherApiCallback;
   private CharSequence mCityNameToSearchOnSwipe;
   private ProgressBar mProgress;
+  private Executor mExecutor = Executors.newSingleThreadExecutor();
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -177,14 +180,14 @@ public class WeatherListActivity extends BaseActivity
   }
 
   private void saveForecastList(final List<WeatherInfo> weatherInfoList) {
-    new Thread(new Runnable() {
+    mExecutor.execute(new Runnable() {
       @Override public void run() {
         SharedPreferences prefs = getSharedPreferences(OFFLINE_FILE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(FORECASTS, new Gson().toJson(weatherInfoList));
         editor.apply();
       }
-    }).start();
+    });
   }
 
   private void setupRecyclerView() {

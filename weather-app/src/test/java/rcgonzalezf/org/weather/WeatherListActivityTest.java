@@ -18,6 +18,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
 import mockit.Deencapsulation;
 import mockit.Expectations;
 import mockit.Mock;
@@ -41,6 +42,7 @@ import rcgonzalezf.org.weather.common.BaseActivity;
 import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent;
 
 import static rcgonzalezf.org.weather.WeatherListActivity.CITY_NAME_TO_SEARCH_ON_SWIPE;
+import static rcgonzalezf.org.weather.common.BaseActivity.FORECASTS;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.LOCATION_SEARCH;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.NO_NETWORK_SEARCH;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.SEARCH_COMPLETED;
@@ -49,8 +51,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   @Tested private WeatherListActivity uut;
   @SuppressWarnings("unused") @Mocked private ContextWrapper mContextWrapper;
-  @SuppressWarnings("unused") @Mocked private SharedPreferences.Editor sharedPreferencesEditor;
-  @SuppressWarnings("unused") @Mocked private SharedPreferences sharedPreferences;
+  @SuppressWarnings("unused") @Mocked private SharedPreferences.Editor mSharedPreferencesEditor;
+  @SuppressWarnings("unused") @Mocked private SharedPreferences mSharedPreferences;
   @SuppressWarnings("unused") @Mocked private BaseActivity mBaseActivity;
   @SuppressWarnings("unused") @Mocked private ProgressBar mProgress;
   @SuppressWarnings("unused") @Mocked private RecyclerView mRecyclerView;
@@ -163,7 +165,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenShouldTrackEvent(NO_NETWORK_SEARCH, "EMPTY");
   }
 
-  @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity(@Mocked Thread thread) {
+  @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity() {
     givenActivityCreated(null);
     givenForecastList();
     givenForecastElement("someCity");
@@ -175,13 +177,21 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenShouldTrackEvent(SEARCH_COMPLETED, "cityName: " + "someCity");
   }
 
-  //@Ignore("Flaky test on TravisCI")
-  @Test public void shouldNotifyAdapterOnUpdatingListWithEmptyCityForEmptyList(@Mocked Thread thread) {
+  @Test public void shouldNotifyAdapterOnUpdatingListWithEmptyCityForEmptyList() {
     givenForecastList();
 
     whenUpdatingList();
 
     thenShouldTrackEvent(SEARCH_COMPLETED, "cityName: " + "");
+  }
+
+  @Test public void shouldSaveIntoSharedPreferencesCache() {
+    givenForecastList();
+    givenTestExecutor();
+
+    whenSavingTheList();
+
+    thenSharedPreferencesShouldSaveTheList();
   }
 
   @Test public void shouldHandleError(@SuppressWarnings("UnusedParameters") @Mocked Log log) {
@@ -288,6 +298,24 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenShouldSetVisible();
   }
 
+  private void thenSharedPreferencesShouldSaveTheList() {
+    new Verifications() {{
+      mSharedPreferencesEditor.putString(withEqual(FORECASTS), withAny(""));
+    }};
+  }
+
+  private void whenSavingTheList() {
+    Deencapsulation.invoke(uut, "saveForecastList", mWeatherInfoList);
+  }
+
+  private void givenTestExecutor() {
+    Deencapsulation.setField(uut, "mExecutor", new Executor() {
+      @Override public void execute(Runnable command) {
+        command.run();
+      }
+    });
+  }
+
   private void thenShouldSetVisible() {
     new Verifications() {{
       //noinspection WrongConstant
@@ -301,7 +329,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   private void givenProgressBarNotVisible() {
     new Expectations() {{
-      mProgress.getVisibility(); result = View.GONE;
+      mProgress.getVisibility();
+      result = View.GONE;
     }};
   }
 
