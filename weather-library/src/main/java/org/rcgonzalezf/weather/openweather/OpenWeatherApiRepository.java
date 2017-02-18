@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import java.util.List;
 import org.rcgonzalezf.weather.common.ServiceConfig;
 import org.rcgonzalezf.weather.common.WeatherRepository;
-import org.rcgonzalezf.weather.common.models.ForecastData;
+import org.rcgonzalezf.weather.common.models.converter.Data;
 import org.rcgonzalezf.weather.common.network.ApiRequest;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequest;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters;
@@ -19,7 +19,7 @@ public class OpenWeatherApiRepository
   }
 
   @Override
-  public List<ForecastData> findWeather(OpenWeatherApiRequestParameters requestParameters) {
+  public List<Data> findWeather(OpenWeatherApiRequestParameters requestParameters) {
     throw new UnsupportedOperationException("This repository doesn't perform sync calls");
   }
 

@@ -20,5 +20,13 @@ package org.rcgonzalezf.weather.openweather.model;
   public String getCountry() {
     return country;
   }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setCountry(String country) {
+    this.country = country;
+  }
 }
 

@@ -9,9 +9,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.rcgonzalezf.weather.BuildConfig;
 import org.rcgonzalezf.weather.common.listeners.OnUpdateWeatherListListener;
-import org.rcgonzalezf.weather.common.models.ForecastData;
 import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback;
+import org.rcgonzalezf.weather.openweather.model.ForecastData;
+import org.rcgonzalezf.weather.openweather.model.OpenWeatherCurrentData;
 import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;
 import org.rcgonzalezf.weather.tests.TestExecutor;
 import org.rcgonzalezf.weather.tests.WeatherTestLibApp;
@@ -23,15 +24,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-@RunWith(RobolectricTestRunner.class) @Config(constants = BuildConfig.class, sdk = 23, application = WeatherTestLibApp.class)
+@RunWith(RobolectricTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 23, application = WeatherTestLibApp.class)
 public class OpenWeatherApiRequestTest {
 
   private OpenWeatherApiRequest uut;
   private OpenWeatherApiCallback mTestApiCallback;
   private boolean mIsSuccess;
   private boolean mIsError;
-  @Mock
-  private ModelConverter<OpenWeatherForecastData> mModelConverter;
+  @Mock private ModelConverter<OpenWeatherForecastData, ForecastData, OpenWeatherCurrentData> mModelConverter;
 
   @Before public void createApiRequestBaseObject() {
     MockitoAnnotations.initMocks(this);
@@ -79,11 +80,11 @@ public class OpenWeatherApiRequestTest {
   }
 
   private void givenInvalidRequestReturningException() throws IOException {
-    when(mModelConverter.getModel()).thenThrow(new IOException("someExec"));
+    when(mModelConverter.getForecastModel()).thenThrow(new IOException("someExec"));
   }
 
   private void givenInvalidRequestReturningEmpty() throws IOException {
-    when(mModelConverter.getModel()).thenReturn(new ArrayList<ForecastData>());
+    when(mModelConverter.getForecastModel()).thenReturn(new ArrayList<ForecastData>());
   }
 
   private void thenCallbackShouldBeError() {
@@ -91,7 +92,7 @@ public class OpenWeatherApiRequestTest {
   }
 
   private void givenInvalidRequestReturningNull() throws IOException {
-    when(mModelConverter.getModel()).thenReturn(null);
+    when(mModelConverter.getForecastModel()).thenReturn(null);
   }
 
   private void whenExecuting() {
@@ -103,7 +104,7 @@ public class OpenWeatherApiRequestTest {
   }
 
   private void givenValidRequestReturningModel() throws IOException {
-    when(mModelConverter.getModel()).thenReturn(new ArrayList<ForecastData>() {{
+    when(mModelConverter.getForecastModel()).thenReturn(new ArrayList<ForecastData>() {{
       add(mock(ForecastData.class));
     }});
   }

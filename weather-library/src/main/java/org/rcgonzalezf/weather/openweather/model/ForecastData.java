@@ -1,30 +1,24 @@
-package org.rcgonzalezf.weather.common.models;
+package org.rcgonzalezf.weather.openweather.model;
 
 import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
-import org.rcgonzalezf.weather.openweather.model.City;
+import org.rcgonzalezf.weather.common.models.converter.Data;
 
-public class ForecastData {
+public class ForecastData implements Data {
 
-  @SerializedName("city")
-  private City mCity;
-  @SerializedName("cnt")
-  private int mCount;
-  @SerializedName("list")
-  private List<WeatherData> mWeatherList;
+  @SerializedName("city") private City mCity;
+  @SerializedName("cnt") private int mCount;
+  @SerializedName("list") private List<WeatherData> mWeatherList;
 
-
-  public ForecastData(
-      City city,
-      int count) {
+  public ForecastData(City city, int count) {
     setCity(city);
     setCount(count);
     mWeatherList = new ArrayList<>(count);
   }
 
   @Override public String toString() {
-    return "ForecastData [name=" + getCity().getName() + ", count=" + getCount() +"";
+    return "ForecastData [name=" + getCity().getName() + ", count=" + getCount() + "";
   }
 
   public City getCity() {
@@ -50,5 +44,4 @@ public class ForecastData {
   public void addWeatherItem(WeatherData weatherData) {
     mWeatherList.add(weatherData);
   }
-
 }

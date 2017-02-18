@@ -1,4 +1,4 @@
-package org.rcgonzalezf.weather.common.models;
+package org.rcgonzalezf.weather.openweather.model;
 
 import com.google.gson.annotations.SerializedName;
 

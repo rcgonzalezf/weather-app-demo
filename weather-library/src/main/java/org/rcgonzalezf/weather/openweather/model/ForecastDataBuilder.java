@@ -1,6 +1,4 @@
-package org.rcgonzalezf.weather.common.models;
-
-import org.rcgonzalezf.weather.openweather.model.City;
+package org.rcgonzalezf.weather.openweather.model;
 
 public class ForecastDataBuilder {
   private City city;

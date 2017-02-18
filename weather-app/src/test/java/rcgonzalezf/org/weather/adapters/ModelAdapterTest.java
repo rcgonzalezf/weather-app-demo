@@ -22,7 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.rcgonzalezf.weather.WeatherLibApp;
-import org.rcgonzalezf.weather.common.models.Forecast;
+import org.rcgonzalezf.weather.common.models.WeatherInfo;
 import org.rcgonzalezf.weather.common.models.WeatherViewModel;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
@@ -37,9 +37,9 @@ import static org.mockito.Mockito.verify;
 
 @RunWith(JMockit.class) public class ModelAdapterTest {
 
-  @Tested private ModelAdapter<Forecast> uut;
+  @Tested private ModelAdapter<WeatherInfo> uut;
 
-  private List<Forecast> mModels;
+  private List<WeatherInfo> mModels;
   @Mocked WeatherLibApp mWeatherLipApp;
   @Mocked private Context mContext;
   @Mocked private RecyclerView.ViewHolder mRecyclerViewHolder;
@@ -67,32 +67,32 @@ import static org.mockito.Mockito.verify;
   }
 
   @SuppressWarnings("UnusedParameters") @Test
-  public void shouldBindViewHolder(@Mocked Forecast forecast, @Mocked View view,
+  public void shouldBindViewHolder(@Mocked WeatherInfo weatherInfo, @Mocked View view,
       @Mocked LayoutInflater layoutInflater) {
     givenViewHolder(view);
-    givenModel(forecast);
-    givenDateTime(forecast);
+    givenModel(weatherInfo);
+    givenDateTime(weatherInfo);
     givenResourceStrings();
     givenSharedPreferenceForCelsius(true);
 
     whenBindingViewHolder();
 
-    thenShouldBindModelDataToViewHolder(forecast);
+    thenShouldBindModelDataToViewHolder(weatherInfo);
   }
 
   @SuppressWarnings("UnusedParameters") @Test
-  public void shouldPopulateTemperatureViewInFahrenheit(@Mocked Forecast forecast,
+  public void shouldPopulateTemperatureViewInFahrenheit(@Mocked WeatherInfo weatherInfo,
       @Mocked View view, @Mocked LayoutInflater layoutInflater) {
     givenViewHolder(view);
     givenSharedPreferenceForCelsius(false);
 
-    whenPopulatingTheTemperatureViews(forecast);
+    whenPopulatingTheTemperatureViews(weatherInfo);
 
-    thenShouldBindModelTemperatureToViewHolder(forecast);
+    thenShouldBindModelTemperatureToViewHolder(weatherInfo);
   }
 
-  @Test public void shouldGetItemCount(@Mocked Forecast forecast) {
-    givenModel(forecast);
+  @Test public void shouldGetItemCount(@Mocked WeatherInfo weatherInfo) {
+    givenModel(weatherInfo);
 
     whenGettingItemCount();
 
@@ -193,14 +193,14 @@ import static org.mockito.Mockito.verify;
     mItemCount = uut.getItemCount();
   }
 
-  private void thenShouldBindModelTemperatureToViewHolder(final Forecast forecast) {
+  private void thenShouldBindModelTemperatureToViewHolder(final WeatherInfo weatherInfo) {
     new Verifications() {{
-      forecast.getTemperature();
+      weatherInfo.getTemperature();
     }};
   }
 
-  private void whenPopulatingTheTemperatureViews(Forecast forecast) {
-    uut.populateTemperatureViews(mModelViewHolder, forecast);
+  private void whenPopulatingTheTemperatureViews(WeatherInfo weatherInfo) {
+    uut.populateTemperatureViews(mModelViewHolder, weatherInfo);
   }
 
   private void givenSharedPreferenceForCelsius(final boolean celsiusPreferred) {
@@ -222,23 +222,23 @@ import static org.mockito.Mockito.verify;
     }};
   }
 
-  private void givenDateTime(final Forecast forecast) {
+  private void givenDateTime(final WeatherInfo weatherInfo) {
     new Expectations() {{
-      forecast.getDateTime();
+      weatherInfo.getDateTime();
       result = "2012-09-24 18:00:00";
     }};
   }
 
-  private void thenShouldBindModelDataToViewHolder(final Forecast forecast) {
+  private void thenShouldBindModelDataToViewHolder(final WeatherInfo weatherInfo) {
     new Verifications() {{
-      forecast.getWeatherId();
-      forecast.getCityName();
-      forecast.getCountry();
-      forecast.getHumidity();
-      forecast.getDeg();
-      forecast.getDescription();
-      forecast.getTemperature();
-      forecast.getSpeed();
+      weatherInfo.getWeatherId();
+      weatherInfo.getCityName();
+      weatherInfo.getCountry();
+      weatherInfo.getHumidity();
+      weatherInfo.getDeg();
+      weatherInfo.getDescription();
+      weatherInfo.getTemperature();
+      weatherInfo.getSpeed();
     }};
   }
 
@@ -246,8 +246,8 @@ import static org.mockito.Mockito.verify;
     uut.onBindViewHolder(mModelViewHolder, 0);
   }
 
-  private void givenModel(Forecast forecast) {
-    mModels.add(forecast);
+  private void givenModel(WeatherInfo weatherInfo) {
+    mModels.add(weatherInfo);
   }
 
   private void givenViewHolder(View view) {

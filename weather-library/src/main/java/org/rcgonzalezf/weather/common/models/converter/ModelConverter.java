@@ -2,13 +2,14 @@ package org.rcgonzalezf.weather.common.models.converter;
 
 import java.io.IOException;
 import java.util.List;
-import org.rcgonzalezf.weather.common.models.ForecastData;
-import org.rcgonzalezf.weather.openweather.converter.Data;
 
-public interface ModelConverter< D extends Data> {
+public interface ModelConverter<D extends Data, E, W extends Data> {
 
-  void fromPojo(D pojo);
+  void fromForecastPojo(D pojo);
 
-  List<ForecastData> getModel() throws IOException;
+  void fromWeatherPojo(W pojo);
 
+  List<E> getForecastModel() throws IOException;
+
+  List<E> getWeatherModel() throws IOException;
 }

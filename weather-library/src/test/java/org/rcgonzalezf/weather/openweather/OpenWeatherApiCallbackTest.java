@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.rcgonzalezf.weather.common.listeners.OnUpdateWeatherListListener;
-import org.rcgonzalezf.weather.common.models.Forecast;
+import org.rcgonzalezf.weather.common.models.WeatherInfo;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiError;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiResponse;
 
@@ -22,7 +22,7 @@ public class OpenWeatherApiCallbackTest {
   private boolean mOnErrorCalled;
   private OnUpdateWeatherListListener mOnUpdateWeatherListListener = new OnUpdateWeatherListListener() {
 
-    @Override public void updateList(@NonNull List<Forecast> forecastList) {
+    @Override public void updateList(@NonNull List<WeatherInfo> weatherInfoList) {
       mListUpdated = true;
     }
 
