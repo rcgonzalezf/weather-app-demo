@@ -8,7 +8,7 @@ import org.rcgonzalezf.weather.common.listeners.OnUpdateWeatherListListener;
 import org.rcgonzalezf.weather.common.models.WeatherInfo;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
 import org.rcgonzalezf.weather.openweather.model.ForecastData;
-import org.rcgonzalezf.weather.openweather.model.ForecastMapper;
+import org.rcgonzalezf.weather.openweather.model.WeatherInfoMapper;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiError;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiResponse;
 
@@ -35,7 +35,7 @@ public class OpenWeatherApiCallback
       OnUpdateWeatherListListener onUpdateWeatherListListener) {
     if (onUpdateWeatherListListener != null) {
       final List<WeatherInfo> weatherInfoList =
-          new ForecastMapper().withData(apiResponse.getData()).map();
+          new WeatherInfoMapper().withData(apiResponse.getData()).map();
       onUpdateWeatherListListener.updateList(weatherInfoList);
     }
   }

@@ -207,7 +207,6 @@ public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
     givenJson(R.raw.portland_current_weather_empty);
   }
 
-
   private void thenToStringShouldContain(String expected) {
     assertTrue(mForecastData.toString().contains(expected));
   }

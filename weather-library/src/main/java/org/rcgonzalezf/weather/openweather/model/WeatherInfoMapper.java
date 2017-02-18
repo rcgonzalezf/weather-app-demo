@@ -6,14 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 import org.rcgonzalezf.weather.common.models.WeatherInfo;
 
-public class ForecastMapper {
+public class WeatherInfoMapper {
 
   private static final int ALL = -1;
   private List<ForecastData> mData;
   // I've found that most cases the forecast consists of 40 items
   private static final int INITIAL_SIZE = 40;
 
-  public ForecastMapper withData(@NonNull List<ForecastData> data) {
+  public WeatherInfoMapper withData(@NonNull List<ForecastData> data) {
     mData = data;
     return this;
   }

@@ -13,13 +13,13 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(JUnit4.class) public class WeatherInfoMapperTest {
 
-  private ForecastMapper uut;
+  private WeatherInfoMapper uut;
 
   private List<ForecastData> mData;
   private List<WeatherInfo> mDataMaped;
 
   @Before public void initMapper() {
-    uut = new ForecastMapper();
+    uut = new WeatherInfoMapper();
 
     mData = new ArrayList<>();
     mData.add(new ForecastData(new City(), 3));
@@ -38,6 +38,7 @@ import static org.junit.Assert.assertNotNull;
     int expectedSize = 3;
     givenWeatherData(expectedSize);
     givenData();
+    givenCountryName();
 
     whenMapping();
 
@@ -55,6 +56,10 @@ import static org.junit.Assert.assertNotNull;
 
     thenDataMappedShouldNotBeNull();
     thenWeatherItemsExpected(howMany);
+  }
+
+  private void givenCountryName() {
+    mData.get(0).getCity().setCountry("someCountry");
   }
 
   private void thenWeatherItemsExpected(int howManyExpected) {
