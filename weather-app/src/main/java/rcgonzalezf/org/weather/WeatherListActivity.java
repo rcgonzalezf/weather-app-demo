@@ -55,8 +55,8 @@ public class WeatherListActivity extends BaseActivity
       mCityNameToSearchOnSwipe = savedInstanceState.getCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE);
     }
 
-    mProgress = (ProgressBar) findViewById(R.id.progress_bar);
-    mSwipeToRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
+    mProgress = findViewById(R.id.progress_bar);
+    mSwipeToRefreshLayout = findViewById(R.id.swipe_to_refresh_layout);
     enableSwipeToRefreshLayout();
     mSwipeToRefreshLayout.setOnRefreshListener(createSwipeToRefreshListener());
   }
@@ -75,8 +75,12 @@ public class WeatherListActivity extends BaseActivity
   }
 
   private void toggleProgressIndicator() {
-    if (mProgress.getVisibility() == View.VISIBLE) mProgress.setVisibility(View.GONE);
-    else mProgress.setVisibility(View.VISIBLE);
+    runOnUiThread(new Runnable() {
+      @Override public void run() {
+        if (mProgress.getVisibility() == View.VISIBLE) mProgress.setVisibility(View.GONE);
+        else mProgress.setVisibility(View.VISIBLE);
+      }
+    });
   }
 
   @Override public void onEnterAnimationComplete() {

@@ -13,11 +13,11 @@ public interface ForecastService {
 
   String APP_ID = "APPID";
 
-  // "http://api.openweathermap.org/data/2.5/forecast?lon=139.0&lat=35.0&APPID=someApiKey",
+  // "https://api.openweathermap.org/data/2.5/forecast?lon=139.0&lat=35.0&APPID=someApiKey",
   @GET("forecast") Call<OpenWeatherForecastData> findByLatLon(@Query(LAT) String lat,
       @Query(LON) String lon, @Query(APP_ID) String appId);
 
-  // "http://api.openweathermap.org/data/2.5/forecast?q=London&type=like&APPID=someApiKey",
+  // "https://api.openweathermap.org/data/2.5/forecast?q=London&type=like&APPID=someApiKey",
   @GET("forecast") Call<OpenWeatherForecastData> findByQuery(@Query("q") String query,
       @Query(TYPE) String type, @Query(APP_ID) String appId);
 }

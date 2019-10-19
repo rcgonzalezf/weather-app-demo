@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'jacoco-android'
 
 android {
-  compileSdkVersion 25
-  buildToolsVersion "25.0.2"
+  compileSdkVersion 28
+  buildToolsVersion "28.0.3"
 
   defaultConfig {
     applicationId "rcgonzalezf.org.weather"
     minSdkVersion 14
-    targetSdkVersion 25
+    targetSdkVersion 28
     versionCode 4
     versionName "0.2.0"
 
@@ -24,6 +24,7 @@ android {
     release {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+      testCoverageEnabled false
     }
   }
 
@@ -34,40 +35,46 @@ android {
 
   testOptions {
     unitTests.returnDefaultValues = true
+
+    unitTests.all {
+      jacoco {
+        includeNoLocationClasses = true
+      }
+    }
   }
 }
 
 dependencies {
-  compile project(':weather-library')
-  compile fileTree(dir: 'libs', include: ['*.jar'])
+  implementation project(':weather-library')
+  implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-  compile 'com.android.support:appcompat-v7:25.1.0'
-  compile 'com.android.support:support-v4:25.1.0'
-  compile 'com.android.support:recyclerview-v7:25.1.0'
-  compile 'com.android.support:cardview-v7:25.1.0'
-  compile 'com.android.support:design:25.1.0'
-  compile 'com.android.support:palette-v7:25.1.0'
-  compile 'com.google.android.gms:play-services-location:10.0.1'
-  compile 'com.google.android.gms:play-services-analytics:10.0.1'
-  compile 'com.crittercism:crittercism-android-agent:5.6.4'
+  implementation 'com.android.support:appcompat-v7:28.0.0'
+  implementation 'com.android.support:support-v4:28.0.0'
+  implementation 'com.android.support:recyclerview-v7:28.0.0'
+  implementation 'com.android.support:cardview-v7:28.0.0'
+  implementation 'com.android.support:design:28.0.0'
+  implementation 'com.android.support:palette-v7:28.0.0'
+  implementation 'com.google.android.gms:play-services-location:16.0.0'
+  implementation 'com.google.android.gms:play-services-analytics:16.0.4'
+  implementation 'com.crittercism:crittercism-android-agent:5.6.4'
 
-  testCompile 'junit:junit:4.12'
-  testCompile 'com.squareup.okhttp3:mockwebserver:3.4.1'
-  testCompile 'org.mockito:mockito-core:1.10.19'
-  testCompile 'org.robolectric:robolectric:3.1.1'
-  testCompile 'org.jmockit:jmockit:1.30'
+  testImplementation 'junit:junit:4.12'
+  testImplementation 'com.squareup.okhttp3:mockwebserver:3.4.1'
+  testImplementation 'org.mockito:mockito-core:1.10.19'
+  testImplementation 'org.robolectric:robolectric:3.1.1'
+  testImplementation 'org.jmockit:jmockit:1.30'
 
-  androidTestCompile 'junit:junit:4.12'
-  androidTestCompile 'com.android.support:support-annotations:25.1.0'
-  androidTestCompile 'com.android.support.test:runner:0.5'
-  androidTestCompile 'com.android.support.test:rules:0.5'
+  androidTestImplementation 'junit:junit:4.12'
+  androidTestImplementation 'com.android.support:support-annotations:28.0.0'
+  androidTestImplementation 'com.android.support.test:runner:1.0.2'
+  androidTestImplementation 'com.android.support.test:rules:1.0.2'
 
-  androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2', {
+  androidTestImplementation 'com.android.support.test.espresso:espresso-core:2.2.2', {
     exclude group: 'com.android.support', module: 'support-annotations'
   }
 }
 jacoco {
-  toolVersion = "0.7.7.201606060606"
+  toolVersion = "0.8.3"
 }
 jacocoAndroidUnitTestReport {
   csv.enabled false

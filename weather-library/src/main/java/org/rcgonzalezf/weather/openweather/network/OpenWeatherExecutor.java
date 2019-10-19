@@ -43,7 +43,7 @@ class OpenWeatherExecutor {
         OkHttpClient okClient = mWeatherLibApp.createOkHttpClient();
 
         ForecastService service =
-            new Retrofit.Builder().baseUrl("http://api.openweathermap.org/data/2.5/")
+            new Retrofit.Builder().baseUrl("https://api.openweathermap.org/data/2.5/")
                 .client(okClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
