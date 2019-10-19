@@ -1,6 +1,7 @@
 package rcgonzalezf.org.weather;
 
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.support.v4.app.NavUtils;
@@ -78,8 +79,9 @@ import static org.junit.Assert.assertEquals;
     shouldHandleMenuItemSelected(true);
   }
 
-  @Test public void shouldShowMultiPaneForXLargeConfiguration(@Mocked Configuration configuration) {
-    givenScreenLayoutXLarge(configuration);
+  @Test public void shouldShowMultiPaneForXLargeConfiguration(@Mocked Configuration configuration,
+      @Mocked Resources resources) {
+    givenScreenLayoutXLarge(configuration, resources);
 
     whenCheckingIfMultiPane();
 
@@ -87,8 +89,9 @@ import static org.junit.Assert.assertEquals;
   }
 
   @Test
-  public void shouldNotShowMultiPaneForNonXLargeConfiguration(@Mocked Configuration configuration) {
-    givenScreenLayoutNonXLarge(configuration);
+  public void shouldNotShowMultiPaneForNonXLargeConfiguration(@Mocked Configuration configuration,
+      @Mocked Resources resources) {
+    givenScreenLayoutNonXLarge(configuration, resources);
 
     whenCheckingIfMultiPane();
 
@@ -112,11 +115,21 @@ import static org.junit.Assert.assertEquals;
     uut.onBuildHeaders(target);
   }
 
-  private void givenScreenLayoutNonXLarge(final Configuration configuration) {
+  private void givenScreenLayoutNonXLarge(final Configuration configuration,
+      final Resources resources) {
+    new Expectations() {{
+      uut.getResources(); result = resources;
+      resources.getConfiguration(); result = configuration;
+    }};
     configuration.screenLayout = 2;
   }
 
-  private void givenScreenLayoutXLarge(final Configuration configuration) {
+  private void givenScreenLayoutXLarge(final Configuration configuration,
+      final Resources resources) {
+    new Expectations() {{
+      uut.getResources(); result = resources;
+      resources.getConfiguration(); result = configuration;
+    }};
     configuration.screenLayout = 5;
   }
 

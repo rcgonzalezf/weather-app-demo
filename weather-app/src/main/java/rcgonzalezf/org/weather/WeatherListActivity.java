@@ -58,8 +58,8 @@ public class WeatherListActivity extends BaseActivity
       mCityNameToSearchOnSwipe = savedInstanceState.getCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE);
     }
 
-    mProgress = (ProgressBar) findViewById(R.id.progress_bar);
-    mSwipeToRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
+    mProgress = findViewById(R.id.progress_bar);
+    mSwipeToRefreshLayout = findViewById(R.id.swipe_to_refresh_layout);
     enableSwipeToRefreshLayout();
     mSwipeToRefreshLayout.setOnRefreshListener(createSwipeToRefreshListener());
   }

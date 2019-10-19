@@ -2,7 +2,7 @@
 <resources>
   <string name="open_weather_map_api_key" translatable="false">test</string>
   <!-- Use example
-  http://api.openweathermap.org/data/2.5/forecast/city?id=524901&APPID=test
+  https://api.openweathermap.org/data/2.5/forecast/city?id=524901&APPID=test
   -->
   <string name="crittercism_api_key" translatable="false">AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</string>
 
