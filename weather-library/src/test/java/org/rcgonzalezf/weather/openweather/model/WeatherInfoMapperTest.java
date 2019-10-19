@@ -1,4 +1,4 @@
-package org.rcgonzalezf.weather.common.models;
+package org.rcgonzalezf.weather.openweather.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,20 +6,20 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.rcgonzalezf.weather.openweather.model.City;
+import org.rcgonzalezf.weather.common.models.WeatherInfo;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@RunWith(JUnit4.class) public class ForecastMapperTest {
+@RunWith(JUnit4.class) public class WeatherInfoMapperTest {
 
-  ForecastMapper uut;
+  private WeatherInfoMapper uut;
 
   private List<ForecastData> mData;
-  private List<Forecast> mDataMaped;
+  private List<WeatherInfo> mDataMaped;
 
   @Before public void initMapper() {
-    uut = new ForecastMapper();
+    uut = new WeatherInfoMapper();
 
     mData = new ArrayList<>();
     mData.add(new ForecastData(new City(), 3));
@@ -38,6 +38,7 @@ import static org.junit.Assert.assertNotNull;
     int expectedSize = 3;
     givenWeatherData(expectedSize);
     givenData();
+    givenCountryName();
 
     whenMapping();
 
@@ -55,6 +56,10 @@ import static org.junit.Assert.assertNotNull;
 
     thenDataMappedShouldNotBeNull();
     thenWeatherItemsExpected(howMany);
+  }
+
+  private void givenCountryName() {
+    mData.get(0).getCity().setCountry("someCountry");
   }
 
   private void thenWeatherItemsExpected(int howManyExpected) {

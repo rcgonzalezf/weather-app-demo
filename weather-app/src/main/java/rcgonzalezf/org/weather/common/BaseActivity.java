@@ -28,7 +28,7 @@ import com.google.gson.reflect.TypeToken;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
-import org.rcgonzalezf.weather.common.models.Forecast;
+import org.rcgonzalezf.weather.common.models.WeatherInfo;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
 import rcgonzalezf.org.weather.common.analytics.Analytics;
@@ -132,16 +132,16 @@ public abstract class BaseActivity extends AppCompatActivity
 
   public void informNoInternet() {
     Toast.makeText(this, getString(R.string.no_internet_msg), Toast.LENGTH_SHORT).show();
-    final List<Forecast> forecastList = getPreviousForecastList();
-    loadOldData(forecastList);
+    final List<WeatherInfo> weatherInfoList = getPreviousForecastList();
+    loadOldData(weatherInfoList);
   }
 
-  public List<Forecast> getPreviousForecastList() {
+  public List<WeatherInfo> getPreviousForecastList() {
     SharedPreferences sharedPreferences = getSharedPreferences(OFFLINE_FILE, 0);
     String serializedData = sharedPreferences.getString(FORECASTS, null);
-    List<Forecast> storedData = null;
+    List<WeatherInfo> storedData = null;
     if (serializedData != null) {
-      storedData = new Gson().fromJson(serializedData, new TypeToken<List<Forecast>>() {
+      storedData = new Gson().fromJson(serializedData, new TypeToken<List<WeatherInfo>>() {
       }.getType());
     }
     return storedData;

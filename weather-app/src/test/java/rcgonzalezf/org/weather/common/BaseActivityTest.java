@@ -43,7 +43,7 @@ import mockit.integration.junit4.JMockit;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.rcgonzalezf.weather.common.models.Forecast;
+import org.rcgonzalezf.weather.common.models.WeatherInfo;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
 import rcgonzalezf.org.weather.common.analytics.Analytics;
@@ -133,7 +133,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
       @Override public void searchByLocation(double lat, double lon) {
       }
 
-      @Override public void loadOldData(List<Forecast> forecastList) {
+      @Override public void loadOldData(List<WeatherInfo> weatherInfoList) {
         mRetrievingFromCache = true;
       }
     };
@@ -246,7 +246,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     givenEmptyForecastListStoredData();
     givenSharedPreferenceWithStoredData();
 
-    List<Forecast> storedData = whenGettingTheSavedData();
+    List<WeatherInfo> storedData = whenGettingTheSavedData();
 
     thenShouldHaveStoredData(storedData);
   }
@@ -479,11 +479,11 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     this.mGrantResults = new int[] { 1 };
   }
 
-  private void thenShouldHaveStoredData(List<Forecast> storedData) {
+  private void thenShouldHaveStoredData(List<WeatherInfo> storedData) {
     assertNotNull(storedData);
   }
 
-  private List<Forecast> whenGettingTheSavedData() {
+  private List<WeatherInfo> whenGettingTheSavedData() {
     return uut.getPreviousForecastList();
   }
 
@@ -495,8 +495,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   private void givenEmptyForecastListStoredData() {
-    List<Forecast> dataToStore = new ArrayList<>();
-    dataToStore.add(new Forecast());
+    List<WeatherInfo> dataToStore = new ArrayList<>();
+    dataToStore.add(new WeatherInfo());
     mStoredData = new Gson().toJson(dataToStore);
   }
 

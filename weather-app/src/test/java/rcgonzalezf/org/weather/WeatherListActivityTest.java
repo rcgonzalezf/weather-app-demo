@@ -18,6 +18,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
 import mockit.Deencapsulation;
 import mockit.Expectations;
 import mockit.Mock;
@@ -32,7 +33,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.rcgonzalezf.weather.common.ServiceConfig;
 import org.rcgonzalezf.weather.common.WeatherRepository;
-import org.rcgonzalezf.weather.common.models.Forecast;
+import org.rcgonzalezf.weather.common.models.WeatherInfo;
 import org.rcgonzalezf.weather.common.models.WeatherViewModel;
 import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters;
@@ -41,6 +42,7 @@ import rcgonzalezf.org.weather.common.BaseActivity;
 import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent;
 
 import static rcgonzalezf.org.weather.WeatherListActivity.CITY_NAME_TO_SEARCH_ON_SWIPE;
+import static rcgonzalezf.org.weather.common.BaseActivity.FORECASTS;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.LOCATION_SEARCH;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.NO_NETWORK_SEARCH;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.SEARCH_COMPLETED;
@@ -49,12 +51,12 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   @Tested private WeatherListActivity uut;
   @SuppressWarnings("unused") @Mocked private ContextWrapper mContextWrapper;
-  @SuppressWarnings("unused") @Mocked private SharedPreferences.Editor sharedPreferencesEditor;
-  @SuppressWarnings("unused") @Mocked private SharedPreferences sharedPreferences;
+  @SuppressWarnings("unused") @Mocked private SharedPreferences.Editor mSharedPreferencesEditor;
+  @SuppressWarnings("unused") @Mocked private SharedPreferences mSharedPreferences;
   @SuppressWarnings("unused") @Mocked private BaseActivity mBaseActivity;
   @SuppressWarnings("unused") @Mocked private ProgressBar mProgress;
   @SuppressWarnings("unused") @Mocked private RecyclerView mRecyclerView;
-  @SuppressWarnings("unused") @Mocked private ModelAdapter<Forecast> mAdapter;
+  @SuppressWarnings("unused") @Mocked private ModelAdapter<WeatherInfo> mAdapter;
   @SuppressWarnings("unused") @Mocked private OpenWeatherApiCallback mOpenWeatherApiCallback;
   @SuppressWarnings("unused") @Mocked private SwipeRefreshLayout mSwipeToRefreshLayout;
 
@@ -67,7 +69,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   @SuppressWarnings("unused") @Mocked private ServiceConfig mServiceConfig;
   @SuppressWarnings("unused") @Mocked private AnalyticsEvent mAnalyticsEvent;
 
-  private List<Forecast> mForecastList;
+  private List<WeatherInfo> mWeatherInfoList;
   private String mQuery;
   private Runnable mNotifyAdapterRunnable;
   private SwipeRefreshLayout.OnRefreshListener mSwipeToRefreshListener;
@@ -100,7 +102,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   @After public void clearEverything() {
     uut = null;
-    mForecastList = null;
+    mWeatherInfoList = null;
     mNotifyAdapterRunnable = null;
     mBaseActivity = null;
   }
@@ -163,10 +165,11 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenShouldTrackEvent(NO_NETWORK_SEARCH, "EMPTY");
   }
 
-  @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity(@Mocked Thread thread) {
+  @Test public void shouldNotifyAdapterOnUpdatingListWithNullCity() {
     givenActivityCreated(null);
     givenForecastList();
     givenForecastElement("someCity");
+    givenTestExecutor();
 
     whenUpdatingList();
 
@@ -175,13 +178,22 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenShouldTrackEvent(SEARCH_COMPLETED, "cityName: " + "someCity");
   }
 
-  //@Ignore("Flaky test on TravisCI")
-  @Test public void shouldNotifyAdapterOnUpdatingListWithEmptyCityForEmptyList(@Mocked Thread thread) {
+  @Test public void shouldNotifyAdapterOnUpdatingListWithEmptyCityForEmptyList() {
     givenForecastList();
+    givenTestExecutor();
 
     whenUpdatingList();
 
     thenShouldTrackEvent(SEARCH_COMPLETED, "cityName: " + "");
+  }
+
+  @Test public void shouldSaveIntoSharedPreferencesCache() {
+    givenForecastList();
+    givenTestExecutor();
+
+    whenSavingTheList();
+
+    thenSharedPreferencesShouldSaveTheList();
   }
 
   @Test public void shouldHandleError(@SuppressWarnings("UnusedParameters") @Mocked Log log) {
@@ -288,6 +300,47 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
     thenShouldSetVisible();
   }
 
+  @Test public void shouldToggleProgressIndicatorOnError() {
+    givenActivityCreated(null);
+    Runnable runnable = givenToggleRunnable();
+
+    whenRunningToggleRunnable(runnable);
+
+    thenShouldToggleProgressIndicator();
+  }
+
+  private void thenShouldToggleProgressIndicator() {
+    new Verifications() {{
+      uut.toggleProgressIndicator();
+    }};
+  }
+
+  private void whenRunningToggleRunnable(Runnable runnable) {
+    runnable.run();
+  }
+
+  private Runnable givenToggleRunnable() {
+    return uut.createRunnableToggleProgressIndicator();
+  }
+
+  private void thenSharedPreferencesShouldSaveTheList() {
+    new Verifications() {{
+      mSharedPreferencesEditor.putString(withEqual(FORECASTS), withAny(""));
+    }};
+  }
+
+  private void whenSavingTheList() {
+    Deencapsulation.invoke(uut, "saveForecastList", mWeatherInfoList);
+  }
+
+  private void givenTestExecutor() {
+    Deencapsulation.setField(uut, "mExecutor", new Executor() {
+      @Override public void execute(Runnable command) {
+        command.run();
+      }
+    });
+  }
+
   private void thenShouldSetVisible() {
     new Verifications() {{
       //noinspection WrongConstant
@@ -301,7 +354,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   private void givenProgressBarNotVisible() {
     new Expectations() {{
-      mProgress.getVisibility(); result = View.GONE;
+      mProgress.getVisibility();
+      result = View.GONE;
     }};
   }
 
@@ -389,7 +443,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   private void thenNotifyAdapterRunnableShouldBeCreated() {
     new Verifications() {{
-      uut.createNotifyRunnable(withAny(mForecastList));
+      uut.createNotifyRunnable(withAny(mWeatherInfoList));
     }};
   }
 
@@ -404,7 +458,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   private void givenNotifyRunnable() {
-    mNotifyAdapterRunnable = uut.createNotifyRunnable(mForecastList);
+    mNotifyAdapterRunnable = uut.createNotifyRunnable(mWeatherInfoList);
   }
 
   private void thenBuilderShouldAddLatLon(final double givenLat, final double givenLon) {
@@ -444,7 +498,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   private void whenUpdatingList() {
-    uut.updateList(mForecastList);
+    uut.updateList(mWeatherInfoList);
   }
 
   private void thenLogDataShouldBeWritten(final String message) {
@@ -460,17 +514,17 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   private void whenLoadingOldData() {
-    uut.loadOldData(mForecastList);
+    uut.loadOldData(mWeatherInfoList);
   }
 
   private void givenForecastElement(String cityName) {
-    Forecast forecast = new Forecast();
-    forecast.setCityName(cityName);
-    mForecastList.add(forecast);
+    WeatherInfo weatherInfo = new WeatherInfo();
+    weatherInfo.setCityName(cityName);
+    mWeatherInfoList.add(weatherInfo);
   }
 
   private void givenForecastList() {
-    mForecastList = new ArrayList<>();
+    mWeatherInfoList = new ArrayList<>();
   }
 
   private void givenStringResource() {
@@ -513,7 +567,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   private void thenAdapterShouldBeInitialized() {
     new Verifications() {{
-      new ModelAdapter<>(new ArrayList<Forecast>(), uut);
+      new ModelAdapter<>(new ArrayList<WeatherInfo>(), uut);
       mAdapter.setOnItemClickListener(uut);
     }};
   }

@@ -8,25 +8,27 @@ import java.util.concurrent.Executor;
 import okhttp3.OkHttpClient;
 import org.rcgonzalezf.weather.R;
 import org.rcgonzalezf.weather.WeatherLibApp;
-import org.rcgonzalezf.weather.common.models.ForecastData;
 import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
 import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback;
-import org.rcgonzalezf.weather.openweather.api.ForecastService;
+import org.rcgonzalezf.weather.openweather.api.OpenWeatherApiService;
+import org.rcgonzalezf.weather.openweather.model.ForecastData;
+import org.rcgonzalezf.weather.openweather.model.OpenWeatherCurrentData;
 import org.rcgonzalezf.weather.openweather.model.OpenWeatherForecastData;
 import retrofit2.Call;
 import retrofit2.GsonConverterFactory;
 import retrofit2.Retrofit;
 
+import static org.rcgonzalezf.weather.openweather.api.OpenWeatherApiService.BASE_URL;
 import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder.LIKE;
 
 class OpenWeatherExecutor {
 
   private final Executor mExecutor;
   private String mApiKey;
-  private ApiCallback<OpenWeatherApiResponse, OpenWeatherApiError> mApiCallback;
+  private ApiCallback<OpenWeatherApiResponse<ForecastData>, OpenWeatherApiError> mApiCallback;
   private static final String TAG = OpenWeatherExecutor.class.getSimpleName();
-  private ModelConverter<OpenWeatherForecastData> mConverter;
+  private ModelConverter<OpenWeatherForecastData, ForecastData, OpenWeatherCurrentData> mConverter;
   @VisibleForTesting
   WeatherLibApp mWeatherLibApp = WeatherLibApp.getInstance();
 
@@ -42,25 +44,33 @@ class OpenWeatherExecutor {
       @Override public void run() {
         OkHttpClient okClient = mWeatherLibApp.createOkHttpClient();
 
-        ForecastService service =
-            new Retrofit.Builder().baseUrl("https://api.openweathermap.org/data/2.5/")
+        OpenWeatherApiService service =
+            new Retrofit.Builder().baseUrl(BASE_URL)
                 .client(okClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
-                .create(ForecastService.class);
+                .create(OpenWeatherApiService.class);
 
         Call<OpenWeatherForecastData> forecastCall;
+        Call<OpenWeatherCurrentData> weatherCall;
+
         if (mRequestParameters.getCityName() != null) {
-          forecastCall = service.findByQuery(mRequestParameters.getCityName(), LIKE, mApiKey);
+          forecastCall = service.findForecastFiveDaysByQuery(mRequestParameters.getCityName(), LIKE, mApiKey);
+          weatherCall = service.findWeatherByQuery(mRequestParameters.getCityName(), LIKE, mApiKey);
         } else {
           forecastCall =
-              service.findByLatLon(mRequestParameters.getLat(), mRequestParameters.getLon(),
+              service.findForecastFiveDaysByLatLon(mRequestParameters.getLat(), mRequestParameters.getLon(),
+                  mApiKey);
+          weatherCall =
+              service.findWeatherByLatLon(mRequestParameters.getLat(), mRequestParameters.getLon(),
                   mApiKey);
         }
 
         try {
-          OpenWeatherForecastData data = forecastCall.execute().body();
-          convertToModel(data);
+          OpenWeatherForecastData forecastData = forecastCall.execute().body();
+
+          OpenWeatherCurrentData weatherData = weatherCall.execute().body();
+          convertToModel(weatherData, forecastData);
         } catch (IOException e) {
           Log.e(TAG, "IOException while getting weather", e);
           notifyOnError();
@@ -76,21 +86,30 @@ class OpenWeatherExecutor {
     mApiCallback.onError(error);
   }
 
-  private void convertToModel(OpenWeatherForecastData openWeatherForecastData) throws IOException {
+  private void convertToModel(OpenWeatherCurrentData openWeatherCurrentData, OpenWeatherForecastData openWeatherForecastData) throws IOException {
+    mConverter.fromWeatherPojo(openWeatherCurrentData);
+    List<ForecastData> forecastData = mConverter.getWeatherModel();
 
-    mConverter.fromPojo(openWeatherForecastData);
-    List<ForecastData> forecastData = mConverter.getModel();
+    convertToModel(openWeatherForecastData, forecastData);
+  }
+
+  private void convertToModel(OpenWeatherForecastData openWeatherForecastData, List<ForecastData>  forecastDataFromWeather) throws IOException {
+
+    mConverter.fromForecastPojo(openWeatherForecastData);
+    List<ForecastData> forecastData = mConverter.getForecastModel();
 
     if (forecastData != null && !forecastData.isEmpty()) {
-      final OpenWeatherApiResponse response = new OpenWeatherApiResponse();
-      response.setData(forecastData);
+      forecastDataFromWeather.addAll(forecastData);
+
+      final OpenWeatherApiResponse<ForecastData> response = new OpenWeatherApiResponse<>();
+      response.setData(forecastDataFromWeather);
       mApiCallback.onSuccess(response);
     } else {
       notifyOnError();
     }
   }
 
-  void setModelConverter(ModelConverter<OpenWeatherForecastData> converter) {
+  void setModelConverter(ModelConverter<OpenWeatherForecastData, ForecastData, OpenWeatherCurrentData> converter) {
     mConverter = converter;
   }
 }
