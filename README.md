@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/moxi/weather-app-demo.svg?branch=feature%2Ftravis-ci)](https://travis-ci.org/rcgonzalezf/weather-app-demo) 
-[![codecov](https://codecov.io/gh/moxi/weather-app-demo/branch/master/graph/badge.svg)](https://codecov.io/gh/rcgonzalezf/weather-app-demo)
+[![Build Status](https://travis-ci.org/rcgonzalezf/weather-app-demo.svg?branch=feature%2Ftravis-ci)](https://travis-ci.org/rcgonzalezf/weather-app-demo) 
+[![codecov](https://codecov.io/gh/rcgonzalezf/weather-app-demo/branch/master/graph/badge.svg)](https://codecov.io/gh/rcgonzalezf/weather-app-demo)
 
 
 # weather-app-demo
