@@ -20,16 +20,16 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 23, application = WeatherTestLibApp.class)
-public class ForecastCreatorTest {
-  Parcelable.Creator<Forecast> uut = Forecast.CREATOR;
-  private Forecast forecast;
-  private Forecast[] forecastArray;
+public class WeatherInfoCreatorTest {
+  Parcelable.Creator<WeatherInfo> uut = WeatherInfo.CREATOR;
+  private WeatherInfo weatherInfo;
+  private WeatherInfo[] weatherInfoArray;
   private Parcel someParcel;
-  private Forecast forecastCreated;
+  private WeatherInfo weatherInfoCreated;
   private int describeContentValue;
 
   @Before public void setup() {
-    forecast = new Forecast();
+    weatherInfo = new WeatherInfo();
   }
 
   @Test public void shouldCreateNewArrayWithCreator() {
@@ -48,7 +48,7 @@ public class ForecastCreatorTest {
 
     whenCreatingFromParcel();
 
-    thenForecastCreatedShouldBeEqualTo(forecast);
+    thenForecastCreatedShouldBeEqualTo(weatherInfo);
   }
 
   @Test public void shouldWriteFromParcelWithNullValues() {
@@ -58,7 +58,7 @@ public class ForecastCreatorTest {
 
     whenCreatingFromParcel();
 
-    thenForecastCreatedShouldBeEqualTo(forecast);
+    thenForecastCreatedShouldBeEqualTo(weatherInfo);
   }
 
   @Test public void shouldNotMatchGivenDifferentHumidity() {
@@ -69,7 +69,7 @@ public class ForecastCreatorTest {
 
     whenCreatingFromParcel();
 
-    thenForecastCreatedShouldNotBeEqualTo(forecast);
+    thenForecastCreatedShouldNotBeEqualTo(weatherInfo);
   }
 
   @Test public void shouldNotMatchGivenDifferentDate() {
@@ -80,7 +80,7 @@ public class ForecastCreatorTest {
 
     whenCreatingFromParcel();
 
-    thenForecastCreatedShouldNotBeEqualTo(forecast);
+    thenForecastCreatedShouldNotBeEqualTo(weatherInfo);
   }
 
   @Test public void shouldNotDescribeContent() {
@@ -94,7 +94,7 @@ public class ForecastCreatorTest {
 
   @Test
   public void equalsContract() {
-    EqualsVerifier.forClass(Forecast.class)
+    EqualsVerifier.forClass(WeatherInfo.class)
         .suppress(Warning.NONFINAL_FIELDS, Warning.NULL_FIELDS)
         .verify();
   }
@@ -104,57 +104,57 @@ public class ForecastCreatorTest {
   }
 
   private void whenDescribingContentForParcelable() {
-    describeContentValue = forecast.describeContents();
+    describeContentValue = weatherInfo.describeContents();
   }
 
   private void givenNewDate(String newDate) {
-    forecast.setDateTime(newDate);
+    weatherInfo.setDateTime(newDate);
   }
 
-  private void thenForecastCreatedShouldNotBeEqualTo(Forecast forecast) {
-    assertNotEquals(forecast, forecastCreated);
+  private void thenForecastCreatedShouldNotBeEqualTo(WeatherInfo weatherInfo) {
+    assertNotEquals(weatherInfo, weatherInfoCreated);
   }
 
   private void givenNewHumidity(String newHumidity) {
-    forecast.setHumidity(newHumidity);
+    weatherInfo.setHumidity(newHumidity);
   }
 
-  private void thenForecastCreatedShouldBeEqualTo(Forecast expectedForecast) {
-    assertEquals(expectedForecast.hashCode(), forecastCreated.hashCode());
-    assertEquals(expectedForecast, forecastCreated);
+  private void thenForecastCreatedShouldBeEqualTo(WeatherInfo expectedWeatherInfo) {
+    assertEquals(expectedWeatherInfo.hashCode(), weatherInfoCreated.hashCode());
+    assertEquals(expectedWeatherInfo, weatherInfoCreated);
   }
 
   private void whenCreatingFromParcel() {
-    forecastCreated = uut.createFromParcel(someParcel);
+    weatherInfoCreated = uut.createFromParcel(someParcel);
     someParcel.recycle();
   }
 
   @TargetApi(Build.VERSION_CODES.M) private void givenWritingToParcel() {
     someParcel = Parcel.obtain();
-    forecast.writeToParcel(someParcel, 0);
+    weatherInfo.writeToParcel(someParcel, 0);
     someParcel.setDataPosition(0);
   }
 
   private void givenForecastWithValues(int weatherId, int cityId, String cityName, double speed,
       double temp, String humidity, String date, String country, double deg, String desc) {
-    forecast.setWeatherId(weatherId);
-    forecast.setCityId(cityId);
-    forecast.setCityName(cityName);
-    forecast.setSpeed(speed);
-    forecast.setTemperature(temp);
-    forecast.setHumidity(humidity);
-    forecast.setDateTime(date);
-    forecast.setCountry(country);
-    forecast.setDeg(deg);
-    forecast.setDescription(desc);
+    weatherInfo.setWeatherId(weatherId);
+    weatherInfo.setCityId(cityId);
+    weatherInfo.setCityName(cityName);
+    weatherInfo.setSpeed(speed);
+    weatherInfo.setTemperature(temp);
+    weatherInfo.setHumidity(humidity);
+    weatherInfo.setDateTime(date);
+    weatherInfo.setCountry(country);
+    weatherInfo.setDeg(deg);
+    weatherInfo.setDescription(desc);
   }
 
   private void thenShouldCreateAnArrayWithSize(int expectedSize) {
     assertNotNull(expectedSize);
-    assertEquals(expectedSize, forecastArray.length);
+    assertEquals(expectedSize, weatherInfoArray.length);
   }
 
   private void whenCreatingNewArrayWithSize(int givenExpectedSize) {
-    forecastArray = uut.newArray(givenExpectedSize);
+    weatherInfoArray = uut.newArray(givenExpectedSize);
   }
 }
