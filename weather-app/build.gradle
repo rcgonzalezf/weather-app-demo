@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 apply plugin: 'jacoco-android'
 
 android {
@@ -10,7 +12,7 @@ android {
     minSdkVersion 14
     targetSdkVersion 28
     versionCode 4
-    versionName "0.2.0"
+    versionName "0.2.1"
 
     testApplicationId "org.rcgonzalezf.weather.test"
     testHandleProfiling true
@@ -47,6 +49,7 @@ android {
 dependencies {
   implementation project(':weather-library')
   implementation fileTree(dir: 'libs', include: ['*.jar'])
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
   implementation 'androidx.appcompat:appcompat:1.0.0'
   implementation 'androidx.legacy:legacy-support-v4:1.0.0'
@@ -73,6 +76,7 @@ dependencies {
   androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0', {
     exclude group: 'com.android.support', module: 'support-annotations'
   }
+  androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.1.0'
 }
 jacoco {
   toolVersion = "0.8.3"
