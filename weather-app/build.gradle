@@ -11,8 +11,8 @@ android {
     applicationId "rcgonzalezf.org.weather"
     minSdkVersion 14
     targetSdkVersion 28
-    versionCode 4
-    versionName "0.2.0"
+    versionCode 5
+    versionName "0.2.1"
 
     testApplicationId "org.rcgonzalezf.weather.test"
     testHandleProfiling true
