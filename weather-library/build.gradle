@@ -60,7 +60,6 @@ dependencies {
   testImplementation 'org.robolectric:robolectric:4.3'
   testImplementation 'nl.jqno.equalsverifier:equalsverifier:2.1.5'
   testImplementation 'org.meanbean:meanbean:2.0.3'
-
 }
 
 

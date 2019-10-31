@@ -1,6 +1,7 @@
 package org.rcgonzalezf.weather.espresso.navigation
 
 import androidx.test.espresso.Espresso
+import androidx.test.espresso.Espresso.onIdle
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -31,8 +32,9 @@ class WeatherListUi {
     }
 
     class Verifications {
-
         internal fun checkWeatherResultCity(expectedCity: String) {
+            onIdle()
+            // TODO what next onView is doing?
             onView(withId(R.id.main_recycler_view))
             onView(RecyclerViewMatcher(R.id.main_recycler_view).atPosition(1))
                     .check(matches(hasDescendant(withText(expectedCity))))
