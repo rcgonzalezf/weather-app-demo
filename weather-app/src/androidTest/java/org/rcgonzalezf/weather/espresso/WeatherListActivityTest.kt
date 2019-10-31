@@ -39,7 +39,6 @@ class WeatherListActivityTest {
         WeatherListUi.Navigations().openDialog()
         EnterCityManuallyUi.Actions().pressOkButton()
 
-
         uut.checkWeatherResultCity("Portland, US")
     }
 }
