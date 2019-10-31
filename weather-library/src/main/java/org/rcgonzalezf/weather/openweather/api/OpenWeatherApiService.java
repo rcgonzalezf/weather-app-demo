@@ -25,7 +25,7 @@ public interface OpenWeatherApiService {
       @Query(LON) String lon, @Query(APP_ID) String appId);
 
   // "https://api.openweathermap.org/data/2.5/forecast?q=London&type=like&APPID=someApiKey",
-  @GET("forecast") Call<OpenWeatherForecastData> findForecastFiveDaysByQuery(@Query("q") String query,
+  @GET("forecast") Call<OpenWeatherForecastData> findForecastFiveDaysByQuery(@Query(value = "q", encoded = true) String query,
       @Query(TYPE) String type, @Query(APP_ID) String appId);
 
   /*
@@ -38,6 +38,6 @@ public interface OpenWeatherApiService {
       @Query(LON) String lon, @Query(APP_ID) String appId);
 
   // "https://api.openweathermap.org/data/2.5/weather?q=London&type=like&APPID=someApiKey",
-  @GET("weather") Call<OpenWeatherCurrentData> findWeatherByQuery(@Query("q") String query,
+  @GET("weather") Call<OpenWeatherCurrentData> findWeatherByQuery(@Query(value = "q", encoded = true) String query,
       @Query(TYPE) String type, @Query(APP_ID) String appId);
 }
