@@ -15,7 +15,7 @@ android {
     testApplicationId "org.rcgonzalezf.weather.test"
     testHandleProfiling true
     testFunctionalTest true
-    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
   }
   buildTypes {
     debug {
@@ -48,12 +48,12 @@ dependencies {
   implementation project(':weather-library')
   implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-  implementation 'com.android.support:appcompat-v7:28.0.0'
-  implementation 'com.android.support:support-v4:28.0.0'
-  implementation 'com.android.support:recyclerview-v7:28.0.0'
-  implementation 'com.android.support:cardview-v7:28.0.0'
-  implementation 'com.android.support:design:28.0.0'
-  implementation 'com.android.support:palette-v7:28.0.0'
+  implementation 'androidx.appcompat:appcompat:1.0.0'
+  implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+  implementation 'androidx.recyclerview:recyclerview:1.0.0'
+  implementation 'androidx.cardview:cardview:1.0.0'
+  implementation 'com.google.android.material:material:1.0.0'
+  implementation 'androidx.palette:palette:1.0.0'
   implementation 'com.google.android.gms:play-services-location:16.0.0'
   implementation 'com.google.android.gms:play-services-analytics:16.0.4'
   implementation 'com.crittercism:crittercism-android-agent:5.6.4'
@@ -65,11 +65,11 @@ dependencies {
   testImplementation 'org.jmockit:jmockit:1.34'
 
   androidTestImplementation 'junit:junit:4.12'
-  androidTestImplementation 'com.android.support:support-annotations:28.0.0'
-  androidTestImplementation 'com.android.support.test:runner:1.0.2'
-  androidTestImplementation 'com.android.support.test:rules:1.0.2'
+  androidTestImplementation 'androidx.annotation:annotation:1.0.0'
+  androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+  androidTestImplementation 'androidx.test:rules:1.1.1'
 
-  androidTestImplementation 'com.android.support.test.espresso:espresso-core:2.2.2', {
+  androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0', {
     exclude group: 'com.android.support', module: 'support-annotations'
   }
 }

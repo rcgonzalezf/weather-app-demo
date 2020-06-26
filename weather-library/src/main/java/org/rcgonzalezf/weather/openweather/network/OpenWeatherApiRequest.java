@@ -1,6 +1,7 @@
 package org.rcgonzalezf.weather.openweather.network;
 
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.VisibleForTesting;
+
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import org.rcgonzalezf.weather.common.models.converter.ModelConverter;
@@ -22,8 +23,9 @@ public class OpenWeatherApiRequest
     this(apiKey, new OpenWeatherApiModelConverter());
   }
 
-  @VisibleForTesting OpenWeatherApiRequest(String apiKey,
-      ModelConverter<OpenWeatherForecastData, ForecastData, OpenWeatherCurrentData> modelConverter) {
+  @VisibleForTesting
+  OpenWeatherApiRequest(String apiKey,
+                        ModelConverter<OpenWeatherForecastData, ForecastData, OpenWeatherCurrentData> modelConverter) {
     mApiKey = apiKey;
     mModelConverter = modelConverter;
   }

@@ -2,13 +2,16 @@ package rcgonzalezf.org.weather.common;
 
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.annotation.StringRes;
-import android.support.annotation.VisibleForTesting;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.annotation.StringRes;
+import androidx.annotation.VisibleForTesting;
+import androidx.core.app.ActivityCompat;
 import android.view.View;
+
+import com.google.android.material.snackbar.Snackbar;
+
 import java.lang.ref.WeakReference;
 import rcgonzalezf.org.weather.R;
 
@@ -26,8 +29,8 @@ public class PermissionChecker implements ActivityCompat.OnRequestPermissionsRes
   private PermissionResultListener mPermissionResultListener;
 
   public PermissionChecker(@NonNull String permission, @NonNull BaseActivity activity,
-      int requestCode, @NonNull View container, @StringRes int permissionGrantedMessageId,
-      @StringRes int permissionsNotGrantedMessageId, @StringRes int permissionRationaleMessageId) {
+                           int requestCode, @NonNull View container, @StringRes int permissionGrantedMessageId,
+                           @StringRes int permissionsNotGrantedMessageId, @StringRes int permissionRationaleMessageId) {
     this.mWeakContext = new WeakReference<>(activity);
     this.mPermission = permission;
     this.mRequestCode = requestCode;
@@ -55,7 +58,8 @@ public class PermissionChecker implements ActivityCompat.OnRequestPermissionsRes
     }
   }
 
-  @VisibleForTesting @NonNull View.OnClickListener getSnackBarClickListener() {
+  @VisibleForTesting
+  @NonNull View.OnClickListener getSnackBarClickListener() {
     return new View.OnClickListener() {
       @Override public void onClick(View view) {
         requestPermissions();

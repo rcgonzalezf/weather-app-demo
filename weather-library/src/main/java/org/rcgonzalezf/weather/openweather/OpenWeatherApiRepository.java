@@ -1,6 +1,7 @@
 package org.rcgonzalezf.weather.openweather;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+
 import java.util.List;
 import org.rcgonzalezf.weather.common.ServiceConfig;
 import org.rcgonzalezf.weather.common.WeatherRepository;
@@ -35,7 +36,8 @@ public class OpenWeatherApiRepository
     return getOpenWeatherApiRequest();
   }
 
-  @NonNull private OpenWeatherApiRequest getOpenWeatherApiRequest() {
+  @NonNull
+  private OpenWeatherApiRequest getOpenWeatherApiRequest() {
     return new OpenWeatherApiRequest(mServiceConfig.getApiKey());
   }
 }

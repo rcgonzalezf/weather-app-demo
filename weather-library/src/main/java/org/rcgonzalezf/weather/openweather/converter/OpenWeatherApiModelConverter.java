@@ -1,6 +1,7 @@
 package org.rcgonzalezf.weather.openweather.converter;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.text.DateFormat;
@@ -50,7 +51,8 @@ public class OpenWeatherApiModelConverter
     return forecastData;
   }
 
-  private @Nullable List<ForecastData> populateWeatherFromPojo(List<ForecastData> forecastData) {
+  private @Nullable
+  List<ForecastData> populateWeatherFromPojo(List<ForecastData> forecastData) {
     if (mOpenWeatherCurrentData.getWeather() != null
         && mOpenWeatherCurrentData.getWeather().size() > 0) {
 

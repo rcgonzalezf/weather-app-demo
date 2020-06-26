@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -37,7 +39,8 @@ public class WeatherUtils {
     return getDayName(context, dateStr, todayDate);
   }
 
-  @VisibleForTesting static String getDayName(Context context, String dateStr, Date todayDate) {
+  @VisibleForTesting
+  static String getDayName(Context context, String dateStr, Date todayDate) {
     SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
     try {
       Date inputDate = dateFormat.parse(dateStr);

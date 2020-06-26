@@ -4,15 +4,17 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
-import android.support.annotation.VisibleForTesting;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
+import androidx.annotation.VisibleForTesting;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.List;
 import org.rcgonzalezf.weather.WeatherLibApp;
 import org.rcgonzalezf.weather.common.models.WeatherViewModel;
@@ -63,8 +65,9 @@ public class ModelAdapter<T extends WeatherViewModel>
     holder.itemView.setTag(mainModel);
   }
 
-  @VisibleForTesting void populateTemperatureViews(ModelAdapter.ModelViewHolder holder,
-      T mainModel) {
+  @VisibleForTesting
+  void populateTemperatureViews(ModelAdapter.ModelViewHolder holder,
+                                T mainModel) {
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
     boolean celsiusPreferred = prefs.getBoolean(SettingsActivity.PREF_TEMPERATURE_UNITS, true);
 

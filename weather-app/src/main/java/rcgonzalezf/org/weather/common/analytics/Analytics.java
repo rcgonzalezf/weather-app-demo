@@ -1,6 +1,7 @@
 package rcgonzalezf.org.weather.common.analytics;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+
 import rcgonzalezf.org.weather.WeatherApp;
 
 public class Analytics {

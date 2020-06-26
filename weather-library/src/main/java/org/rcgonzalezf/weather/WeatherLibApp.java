@@ -1,8 +1,10 @@
 package org.rcgonzalezf.weather;
 
 import android.app.Application;
-import android.support.annotation.VisibleForTesting;
 import android.util.Log;
+
+import androidx.annotation.VisibleForTesting;
+
 import java.io.File;
 import okhttp3.OkHttpClient;
 import org.rcgonzalezf.weather.common.ServiceConfig;

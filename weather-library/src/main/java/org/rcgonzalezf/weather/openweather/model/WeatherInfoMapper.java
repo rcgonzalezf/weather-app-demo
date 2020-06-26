@@ -1,7 +1,8 @@
 package org.rcgonzalezf.weather.openweather.model;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.rcgonzalezf.weather.common.models.WeatherInfo;
@@ -22,7 +23,8 @@ public class WeatherInfoMapper {
     return map(ALL);
   }
 
-  @VisibleForTesting @NonNull List<WeatherInfo> map(int howMany) {
+  @VisibleForTesting
+  @NonNull List<WeatherInfo> map(int howMany) {
     int size = 10;
     if (howMany == ALL) {
       size = INITIAL_SIZE * mData.size();

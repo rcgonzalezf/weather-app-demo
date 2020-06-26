@@ -1,11 +1,13 @@
 package rcgonzalezf.org.weather.utils;
 
-import android.support.annotation.DrawableRes;
+import androidx.annotation.DrawableRes;
+
 import rcgonzalezf.org.weather.R;
 
 public class WeatherArtUtils {
 
-  public static @DrawableRes int getArtResourceForWeatherCondition(int weatherId) {
+  public static @DrawableRes
+  int getArtResourceForWeatherCondition(int weatherId) {
     // Based on weather code data found at:
     // http://bugs.openweathermap.org/projects/api/wiki/Weather_Condition_Codes
     if (weatherId >= 200 && weatherId <= 232) {

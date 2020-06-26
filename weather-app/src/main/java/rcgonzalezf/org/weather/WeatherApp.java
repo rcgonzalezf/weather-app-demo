@@ -1,6 +1,7 @@
 package rcgonzalezf.org.weather;
 
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.VisibleForTesting;
+
 import com.crittercism.app.Crittercism;
 import com.facebook.stetho.Stetho;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
@@ -12,7 +13,8 @@ import rcgonzalezf.org.weather.common.analytics.observer.LogcatAnalyticsObserver
 
 public class WeatherApp extends WeatherLibApp {
 
-  @VisibleForTesting static boolean sIsDebugMode = BuildConfig.DEBUG;
+  @VisibleForTesting
+  static boolean sIsDebugMode = BuildConfig.DEBUG;
   private static AnalyticsManager sAnalyticsManagerInstance;
 
   @Override public void onCreate() {

@@ -5,16 +5,18 @@ import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +71,8 @@ public class WeatherListActivity extends BaseActivity
     outState.putCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE, mCityNameToSearchOnSwipe);
   }
 
-  @VisibleForTesting void onItemsLoadComplete() {
+  @VisibleForTesting
+  void onItemsLoadComplete() {
     toggleProgressIndicator();
     enableSwipeToRefreshLayout();
     if (mSwipeToRefreshLayout.isRefreshing()) {
@@ -165,7 +168,8 @@ public class WeatherListActivity extends BaseActivity
     this.mCityNameToSearchOnSwipe = cityName;
   }
 
-  private @Nullable String cityNameFromLatLon(double lat, double lon) {
+  private @Nullable
+  String cityNameFromLatLon(double lat, double lon) {
     String cityName = null;
     Geocoder geocoder = new Geocoder(this, Locale.getDefault());
 

@@ -1,7 +1,9 @@
 package rcgonzalezf.org.weather.common.analytics.observer;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+
 import java.util.Map;
 import rcgonzalezf.org.weather.common.analytics.AnalyticsBaseData;
 import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent;

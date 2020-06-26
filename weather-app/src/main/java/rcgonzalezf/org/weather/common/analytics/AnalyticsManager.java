@@ -4,8 +4,10 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
+
 import java.util.HashSet;
 import java.util.Set;
 import rcgonzalezf.org.weather.BuildConfig;
@@ -23,7 +25,8 @@ public class AnalyticsManager {
   public static final String NETWORK = "NETWORK";
   public static final String MULTIPANE = "MULTIPANE";
 
-  @VisibleForTesting static String sAndroidVersion = Build.VERSION.RELEASE;
+  @VisibleForTesting
+  static String sAndroidVersion = Build.VERSION.RELEASE;
   @VisibleForTesting static String sAppVersion = BuildConfig.VERSION_NAME;
   private Context mContext;
   private Set<AnalyticsObserver> mAnalyticsObservers = new HashSet<>();
@@ -55,7 +58,8 @@ public class AnalyticsManager {
     }
   }
 
-  @NonNull @NetworkType private String getNetworkType() {
+  @NonNull
+  @NetworkType private String getNetworkType() {
     ConnectivityManager connectivityManager =
         (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
     NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();

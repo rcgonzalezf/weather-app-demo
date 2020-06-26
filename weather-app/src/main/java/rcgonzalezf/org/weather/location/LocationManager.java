@@ -2,10 +2,13 @@ package rcgonzalezf.org.weather.location;
 
 import android.Manifest;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
-import android.support.design.widget.Snackbar;
 import android.view.View;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
+
+import com.google.android.material.snackbar.Snackbar;
+
 import java.lang.ref.WeakReference;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.common.BaseActivity;
@@ -14,7 +17,8 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
 
 public class LocationManager implements LocationRetrieverListener {
 
-  @VisibleForTesting static int CURRENT_SDK_INT = Build.VERSION.SDK_INT;
+  @VisibleForTesting
+  static int CURRENT_SDK_INT = Build.VERSION.SDK_INT;
   private final WeakReference<BaseActivity> baseActivityWeakReference;
   private final WeakReference<View> mContentWeakReference;
   private final LocationRetriever mLocationRetriever;
