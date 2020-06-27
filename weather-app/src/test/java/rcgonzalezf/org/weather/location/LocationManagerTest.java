@@ -2,8 +2,10 @@ package rcgonzalezf.org.weather.location;
 
 import android.annotation.TargetApi;
 import android.os.Build;
-import android.support.design.widget.Snackbar;
 import android.view.View;
+
+import com.google.android.material.snackbar.Snackbar;
+
 import mockit.Expectations;
 import mockit.FullVerifications;
 import mockit.Mocked;

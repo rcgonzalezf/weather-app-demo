@@ -2,9 +2,11 @@ package rcgonzalezf.org.weather;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatDelegate;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.appcompat.app.AppCompatDelegate;
+
 import mockit.Mocked;
 import mockit.Tested;
 import mockit.Verifications;

@@ -6,15 +6,17 @@ import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
-import androidx.core.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import androidx.annotation.IdRes;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

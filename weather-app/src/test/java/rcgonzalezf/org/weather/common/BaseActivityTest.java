@@ -8,18 +8,17 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.preference.PreferenceManager;
-import android.support.annotation.IdRes;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
-import androidx.core.app.FragmentActivity;
+
+import androidx.annotation.IdRes;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
-import androidx.core.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentActivity;
+
 import android.text.Editable;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +27,10 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -295,7 +298,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   @Test public void shouldCloseTheDrawerOnHomePressed(
-      @SuppressWarnings("UnusedParameters") @Mocked Snackbar snackbar, @Mocked MenuItem item) {
+          @SuppressWarnings("UnusedParameters") @Mocked Snackbar snackbar, @Mocked MenuItem item) {
     givenActivityCreated();
 
     whenPressingHome(item);

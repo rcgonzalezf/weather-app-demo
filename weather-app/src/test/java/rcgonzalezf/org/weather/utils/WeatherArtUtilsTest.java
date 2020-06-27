@@ -1,6 +1,7 @@
 package rcgonzalezf.org.weather.utils;
 
-import android.support.annotation.DrawableRes;
+import androidx.annotation.DrawableRes;
+
 import java.util.Arrays;
 import java.util.Collection;
 import org.junit.Test;
@@ -35,7 +36,8 @@ public class WeatherArtUtilsTest {
 
   @SuppressWarnings("WeakerAccess") @Parameterized.Parameter public int weatherId;
 
-  @SuppressWarnings("WeakerAccess") @Parameterized.Parameter(value = 1) public @DrawableRes int expectedDrawableWeatherArtId;
+  @SuppressWarnings("WeakerAccess") @Parameterized.Parameter(value = 1) public @DrawableRes
+  int expectedDrawableWeatherArtId;
 
   private @DrawableRes int mDrawableWeatherArtIdResult;
 
