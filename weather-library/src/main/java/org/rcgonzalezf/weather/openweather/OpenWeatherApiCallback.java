@@ -1,9 +1,7 @@
 package org.rcgonzalezf.weather.openweather;
 
 import android.util.Log;
-
 import androidx.annotation.VisibleForTesting;
-
 import java.lang.ref.WeakReference;
 import java.util.List;
 import org.rcgonzalezf.weather.common.listeners.OnUpdateWeatherListListener;

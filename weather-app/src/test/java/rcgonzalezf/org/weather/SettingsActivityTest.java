@@ -4,11 +4,10 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-
+import android.view.MenuItem;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.NavUtils;
-import android.view.MenuItem;
 import java.util.List;
 import mockit.Expectations;
 import mockit.FullVerifications;

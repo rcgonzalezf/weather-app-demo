@@ -1,7 +1,6 @@
 package org.rcgonzalezf.weather.openweather;
 
 import androidx.annotation.NonNull;
-
 import java.util.List;
 import org.rcgonzalezf.weather.common.ServiceConfig;
 import org.rcgonzalezf.weather.common.WeatherRepository;

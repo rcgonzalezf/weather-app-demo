@@ -6,11 +6,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import androidx.core.app.ActivityCompat;
 import android.view.View;
-
+import androidx.core.app.ActivityCompat;
 import com.google.android.material.snackbar.Snackbar;
-
 import mockit.Mock;
 import mockit.MockUp;
 import mockit.Mocked;

@@ -3,23 +3,19 @@ package rcgonzalezf.org.weather.utils;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-
 import androidx.annotation.StringRes;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-
 import mockit.Expectations;
 import mockit.Mocked;
 import mockit.Tested;
 import mockit.Verifications;
 import mockit.integration.junit4.JMockit;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import rcgonzalezf.org.weather.R;
 
 import static org.junit.Assert.assertEquals;

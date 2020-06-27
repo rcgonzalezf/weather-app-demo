@@ -1,7 +1,6 @@
 package rcgonzalezf.org.weather;
 
 import androidx.annotation.VisibleForTesting;
-
 import com.crittercism.app.Crittercism;
 import com.facebook.stetho.Stetho;
 import com.facebook.stetho.okhttp3.StethoInterceptor;

@@ -2,16 +2,13 @@ package rcgonzalezf.org.weather.common;
 
 import android.content.pm.PackageManager;
 import android.os.Build;
-
+import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.app.ActivityCompat;
-import android.view.View;
-
 import com.google.android.material.snackbar.Snackbar;
-
 import java.lang.ref.WeakReference;
 import rcgonzalezf.org.weather.R;
 

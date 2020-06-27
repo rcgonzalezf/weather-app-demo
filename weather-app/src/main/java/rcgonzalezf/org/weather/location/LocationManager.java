@@ -3,12 +3,9 @@ package rcgonzalezf.org.weather.location;
 import android.Manifest;
 import android.os.Build;
 import android.view.View;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
-
 import com.google.android.material.snackbar.Snackbar;
-
 import java.lang.ref.WeakReference;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.common.BaseActivity;

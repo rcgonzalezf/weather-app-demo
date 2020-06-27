@@ -1,9 +1,7 @@
 package org.rcgonzalezf.weather.openweather.network;
 
 import android.util.Log;
-
 import androidx.annotation.VisibleForTesting;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Executor;

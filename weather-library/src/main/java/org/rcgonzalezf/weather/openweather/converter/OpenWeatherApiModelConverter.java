@@ -1,7 +1,6 @@
 package org.rcgonzalezf.weather.openweather.converter;
 
 import androidx.annotation.Nullable;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.text.DateFormat;

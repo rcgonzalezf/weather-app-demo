@@ -6,11 +6,9 @@ import android.preference.PreferenceActivity;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.LayoutRes;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatDelegate;
-
 import rcgonzalezf.org.weather.common.analytics.Analytics;
 
 /**

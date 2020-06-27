@@ -1,7 +1,6 @@
 package rcgonzalezf.org.weather.utils;
 
 import androidx.annotation.DrawableRes;
-
 import rcgonzalezf.org.weather.R;
 
 public class WeatherArtUtils {

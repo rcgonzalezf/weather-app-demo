@@ -7,10 +7,9 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
-
+import android.view.MenuItem;
 import androidx.appcompat.app.ActionBar;
 import androidx.core.app.NavUtils;
-import android.view.MenuItem;
 import java.util.List;
 import rcgonzalezf.org.weather.common.analytics.Analytics;
 import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent;

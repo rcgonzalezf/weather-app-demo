@@ -1,7 +1,6 @@
 package org.rcgonzalezf.weather.common;
 
 import androidx.annotation.NonNull;
-
 import org.rcgonzalezf.weather.common.network.ApiCallback;
 import org.rcgonzalezf.weather.common.network.ApiError;
 import org.rcgonzalezf.weather.common.network.ApiResponse;

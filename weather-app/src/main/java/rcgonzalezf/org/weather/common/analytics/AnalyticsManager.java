@@ -4,10 +4,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
-
 import java.util.HashSet;
 import java.util.Set;
 import rcgonzalezf.org.weather.BuildConfig;

@@ -4,9 +4,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.appcompat.app.AppCompatDelegate;
-
 import mockit.Mocked;
 import mockit.Tested;
 import mockit.Verifications;

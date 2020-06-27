@@ -1,7 +1,6 @@
 package org.rcgonzalezf.weather.openweather;
 
 import androidx.annotation.NonNull;
-
 import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
