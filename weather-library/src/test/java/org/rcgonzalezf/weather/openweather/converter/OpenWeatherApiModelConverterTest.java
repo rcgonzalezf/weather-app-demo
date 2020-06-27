@@ -9,7 +9,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.rcgonzalezf.weather.BuildConfig;
 import org.rcgonzalezf.weather.R;
 import org.rcgonzalezf.weather.openweather.model.ForecastData;
 import org.rcgonzalezf.weather.openweather.model.OpenWeatherCurrentData;
@@ -25,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 23, application = WeatherTestLibApp.class)
+@Config(sdk = 23, application = WeatherTestLibApp.class)
 public class OpenWeatherApiModelConverterTest extends ConverterHelperTest {
 
   private OpenWeatherApiModelConverter uut;

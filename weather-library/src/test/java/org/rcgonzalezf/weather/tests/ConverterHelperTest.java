@@ -5,14 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import org.junit.After;
 import org.junit.runner.RunWith;
-import org.rcgonzalezf.weather.BuildConfig;
 import org.rcgonzalezf.weather.WeatherLibApp;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertNotNull;
 
-@RunWith(RobolectricTestRunner.class) @Config(constants = BuildConfig.class, sdk = 23)
+@RunWith(RobolectricTestRunner.class) @Config(sdk = 23, application = WeatherTestLibApp.class)
 public abstract class ConverterHelperTest {
 
   protected InputStream mInputStream;

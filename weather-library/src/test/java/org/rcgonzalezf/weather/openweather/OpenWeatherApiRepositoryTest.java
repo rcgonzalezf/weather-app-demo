@@ -3,7 +3,6 @@ package org.rcgonzalezf.weather.openweather;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.rcgonzalezf.weather.BuildConfig;
 import org.rcgonzalezf.weather.common.ServiceConfig;
 import org.rcgonzalezf.weather.common.WeatherRepository;
 import org.rcgonzalezf.weather.common.network.ApiCallback;
@@ -19,7 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-@RunWith(RobolectricTestRunner.class) @Config(constants = BuildConfig.class, sdk = 23, application = WeatherTestLibApp.class)
+@RunWith(RobolectricTestRunner.class) @Config(sdk = 23, application = WeatherTestLibApp.class)
 public class OpenWeatherApiRepositoryTest {
 
   private WeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback> mWeatherRepository;
