@@ -1,6 +1,7 @@
 package org.rcgonzalezf.weather.tests;
 
-import android.support.annotation.RawRes;
+import androidx.annotation.RawRes;
+
 import java.io.IOException;
 import java.io.InputStream;
 import org.junit.After;
