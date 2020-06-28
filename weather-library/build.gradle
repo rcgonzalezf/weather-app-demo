@@ -73,5 +73,5 @@ jacocoAndroidUnitTestReport {
   html.enabled true
   xml.enabled true
   excludes += ['**/AutoValue_*.*',
-      '**/*JavascriptBridge.class', 'jdk.internal.*']
+      '**/*JavascriptBridge.class', 'jdk.internal.*', '*$Impl_*']
 }
