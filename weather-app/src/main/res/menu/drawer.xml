@@ -27,6 +27,11 @@
             android:title="@string/home"/>
 
         <item
+            android:id="@+id/drawer_cities"
+            android:icon="@drawable/ic_baseline_location_city_24dp"
+            android:title="@string/action_cities"/>
+
+        <item
             android:id="@+id/drawer_settings"
             android:icon="@drawable/ic_settings_black_24dp"
             android:title="@string/action_settings"/>

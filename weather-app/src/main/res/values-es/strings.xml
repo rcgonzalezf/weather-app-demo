@@ -26,5 +26,6 @@
   <string name="permissions_location_granted">Permisos de ubicación obtenidos, obteniendo ubicación.</string>
   <string name="permissions_location_rationale">El permiso de ubicación es necesario para obtener el clima de la ubicación actual.</string>
   <string name="profile_image">Avatar</string>
+  <string name="action_cities">Ciudades</string>
 
 </resources>
