@@ -16,12 +16,15 @@ import mockit.Tested;
 import mockit.Verifications;
 import mockit.integration.junit4.JMockit;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import rcgonzalezf.org.weather.R;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -36,11 +39,13 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
   private int mTestRequestCode;
   private boolean mHasPermission;
   private boolean mOnSuccessCalled;
+  @org.mockito.Mock
   private PermissionResultListener mPermissionListener;
   private View.OnClickListener mOkClickListener;
   private boolean mOnFailureCalled;
 
   @Before public void setup() {
+    MockitoAnnotations.initMocks(this);
     BaseActivity activityMock = mock(BaseActivity.class);
     View containerMock = mock(View.class);
 
@@ -85,7 +90,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
     thenShouldShowSnackbarWithPermissionRationaleMessage(false);
   }
 
-  @Ignore(value = "JMockit and Jacoco conflict")
   @Test public void shouldCallPermissionOnSuccess() {
     givenPermissionResultListener();
     givenPermissionRequested(mPermissionListener);
@@ -96,7 +100,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
     thenShouldCallOnFailure(false);
   }
 
-  @Ignore(value = "JMockit and Jacoco conflict")
+  @Test
   public void shouldCallFailureOnEmptyGrantedResults() {
     givenPermissionResultListener();
     givenPermissionRequested(mPermissionListener);
@@ -107,7 +111,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
     thenShouldCallOnFailure(true);
   }
 
-  @Ignore(value = "JMockit and Jacoco conflict")
   @Test public void shouldCallPermissionOnFailure() {
     givenPermissionResultListener();
     givenPermissionRequested(mPermissionListener);
@@ -118,7 +121,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
     thenShouldCallOnFailure(true);
   }
 
-  @Ignore(value = "JMockit and Jacoco conflict")
   @Test public void shouldNotBreakTheOnRequestPermissionsResultChain() {
     givenPermissionResultListener();
     givenPermissionRequested(mPermissionListener);
@@ -209,21 +211,24 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
   @TargetApi(Build.VERSION_CODES.M)
   private void whenOnPermissionRequestWithEmptyGrantedResults() {
-    uut.onRequestPermissionsResult(mTestRequestCode, new String[] { "somePermission" }, new int[] {});
+    uut.onRequestPermissionsResult(mTestRequestCode, new String[] { "somePermission" },
+        new int[] {});
   }
 
-  private void givenPermissionResultListener() {
-    //noinspection unused
-    mPermissionListener = new MockUp<PermissionResultListener>() {
-
-      @Mock public void onSuccess() {
+  @SuppressWarnings("rawtypes") private void givenPermissionResultListener() {
+    doAnswer(new Answer() {
+      @Override public Object answer(InvocationOnMock invocation) {
         mOnSuccessCalled = true;
+        return null;
       }
+    }).when(mPermissionListener).onSuccess();
 
-      @Mock public void onFailure() {
+    doAnswer(new Answer() {
+      @Override public Object answer(InvocationOnMock invocation) {
         mOnFailureCalled = true;
+        return null;
       }
-    }.getMockInstance();
+    }).when(mPermissionListener).onFailure();
   }
 
   private void givenPermissionRequested(PermissionResultListener mPermissionListener) {
@@ -275,5 +280,4 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
       }
     };
   }
-
 }
