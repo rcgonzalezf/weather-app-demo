@@ -31,6 +31,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockitoAnnotations;
 import org.rcgonzalezf.weather.common.ServiceConfig;
 import org.rcgonzalezf.weather.common.WeatherRepository;
 import org.rcgonzalezf.weather.common.models.WeatherInfo;
@@ -59,6 +60,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   @SuppressWarnings("unused") @Mocked private ModelAdapter<WeatherInfo> mAdapter;
   @SuppressWarnings("unused") @Mocked private OpenWeatherApiCallback mOpenWeatherApiCallback;
   @SuppressWarnings("unused") @Mocked private SwipeRefreshLayout mSwipeToRefreshLayout;
+  @org.mockito.Mock
+  private Bundle savedInstanceState;
 
   @SuppressWarnings("unused") @Mocked
   private OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder
@@ -77,6 +80,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   private boolean mIsPerformingAction;
 
   @Before public void setUp() throws Exception {
+    MockitoAnnotations.initMocks(this);
     uut = new WeatherListActivity();
 
     new MockUp<AppCompatActivity>() {
@@ -133,7 +137,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   @Test public void shouldLoadOldData(@Mocked Thread thread) {
-    givenActivityCreated(null);
+    givenActivityCreated(savedInstanceState);
     givenForecastList();
     givenForecastElement("someCity");
 
@@ -146,7 +150,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   @Test
   public void shouldNotLoadOldForNullList(@SuppressWarnings("UnusedParameters") @Mocked Log log) {
-    givenActivityCreated(null);
+    givenActivityCreated(savedInstanceState);
 
     whenLoadingOldData();
 
@@ -334,7 +338,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   private void givenTestExecutor() {
-    Deencapsulation.setField(uut, "mExecutor", new Executor() {
+    Deencapsulation.setField(uut, "executor", new Executor() {
       @Override public void execute(Runnable command) {
         command.run();
       }
