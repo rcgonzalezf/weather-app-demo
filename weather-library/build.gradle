@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'jacoco-android'
+apply plugin: "com.vanniktech.android.junit.jacoco"
 
 android {
   compileSdkVersion 28
@@ -29,11 +29,6 @@ android {
     unitTests {
       includeAndroidResources = true
     }
-    unitTests.all {
-      jacoco {
-        includeNoLocationClasses = true
-      }
-    }
   }
 
   lintOptions {
@@ -45,7 +40,7 @@ android {
 
 dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
-  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
 
   implementation 'androidx.appcompat:appcompat:1.0.0'
   implementation 'com.squareup.retrofit2:retrofit:2.1.0'
@@ -62,19 +57,27 @@ dependencies {
   testImplementation 'org.meanbean:meanbean:2.0.3'
 }
 
+junitJacoco {
+  jacocoVersion = "$versions.jacoco"
+  //ignoreProjects = [] // type String array
 
-jacoco {
-  toolVersion = "0.8.4"
-}
-
-tasks.withType(Test) {
-  jacoco.includeNoLocationClasses = true
-}
-
-jacocoAndroidUnitTestReport {
-  csv.enabled false
-  html.enabled true
-  xml.enabled true
-  excludes += ['**/AutoValue_*.*',
-      '**/*JavascriptBridge.class', 'jdk.internal.*', '*$Impl_*']
+  // exclusion lists taken from https://github.com/arturdm/jacoco-android-gradle-plugin
+  excludes = [
+      // Android excludes
+      '**/R.class',
+      '**/R$*.class',
+      '**/BuildConfig.*',
+      '**/Manifest*.*',
+      // Data bindging
+      'android/databinding/**/*.class',
+      '**/android/databinding/*Binding.class',
+      '**/BR.*',
+      // Dagger 2
+      '**/*_MembersInjector.class',
+      '**/Dagger*Component.class',
+      '**/Dagger*Component$Builder.class',
+      '**/*Module_*Factory.class',
+      '**/AutoValue_*.*', '**/*JavascriptBridge.class', 'jdk.internal.*', '*$Impl_*']
+  includeNoLocationClasses = true
+  includeInstrumentationCoverageInMergedReport = false
 }

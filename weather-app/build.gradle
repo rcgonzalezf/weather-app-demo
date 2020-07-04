@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'jacoco-android'
+apply plugin: "com.vanniktech.android.junit.jacoco"
 
 android {
   compileSdkVersion 28
@@ -38,18 +38,13 @@ android {
   testOptions {
     unitTests.returnDefaultValues = true
     unitTests.includeAndroidResources = true
-    unitTests.all {
-      jacoco {
-        includeNoLocationClasses = true
-      }
-    }
   }
 }
 
 dependencies {
   implementation project(':weather-library')
   implementation fileTree(dir: 'libs', include: ['*.jar'])
-  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
 
   implementation 'androidx.appcompat:appcompat:1.0.0'
   implementation 'androidx.legacy:legacy-support-v4:1.0.0'
@@ -78,14 +73,29 @@ dependencies {
   }
   androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.1.0'
 }
-jacoco {
-  toolVersion = "0.8.3"
+
+junitJacoco {
+  jacocoVersion = "$versions.jacoco"
+  //ignoreProjects = [] // type String array
+  // exclusion lists taken from https://github.com/arturdm/jacoco-android-gradle-plugin
+  excludes = [
+      // Android excludes
+      '**/R.class',
+      '**/R$*.class',
+      '**/BuildConfig.*',
+      '**/Manifest*.*',
+      // Data bindging
+      'android/databinding/**/*.class',
+      '**/android/databinding/*Binding.class',
+      '**/BR.*',
+      // Dagger 2
+      '**/*_MembersInjector.class',
+      '**/Dagger*Component.class',
+      '**/Dagger*Component$Builder.class',
+      '**/*Module_*Factory.class',
+      '**/AutoValue_*.*', '**/*JavascriptBridge.class', 'jdk.internal.*', '*$Impl_*']
+  includeNoLocationClasses = true
+  includeInstrumentationCoverageInMergedReport = false
 }
-jacocoAndroidUnitTestReport {
-  csv.enabled false
-  html.enabled true
-  xml.enabled true
-  excludes += ['**/AutoValue_*.*',
-      '**/*JavascriptBridge.class', 'jdk.internal.*', '*$Impl_*']
-}
+
 apply plugin: 'com.google.gms.google-services'
