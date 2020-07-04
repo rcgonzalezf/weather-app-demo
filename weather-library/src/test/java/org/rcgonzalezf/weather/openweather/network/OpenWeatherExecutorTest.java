@@ -23,7 +23,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @RunWith(RobolectricTestRunner.class)
-@Config(application = WeatherTestLibApp.class)
+@Config(application = WeatherTestLibApp.class, sdk = 28)
 public class OpenWeatherExecutorTest {
 
   private OpenWeatherExecutor uut;
