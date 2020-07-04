@@ -28,19 +28,18 @@ import rcgonzalezf.org.weather.adapters.ModelAdapter.OnItemClickListener
 import rcgonzalezf.org.weather.common.BaseActivity
 import rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog
 import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent
-import java.util.ArrayList
 import java.util.Locale
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
 class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel>,
         OnUpdateWeatherListListener {
-    private var recyclerView: RecyclerView? = null
-    private var swipeToRefreshLayout: SwipeRefreshLayout? = null
-    private var adapter: ModelAdapter<WeatherInfo>? = null
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var swipeToRefreshLayout: SwipeRefreshLayout
+    private lateinit var adapter: ModelAdapter<WeatherInfo>
     private var openWeatherApiCallback: OpenWeatherApiCallback? = null
     private var cityNameToSearchOnSwipe: CharSequence? = null
-    private var progress: ProgressBar? = null
+    private lateinit var progress: ProgressBar
     private val executor: Executor = Executors.newSingleThreadExecutor()
 
     public override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,7 +50,7 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
         progress = findViewById(id.progress_bar)
         swipeToRefreshLayout = findViewById(id.swipe_to_refresh_layout)
         enableSwipeToRefreshLayout()
-        swipeToRefreshLayout?.setOnRefreshListener(createSwipeToRefreshListener())
+        swipeToRefreshLayout.setOnRefreshListener(createSwipeToRefreshListener())
     }
 
     public override fun onSaveInstanceState(outState: Bundle) {
@@ -63,27 +62,21 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
     fun onItemsLoadComplete() {
         toggleProgressIndicator()
         enableSwipeToRefreshLayout()
-        swipeToRefreshLayout?.let {
-            if (it.isRefreshing) {
-                it.isRefreshing = false
-            }
-        }
+        swipeToRefreshLayout.isRefreshing = !swipeToRefreshLayout.isRefreshing
     }
 
     @VisibleForTesting
     fun toggleProgressIndicator() {
-        progress?.let {
-            it.visibility = if (it.visibility == View.VISIBLE) {
-                View.GONE
-            } else {
-                View.VISIBLE
-            }
+        progress.visibility = if (progress.visibility == View.VISIBLE) {
+            View.GONE
+        } else {
+            View.VISIBLE
         }
     }
 
     override fun onEnterAnimationComplete() {
         super.onEnterAnimationComplete()
-        recyclerView?.scheduleLayoutAnimation()
+        recyclerView.scheduleLayoutAnimation()
     }
 
     override fun onItemClick(view: View, viewModel: WeatherViewModel) {
@@ -174,8 +167,7 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
         val addresses: List<Address>
         try {
             addresses = geocoder.getFromLocation(lat, lon, 1)
-            cityName = addresses[0]
-                    .locality
+            cityName = addresses[0].locality
         } catch (e: Exception) {
             Log.d(TAG, "error retrieving the cityName with Geocoder")
         }
@@ -193,10 +185,10 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
 
     private fun setupRecyclerView() {
         adapter = ModelAdapter(ArrayList(), this)
-        adapter?.setOnItemClickListener(this)
+        adapter.setOnItemClickListener(this)
         recyclerView = findViewById<View>(id.main_recycler_view) as RecyclerView
-        recyclerView?.layoutManager = LinearLayoutManager(this)
-        recyclerView?.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
     }
 
     private fun notifyAdapter(weatherInfoList: List<WeatherInfo>) {
@@ -207,10 +199,9 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
     @VisibleForTesting
     fun createNotifyRunnable(weatherInfoList: List<WeatherInfo>?): Runnable {
         return Runnable {
-            adapter?.let {
-                it.setItems(weatherInfoList)
-                it.notifyDataSetChanged()
-            }
+            adapter.setItems(weatherInfoList)
+            adapter.notifyDataSetChanged()
+
             onItemsLoadComplete()
         }
     }
@@ -226,7 +217,7 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
     }
 
     private fun enableSwipeToRefreshLayout() {
-        swipeToRefreshLayout?.isEnabled = cityNameToSearchOnSwipe != null
+        swipeToRefreshLayout.isEnabled = cityNameToSearchOnSwipe != null
     }
 
     companion object {
