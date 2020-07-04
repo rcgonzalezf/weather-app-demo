@@ -4,15 +4,15 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: "com.vanniktech.android.junit.jacoco"
 
 android {
-  compileSdkVersion 28
-  buildToolsVersion "28.0.3"
+  compileSdkVersion 29
+  buildToolsVersion "29.0.3"
 
   defaultConfig {
     applicationId "rcgonzalezf.org.weather"
     minSdkVersion 14
-    targetSdkVersion 28
-    versionCode 5
-    versionName "0.2.1"
+    targetSdkVersion 29
+    versionCode 6
+    versionName "0.2.2"
 
     testApplicationId "org.rcgonzalezf.weather.test"
     testHandleProfiling true
