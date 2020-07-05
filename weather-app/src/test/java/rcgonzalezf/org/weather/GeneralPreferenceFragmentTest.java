@@ -19,8 +19,12 @@ import mockit.integration.junit4.JMockit;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockitoAnnotations;
+import org.rcgonzalezf.weather.WeatherLibApp;
+
 import rcgonzalezf.org.weather.common.analytics.Analytics;
 import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent;
+import rcgonzalezf.org.weather.common.analytics.AnalyticsManager;
 
 import static org.junit.Assert.assertTrue;
 import static rcgonzalezf.org.weather.SettingsActivity.PREF_TEMPERATURE_UNITS;
@@ -32,15 +36,20 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Sett
 
   @Tested private SettingsActivity.GeneralPreferenceFragment uut;
 
-  @SuppressWarnings("unused") @Mocked private PreferenceFragment mPreferenceFragment;
-  @SuppressWarnings("unused") @Mocked private Context mContext;
-  @SuppressWarnings("unused") @Mocked private SharedPreferences mSharedPreferences;
-  @SuppressWarnings("unused") @Mocked private PreferenceManager mPreferenceManager;
-  @SuppressWarnings("unused") @Mocked private Preference mUsernameToDisplay;
-  @SuppressWarnings("unused") @Mocked private SwitchPreference mTemperatureUnitsPreference;
+  @SuppressWarnings("unused") @Mocked private PreferenceFragment preferenceFragment;
+  @SuppressWarnings("unused") @Mocked private Context context;
+  @SuppressWarnings("unused") @Mocked private SharedPreferences sharedPreferences;
+  @SuppressWarnings("unused") @Mocked private PreferenceManager preferenceManager;
+  @SuppressWarnings("unused") @Mocked private Preference usernameToDisplay;
+  @SuppressWarnings("unused") @Mocked private SwitchPreference temperatureUnitsPreference;
+  @SuppressWarnings("unused") @Mocked private AnalyticsManager analyticsManager;
+  @org.mockito.Mock
+  private WeatherApp weatherApp;
   private boolean mOptionsItemSelected;
 
-  @Before public void setUp() throws Exception {
+  @Before public void setUp() {
+    MockitoAnnotations.initMocks(this);
+    WeatherLibApp.setAppInstance(weatherApp);
     uut = new SettingsActivity.GeneralPreferenceFragment();
   }
 
@@ -95,11 +104,11 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Sett
   }
 
   private void givenTemperatureUnitPreference() {
-    Deencapsulation.setField(uut, "mTemperatureUnitsPreference", mTemperatureUnitsPreference);
+    Deencapsulation.setField(uut, "temperatureUnitsPreference", temperatureUnitsPreference);
   }
 
   private void whenPreferenceClick() {
-    uut.onPreferenceClick(mUsernameToDisplay);
+    uut.onPreferenceClick(usernameToDisplay);
   }
 
   private void thenShouldTrackEvent(final String nameChange, final Analytics analytics,
@@ -121,19 +130,19 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Sett
   }
 
   private void whenPreferenceChange(Object newValue) {
-    uut.onPreferenceChange(mTemperatureUnitsPreference, newValue);
+    uut.onPreferenceChange(temperatureUnitsPreference, newValue);
   }
 
   private void givenPreferences() {
     new Expectations() {{
-      mPreferenceFragment.findPreference(PREF_TEMPERATURE_UNITS);
-      result = mTemperatureUnitsPreference;
+      preferenceFragment.findPreference(PREF_TEMPERATURE_UNITS);
+      result = temperatureUnitsPreference;
     }};
   }
 
   private void thenShouldDelegateOptionsItemSelected(final MenuItem menuItem) {
     new Verifications() {{
-      mPreferenceFragment.onOptionsItemSelected(menuItem);
+      preferenceFragment.onOptionsItemSelected(menuItem);
     }};
   }
 
@@ -143,7 +152,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Sett
 
   private void thenShouldStartActivity() {
     new Verifications() {{
-      mPreferenceFragment.startActivity(withAny(new Intent()));
+      preferenceFragment.startActivity(withAny(new Intent()));
     }};
   }
 
@@ -160,14 +169,14 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Sett
 
   private void givenPreviousValue() {
     new Expectations() {{
-      mSharedPreferences.getString(withAny("key"), "");
+      sharedPreferences.getString(withAny("key"), "");
       result = "someUserName";
     }};
   }
 
   private void thenShouldBindPreference(final String preferenceName) {
     new Verifications() {{
-      mPreferenceFragment.findPreference(preferenceName);
+      preferenceFragment.findPreference(preferenceName);
     }};
   }
 

@@ -23,7 +23,6 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(JMockit.class) public class WeatherUtilsTest {
 
-  @Tested private WeatherUtils uut;
   private boolean mHasInternetConnection;
   private String mDateStr;
   private String mDateFormatted;
@@ -33,10 +32,6 @@ import static org.junit.Assert.assertNotNull;
   private String mFormattedTemperature;
   private Date mTodayDate;
   private String mDayName;
-
-  @Before public void setUp() throws Exception {
-    uut = new WeatherUtils();
-  }
 
   @Test public void shouldHaveInternetConnection(@Mocked Context context,
       @Mocked ConnectivityManager connectivityManager, @Mocked NetworkInfo networkInfo) {

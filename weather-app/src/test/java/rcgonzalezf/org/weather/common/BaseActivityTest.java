@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.view.Menu;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.IdRes;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -25,14 +27,25 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.rcgonzalezf.weather.WeatherLibApp;
+import org.rcgonzalezf.weather.common.models.WeatherInfo;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+
 import mockit.Expectations;
 import mockit.FullVerifications;
 import mockit.Mock;
@@ -40,14 +53,12 @@ import mockit.MockUp;
 import mockit.Mocked;
 import mockit.Verifications;
 import mockit.integration.junit4.JMockit;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.rcgonzalezf.weather.common.models.WeatherInfo;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
+import rcgonzalezf.org.weather.WeatherApp;
 import rcgonzalezf.org.weather.common.analytics.Analytics;
 import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent;
+import rcgonzalezf.org.weather.common.analytics.AnalyticsManager;
 import rcgonzalezf.org.weather.location.LocationManager;
 import rcgonzalezf.org.weather.utils.WeatherUtils;
 
@@ -58,568 +69,638 @@ import static org.mockito.Mockito.mock;
 import static rcgonzalezf.org.weather.common.BaseActivity.FORECASTS;
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.MANUAL_SEARCH;
 
-@RunWith(JMockit.class) public class BaseActivityTest {
-
-  private BaseActivity uut;
-
-  @SuppressWarnings("unused") @Mocked private Activity mActivity;
-  @SuppressWarnings("unused") @Mocked private ContextWrapper mContextWrapper;
-  @SuppressWarnings("unused") @Mocked private Context mContext;
-  @SuppressWarnings("unused") @Mocked private FragmentActivity mFragmentActivity;
-  @SuppressWarnings("unused") @Mocked private AppCompatDelegate mDelegate;
-
-  @SuppressWarnings("unused") @Mocked private Toolbar mToolbar;
-  @SuppressWarnings("unused") @Mocked private DrawerLayout mDrawerLayout;
-  @SuppressWarnings("unused") @Mocked private NavigationView mNavigationView;
-  @SuppressWarnings("unused") @Mocked private TextView mTextView;
-  @SuppressWarnings("unused") @Mocked private EditText mEditText;
-  @SuppressWarnings("unused") @Mocked private SharedPreferences mSharedPreferences;
-  @SuppressWarnings("unused") @Mocked private PreferenceManager mPreferenceManager;
-  @SuppressWarnings("unused") @Mocked private FloatingActionButton mFloatingActionButton;
-  @SuppressWarnings("unused") @Mocked private Analytics mAnalytics;
-
-  private boolean mRetrievingFromCache;
-  private boolean mSearchingByQuery;
-  private boolean mSuperOnOptionsItemSelectedCalled;
-  private boolean mIsNullUserDisplayName;
-  private String mStoredData;
-  private int mRequestCode;
-  private String[] mPermissions;
-  private int[] mGrantResults;
-  private CharSequence mUserInput;
-  private View.OnClickListener mFabClickListener;
-  private DialogInterface.OnClickListener mDialogClickListener;
-  private NavigationView.OnNavigationItemSelectedListener mNavigationListener;
-
-  @Before public void setUp() {
-    //noinspection unused
-    new MockUp<View>() {
-      @Mock View inflate(Context context, int resource, ViewGroup root) {
-        return mEditText;
-      }
-
-      @Mock View findViewById(int id) {
-        return mEditText;
-      }
-    };
-    new MockUp<AppCompatActivity>() {
-      @SuppressWarnings("unused") @Mock View findViewById(@IdRes int id) {
-        View view = null;
-        if (id == R.id.toolbar) {
-          view = mToolbar;
-        } else if (id == R.id.drawer_layout) {
-          view = mDrawerLayout;
-        } else if (id == R.id.navigation_view) {
-          view = mNavigationView;
-        } else if (id == R.id.user_display_name) {
-          view = mIsNullUserDisplayName ? null : mTextView;
-        } else if (id == R.id.main_fab) {
-          view = mFloatingActionButton;
-        }
-        return view;
-      }
-
-      @SuppressWarnings("unused") @Mock boolean onOptionsItemSelected(MenuItem item) {
-        mSuperOnOptionsItemSelectedCalled = true;
-        return true;
-      }
-    };
-
-    uut = new BaseActivity() {
-      @Override protected void searchByQuery(String query, CharSequence userInput) {
-        mSearchingByQuery = true;
-      }
-
-      @Override public void searchByLocation(double lat, double lon) {
-      }
-
-      @Override public void loadOldData(List<WeatherInfo> weatherInfoList) {
-        mRetrievingFromCache = true;
-      }
-    };
-  }
-
-  @Test public void shouldInitLocationManagerWhenCreatingTheActivity(
-      @SuppressWarnings("UnusedParameters") @Mocked LocationManager mLocationManager, @Mocked View view) {
-
-    whenCreatingTheActivity();
-
-    thenLocationManagerShouldBeInstantiated(view);
-  }
-
-  @Test public void shouldConnectLocationManagerOnStart(@Mocked LocationManager mLocationManager) {
-    givenActivityCreated();
-
-    whenStartingTheActivity();
-
-    thenLocationManagerShouldBeConnected(mLocationManager);
-  }
-
-  @Test
-  public void shouldDisconnectLocationManagerOnStop(@Mocked LocationManager mLocationManager) {
-    givenActivityCreated();
-
-    whenStoppingTheActivity();
+@RunWith(JMockit.class)
+public class BaseActivityTest {
+
+    private BaseActivity uut;
+
+    @SuppressWarnings("unused")
+    @Mocked
+    private Activity mActivity;
+    @SuppressWarnings("unused")
+    @Mocked
+    private ContextWrapper mContextWrapper;
+    @SuppressWarnings("unused")
+    @Mocked
+    private Context mContext;
+    @SuppressWarnings("unused")
+    @Mocked
+    private FragmentActivity mFragmentActivity;
+    @SuppressWarnings("unused")
+    @Mocked
+    private AppCompatDelegate mDelegate;
+
+    @SuppressWarnings("unused")
+    @Mocked
+    private Toolbar mToolbar;
+    @SuppressWarnings("unused")
+    @Mocked
+    private DrawerLayout mDrawerLayout;
+    @SuppressWarnings("unused")
+    @Mocked
+    private NavigationView mNavigationView;
+    @org.mockito.Mock
+    private TextView mTextView;
+    @SuppressWarnings("unused")
+    @Mocked
+    private EditText mEditText;
+    @SuppressWarnings("unused")
+    @Mocked
+    private SharedPreferences mSharedPreferences;
+    @SuppressWarnings("unused")
+    @Mocked
+    private PreferenceManager mPreferenceManager;
+    @SuppressWarnings("unused")
+    @Mocked
+    private FloatingActionButton mFloatingActionButton;
+    @SuppressWarnings("unused")
+    @Mocked
+    private Analytics mAnalytics;
+    @SuppressWarnings("unused")
+    @Mocked
+    private AnalyticsManager analyticsManager;
+
+    private boolean mRetrievingFromCache;
+    private boolean mSearchingByQuery;
+    private boolean mSuperOnOptionsItemSelectedCalled;
+    private boolean mIsNullUserDisplayName;
+    private String mStoredData;
+    private int mRequestCode;
+    private String[] mPermissions;
+    private int[] mGrantResults;
+    private CharSequence mUserInput;
+    private View.OnClickListener mFabClickListener;
+    private DialogInterface.OnClickListener mDialogClickListener;
+    private NavigationView.OnNavigationItemSelectedListener mNavigationListener;
+    @org.mockito.Mock
+    private View content;
+    @org.mockito.Mock
+    private Bundle bundle;
+    @org.mockito.Mock
+    private WeatherApp weatherApp;
+
+    @Before
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+        WeatherLibApp.setAppInstance(weatherApp);
+        //noinspection unused
+        new MockUp<View>() {
+            @Mock
+            View inflate(Context context, int resource, ViewGroup root) {
+                return mEditText;
+            }
+
+            @Mock
+            View findViewById(int id) {
+                return mEditText;
+            }
+        };
+        new MockUp<AppCompatActivity>() {
+            @SuppressWarnings("unused")
+            @Mock
+            View findViewById(@IdRes int id) {
+                View view = null;
+                if (id == R.id.toolbar) {
+                    view = mToolbar;
+                } else if (id == R.id.drawer_layout) {
+                    view = mDrawerLayout;
+                } else if (id == R.id.navigation_view) {
+                    view = mNavigationView;
+                } else if (id == R.id.user_display_name) {
+                    view = mIsNullUserDisplayName ? null : mTextView;
+                } else if (id == R.id.main_fab) {
+                    view = mFloatingActionButton;
+                } else if (id == R.id.content) {
+                    view = content;
+                } else if (id == R.id.user_display_name) {
+                    view = mTextView;
+                }
+                return view;
+            }
 
-    thenLocationManagerShouldBeDisconnected(mLocationManager);
-  }
+            @SuppressWarnings("unused")
+            @Mock
+            boolean onOptionsItemSelected(MenuItem item) {
+                mSuperOnOptionsItemSelectedCalled = true;
+                return true;
+            }
+        };
 
-  @Test public void shouldCreateOptionsMenu() {
-    boolean createOptionsMenu = whenCreatingOptionsMenu();
+        uut = new BaseActivity() {
+            @Override
+            protected void searchByQuery(String query, CharSequence userInput) {
+                mSearchingByQuery = true;
+            }
 
-    thenMenuShouldBeCreated(createOptionsMenu);
-  }
+            @Override
+            public void searchByLocation(double lat, double lon) {
+            }
 
-  @Test public void shouldOpenDrawerWhenSelectingOptionMenu(@Mocked MenuItem item) {
-    givenActivityCreated();
-    givenMenuItemId(item, android.R.id.home);
+            @Override
+            public void loadOldData(List<WeatherInfo> weatherInfoList) {
+                mRetrievingFromCache = true;
+            }
+        };
+    }
 
-    whenOptionItemIsSelected(item);
+    @Test
+    public void shouldInitLocationManagerWhenCreatingTheActivity(
+            @SuppressWarnings("UnusedParameters") @Mocked LocationManager mLocationManager, @Mocked View view) {
 
-    thenShouldOpenDrawer();
-    thenShouldCallSuperOnOptionsItemSelected(false);
-  }
+        whenCreatingTheActivity();
 
-  @Test public void shouldNavigateToSettingWhenSelectingOptionMenu(@Mocked MenuItem item,
-      @Mocked Intent intent) {
-    givenActivityCreated();
-    givenMenuItemId(item, R.id.action_settings);
+        thenLocationManagerShouldBeInstantiated(view);
+    }
 
-    whenOptionItemIsSelected(item);
+    @Test
+    public void shouldConnectLocationManagerOnStart(@Mocked LocationManager mLocationManager) {
+        givenActivityCreated();
 
-    thenShouldNavigateToSettings(intent);
-    thenShouldCallSuperOnOptionsItemSelected(false);
-  }
+        whenStartingTheActivity();
 
-  @Test
-  public void shouldCallSuperWhenSelectingOptionMenuAndNoItemIsExpected(@Mocked MenuItem item) {
-    givenActivityCreated();
-    givenMenuItemId(item, -1);
+        thenLocationManagerShouldBeConnected(mLocationManager);
+    }
 
-    whenOptionItemIsSelected(item);
+    @Test
+    public void shouldDisconnectLocationManagerOnStop(@Mocked LocationManager mLocationManager) {
+        givenActivityCreated();
 
-    thenShouldCallSuperOnOptionsItemSelected(true);
-  }
+        whenStoppingTheActivity();
 
-  @Test public void shouldNotInteractOnNullActionBar(@Mocked ActionBar actionBar) {
-    givenActivityCreated();
-    givenNullActionBar();
+        thenLocationManagerShouldBeDisconnected(mLocationManager);
+    }
 
-    whenInitializingTheToolBar();
+    @Test
+    public void shouldCreateOptionsMenu() {
+        boolean createOptionsMenu = whenCreatingOptionsMenu();
 
-    thenNoActionBarInteractions(actionBar);
-  }
+        thenMenuShouldBeCreated(createOptionsMenu);
+    }
 
-  @Test public void shouldNotInteractOnNullUserDisplayNameTextView() {
-    givenNullUserDisplayName();
-    givenActivityCreated();
+    @Test
+    public void shouldOpenDrawerWhenSelectingOptionMenu(@Mocked MenuItem item) {
+        givenActivityCreated();
+        givenMenuItemId(item, android.R.id.home);
 
-    whenSettingUpTheDrawer();
+        whenOptionItemIsSelected(item);
 
-    thenNoTextViewInteractions(mTextView);
-  }
+        thenShouldOpenDrawer();
+        thenShouldCallSuperOnOptionsItemSelected(false);
+    }
 
-  @Test
-  public void shouldShowAlertDialogWhenPressingFabForManualInput(@Mocked AlertDialog alertDialog,
-      @SuppressWarnings("UnusedParameters") @Mocked AlertDialog.Builder alertDialogBuilder) {
-    givenActivityCreated();
+    @Test
+    public void shouldNavigateToSettingWhenSelectingOptionMenu(@Mocked MenuItem item,
+                                                               @Mocked Intent intent) {
+        givenActivityCreated();
+        givenMenuItemId(item, R.id.action_settings);
 
-    whenPerformingFabAction();
+        whenOptionItemIsSelected(item);
 
-    thenAlertDialogShouldBeShown(alertDialog);
-  }
+        thenShouldNavigateToSettings(intent);
+        thenShouldCallSuperOnOptionsItemSelected(false);
+    }
 
-  @Test public void shouldInformNoInternet(@Mocked Toast toast) {
-    whenInformingNoInternet();
+    @Test
+    public void shouldCallSuperWhenSelectingOptionMenuAndNoItemIsExpected(@Mocked MenuItem item) {
+        givenActivityCreated();
+        givenMenuItemId(item, -1);
 
-    thenShouldShowTheToast(toast);
-  }
+        whenOptionItemIsSelected(item);
 
-  @Test public void shouldTryToLoadPreviousDataWhenNoInternet(
-      @SuppressWarnings("UnusedParameters") @Mocked Toast toast) {
-    whenInformingNoInternet();
+        thenShouldCallSuperOnOptionsItemSelected(true);
+    }
 
-    thenShouldLoadData();
-  }
+    @Test
+    public void shouldNotInteractOnNullActionBar(@Mocked ActionBar actionBar) {
+        givenActivityCreated();
+        givenNullActionBar();
 
-  @Test public void shouldGetSavedStoredData() {
-    givenEmptyForecastListStoredData();
-    givenSharedPreferenceWithStoredData();
+        whenInitializingTheToolBar();
 
-    List<WeatherInfo> storedData = whenGettingTheSavedData();
+        thenNoActionBarInteractions(actionBar);
+    }
 
-    thenShouldHaveStoredData(storedData);
-  }
+    @Test
+    public void shouldNotInteractOnNullUserDisplayNameTextView() {
+        givenNullUserDisplayName();
+        givenActivityCreated();
 
-  @Test
-  public void shouldDelegateOnRequestPermissionsResult(@Mocked LocationManager mLocationManager) {
-    givenActivityCreated();
-    givenPermissionResultParameters();
+        whenSettingUpTheDrawer();
 
-    whenHandlingRequestPermissionsResult();
+        thenNoTextViewInteractions(mTextView);
+    }
 
-    thenShouldDelegateThePermissionsResult(mLocationManager);
-  }
+    @Test
+    public void shouldShowAlertDialogWhenPressingFabForManualInput(@Mocked AlertDialog alertDialog,
+                                                                   @SuppressWarnings("UnusedParameters") @Mocked AlertDialog.Builder alertDialogBuilder) {
+        givenActivityCreated();
 
-  @SuppressWarnings("UnusedParameters") @Test
-  public void shouldSearchByQuery(@Mocked Toast toast, @Mocked Editable editable) {
-    givenValidEditableInput(editable);
-    givenHasInternet(true);
+        whenPerformingFabAction();
 
-    whenSearchingByManualInput();
+        thenAlertDialogShouldBeShown(alertDialog);
+    }
 
-    thenShouldSearchByQuery(true);
-  }
+    @Test
+    public void shouldInformNoInternet(@Mocked Toast toast) {
+        whenInformingNoInternet();
 
-  @SuppressWarnings("UnusedParameters") @Test
-  public void shouldInformNoInternetIfSearchByQueryAndLostConnectivity(@Mocked Toast toast) {
-    givenValidEditableInput("");
-    givenHasInternet(false);
+        thenShouldShowTheToast(toast);
+    }
 
-    whenSearchingByManualInput();
+    @Test
+    public void shouldTryToLoadPreviousDataWhenNoInternet(
+            @SuppressWarnings("UnusedParameters") @Mocked Toast toast) {
+        whenInformingNoInternet();
 
-    thenShouldSearchByQuery(false);
-    thenShouldInformNoInternet();
-  }
+        thenShouldLoadData();
+    }
 
-  @Test public void shouldNotPerformQueryAndInformUserForInvalidInput(@Mocked Toast toast,
-      @Mocked Editable editable,
-      @SuppressWarnings("UnusedParameters") @Mocked URLEncoder urlEncoder)
-      throws UnsupportedEncodingException {
-    givenInvalidEditableInput(editable);
+    @Test
+    public void shouldGetSavedStoredData() {
+        givenEmptyForecastListStoredData();
+        givenSharedPreferenceWithStoredData();
 
-    whenSearchingByManualInput();
+        List<WeatherInfo> storedData = whenGettingTheSavedData();
 
-    thenShouldShowTheToast(toast);
-    thenShouldSearchByQuery(false);
-  }
+        thenShouldHaveStoredData(storedData);
+    }
 
-  @Test public void shouldCloseTheDrawerOnHomePressed(
-          @SuppressWarnings("UnusedParameters") @Mocked Snackbar snackbar, @Mocked MenuItem item) {
-    givenActivityCreated();
+    @Test
+    public void shouldDelegateOnRequestPermissionsResult(@Mocked LocationManager mLocationManager) {
+        givenActivityCreated();
+        givenPermissionResultParameters();
 
-    whenPressingHome(item);
+        whenHandlingRequestPermissionsResult();
 
-    thenShouldCloseDrawer();
-  }
+        thenShouldDelegateThePermissionsResult(mLocationManager);
+    }
 
-  @SuppressWarnings("UnusedParameters") @Test
-  public void shouldDelegateActionWhenFabIsClicked(@Mocked AlertDialog alertDialog,
-      @Mocked AlertDialog.Builder alertDialogBuilder) {
-    givenFabClickListener();
+    @SuppressWarnings("UnusedParameters")
+    @Test
+    public void shouldSearchByQuery(@Mocked Toast toast, @Mocked Editable editable) {
+        givenValidEditableInput(editable);
+        givenHasInternet(true);
 
-    whenClickingTheFab();
+        whenSearchingByManualInput();
 
-    thenShouldCreateDialogToSearch();
-  }
+        thenShouldSearchByQuery(true);
+    }
 
-  @Test public void shouldCancelDialogOnCancel(@Mocked DialogInterface dialog,
-      @SuppressWarnings("UnusedParameters") @Mocked AnalyticsEvent analyticsEvent) {
-    givenCancelClickListener();
+    @SuppressWarnings("UnusedParameters")
+    @Test
+    public void shouldInformNoInternetIfSearchByQueryAndLostConnectivity(@Mocked Toast toast) {
+        givenValidEditableInput("");
+        givenHasInternet(false);
 
-    whenClickingDialog(dialog);
+        whenSearchingByManualInput();
 
-    thenShouldCancel(dialog);
-    thenShouldTrackEvent(MANUAL_SEARCH, "CANCEL");
-  }
+        thenShouldSearchByQuery(false);
+        thenShouldInformNoInternet();
+    }
 
-  @SuppressWarnings("UnusedParameters") @Test
-  public void shouldSearchByManualInputOnDialogOk(@Mocked DialogInterface dialog, @Mocked Toast toast,
-      @Mocked AnalyticsEvent analyticsEvent, @Mocked ConnectivityManager connectivityManager) {
-    givenOkClickListener("someInput");
-    givenHasInternet(true);
+    @Test
+    public void shouldNotPerformQueryAndInformUserForInvalidInput(@Mocked Toast toast,
+                                                                  @Mocked Editable editable,
+                                                                  @SuppressWarnings("UnusedParameters") @Mocked URLEncoder urlEncoder)
+            throws UnsupportedEncodingException {
+        givenInvalidEditableInput(editable);
 
-    whenClickingDialog(dialog);
+        whenSearchingByManualInput();
 
-    thenShouldTrackEvent(MANUAL_SEARCH, "someInput");
-    thenShouldSearchByManualInput("someInput");
-  }
+        thenShouldShowTheToast(toast);
+        thenShouldSearchByQuery(false);
+    }
 
-  @Test public void shouldNavigateToSettingsWhenSelectingFromDrawer(@Mocked MenuItem item,
-      @Mocked Intent intent) {
-    givenNavigationListener();
-    givenMenuItemId(item, R.id.drawer_settings);
+    @Test
+    public void shouldCloseTheDrawerOnHomePressed(
+            @SuppressWarnings("UnusedParameters") @Mocked Snackbar snackbar, @Mocked MenuItem item) {
+        givenActivityCreated();
 
-    whenNavigationItemSelected(item);
+        whenPressingHome(item);
 
-    thenShouldNavigateToSettings(intent);
-  }
+        thenShouldCloseDrawer();
+    }
 
-  @Test
-  public void shouldHandleHomePressedWhenSelectingFromDrawerNotKnownItem(@Mocked MenuItem item,
-      @SuppressWarnings("UnusedParameters") @Mocked Snackbar snackbar) {
-    givenActivityCreated();
-    givenNavigationListener();
-    givenMenuItemId(item, -1);
+    @SuppressWarnings("UnusedParameters")
+    @Test
+    public void shouldDelegateActionWhenFabIsClicked(@Mocked AlertDialog alertDialog,
+                                                     @Mocked AlertDialog.Builder alertDialogBuilder) {
+        givenFabClickListener();
 
-    whenNavigationItemSelected(item);
+        whenClickingTheFab();
 
-    thenShouldHandleHomePressed(item);
-  }
+        thenShouldCreateDialogToSearch();
+    }
 
-  private void thenShouldTrackEvent(final String eventName, final String additionalDetails) {
-    new Verifications() {{
-      //noinspection WrongConstant
-      new AnalyticsEvent(withEqual(eventName), withEqual(additionalDetails));
-    }};
-  }
+    @Test
+    public void shouldCancelDialogOnCancel(@Mocked DialogInterface dialog,
+                                           @SuppressWarnings("UnusedParameters") @Mocked AnalyticsEvent analyticsEvent) {
+        givenCancelClickListener();
 
-  private void thenShouldHandleHomePressed(final MenuItem item) {
-    new Verifications() {{
-      uut.homePressed(item);
-    }};
-  }
+        whenClickingDialog(dialog);
 
-  private void whenNavigationItemSelected(MenuItem item) {
-    mNavigationListener.onNavigationItemSelected(item);
-  }
+        thenShouldCancel(dialog);
+        thenShouldTrackEvent(MANUAL_SEARCH, "CANCEL");
+    }
+
+    @SuppressWarnings("UnusedParameters")
+    @Test
+    public void shouldSearchByManualInputOnDialogOk(@Mocked DialogInterface dialog, @Mocked Toast toast,
+                                                    @Mocked AnalyticsEvent analyticsEvent, @Mocked ConnectivityManager connectivityManager) {
+        givenOkClickListener("someInput");
+        givenHasInternet(true);
 
-  private void givenNavigationListener() {
-    mNavigationListener = uut.getNavigationListener();
-  }
-
-  private void thenShouldSearchByManualInput(final CharSequence editable) {
-    new Verifications() {{
-      uut.searchByManualInput(withAny(editable));
-    }};
-  }
-
-  private void givenOkClickListener(CharSequence editable) {
-    mDialogClickListener = uut.getOkClickListener(editable);
-  }
-
-  private void thenShouldCancel(final DialogInterface dialog) {
-    new Verifications() {{
-      dialog.cancel();
-    }};
-  }
-
-  private void whenClickingDialog(DialogInterface dialog) {
-    mDialogClickListener.onClick(dialog, 1);
-  }
-
-  private void givenCancelClickListener() {
-    mDialogClickListener = uut.getCancelListener();
-  }
-
-  private void thenShouldCreateDialogToSearch() {
-    new Verifications() {{
-      new AlertDialog.Builder(withInstanceLike(uut));
-    }};
-  }
-
-  private void whenClickingTheFab() {
-    mFabClickListener.onClick(null);
-  }
-
-  private void givenFabClickListener() {
-    mFabClickListener = uut.getFabClickListener();
-  }
-
-  private void thenShouldCloseDrawer() {
-    new Verifications() {{
-      mDrawerLayout.closeDrawers();
-    }};
-  }
-
-  private void whenPressingHome(MenuItem item) {
-    uut.homePressed(item);
-  }
-
-  private void givenInvalidEditableInput(final Editable editable)
-      throws UnsupportedEncodingException {
-    mUserInput = editable;
-    new Expectations() {{
-      URLEncoder.encode(editable.toString(), "UTF-8");
-      result = new UnsupportedEncodingException("");
-    }};
-  }
-
-  private void thenShouldInformNoInternet() {
-    new Verifications() {{
-      uut.informNoInternet();
-    }};
-  }
-
-  private void thenShouldSearchByQuery(boolean expected) {
-    assertEquals(expected, mSearchingByQuery);
-  }
-
-  private void whenSearchingByManualInput() {
-    uut.searchByManualInput(mUserInput);
-  }
-
-  private void givenHasInternet(final boolean hasInternet) {
-    //noinspection unused
-    new MockUp<WeatherUtils>() {
-      @Mock
-      boolean hasInternetConnection(Context context) {
-        return hasInternet;
-      }
-    };
-  }
-
-  private void givenValidEditableInput(CharSequence editable) {
-    mUserInput = editable;
-  }
-
-  private void thenShouldDelegateThePermissionsResult(final LocationManager locationManager) {
-    new Verifications() {{
-      locationManager.onRequestPermissionsResult(mRequestCode, mPermissions, mGrantResults);
-    }};
-  }
-
-  private void whenHandlingRequestPermissionsResult() {
-    uut.onRequestPermissionsResult(mRequestCode, mPermissions, mGrantResults);
-  }
-
-  private void givenPermissionResultParameters() {
-    this.mRequestCode = 1;
-    this.mPermissions = new String[] { "" };
-    this.mGrantResults = new int[] { 1 };
-  }
-
-  private void thenShouldHaveStoredData(List<WeatherInfo> storedData) {
-    assertNotNull(storedData);
-  }
-
-  private List<WeatherInfo> whenGettingTheSavedData() {
-    return uut.getPreviousForecastList();
-  }
-
-  private void givenSharedPreferenceWithStoredData() {
-    new Expectations() {{
-      mSharedPreferences.getString(FORECASTS, null);
-      result = mStoredData;
-    }};
-  }
-
-  private void givenEmptyForecastListStoredData() {
-    List<WeatherInfo> dataToStore = new ArrayList<>();
-    dataToStore.add(new WeatherInfo());
-    mStoredData = new Gson().toJson(dataToStore);
-  }
-
-  private void thenShouldLoadData() {
-    assertTrue(mRetrievingFromCache);
-  }
-
-  private void thenShouldShowTheToast(final Toast toast) {
-    new Verifications() {{
-      toast.show();
-    }};
-  }
-
-  private void whenInformingNoInternet() {
-    uut.informNoInternet();
-  }
-
-  private void thenAlertDialogShouldBeShown(final AlertDialog alertDialog) {
-    new Verifications() {{
-      alertDialog.show();
-    }};
-  }
-
-  private void whenPerformingFabAction() {
-    uut.performFabAction();
-  }
-
-  private void givenNullUserDisplayName() {
-    mIsNullUserDisplayName = true;
-  }
-
-  private void whenSettingUpTheDrawer() {
-    uut.setupDrawerLayout();
-  }
-
-  private void thenNoTextViewInteractions(TextView mTextView) {
-    new FullVerifications(mTextView) {
-    };
-  }
-
-  private void thenNoActionBarInteractions(final ActionBar actionBar) {
-    new FullVerifications(actionBar) {
-    };
-  }
-
-  private void whenInitializingTheToolBar() {
-    uut.initToolbar();
-  }
-
-  private void givenNullActionBar() {
-    new Expectations() {{
-      mDelegate.getSupportActionBar();
-      result = null;
-    }};
-  }
-
-  private void thenShouldCallSuperOnOptionsItemSelected(boolean expected) {
-    assertEquals(expected, mSuperOnOptionsItemSelectedCalled);
-  }
-
-  private void thenShouldNavigateToSettings(final Intent intent) {
-    new Verifications() {{
-      new Intent(uut, SettingsActivity.class);
-      uut.startActivity(withAny(intent));
-    }};
-  }
-
-  private void thenShouldOpenDrawer() {
-    new Verifications() {{
-      mDrawerLayout.openDrawer(GravityCompat.START);
-    }};
-  }
-
-  private void whenOptionItemIsSelected(MenuItem item) {
-    uut.onOptionsItemSelected(item);
-  }
-
-  private void givenMenuItemId(final MenuItem item, final int itemId) {
-    new Expectations() {{
-      item.getItemId();
-      result = itemId;
-    }};
-  }
-
-  private void thenMenuShouldBeCreated(boolean createOptionsMenu) {
-    assertTrue(createOptionsMenu);
-  }
-
-  private boolean whenCreatingOptionsMenu() {
-    return uut.onCreateOptionsMenu(mock(Menu.class));
-  }
-
-  private void thenLocationManagerShouldBeDisconnected(final LocationManager mLocationManager) {
-    new Verifications() {{
-      mLocationManager.disconnect();
-    }};
-  }
-
-  private void whenStoppingTheActivity() {
-    uut.onStop();
-  }
-
-  private void givenActivityCreated() {
-    uut.onCreate(null);
-  }
-
-  private void thenLocationManagerShouldBeConnected(final LocationManager mLocationManager) {
-    new Verifications() {{
-      mLocationManager.connect();
-    }};
-  }
-
-  private void whenStartingTheActivity() {
-    uut.onStart();
-  }
-
-  private void thenLocationManagerShouldBeInstantiated(final View view) {
-    new Verifications() {{
-      new LocationManager(uut, withAny(view));
-    }};
-  }
-
-  private void whenCreatingTheActivity() {
-    uut.onCreate(null);
-  }
+        whenClickingDialog(dialog);
+
+        thenShouldTrackEvent(MANUAL_SEARCH, "someInput");
+        thenShouldSearchByManualInput("someInput");
+    }
+
+    @Test
+    public void shouldNavigateToSettingsWhenSelectingFromDrawer(@Mocked MenuItem item,
+                                                                @Mocked Intent intent) {
+        givenNavigationListener();
+        givenMenuItemId(item, R.id.drawer_settings);
+
+        whenNavigationItemSelected(item);
+
+        thenShouldNavigateToSettings(intent);
+    }
+
+    @Test
+    public void shouldHandleHomePressedWhenSelectingFromDrawerNotKnownItem(@Mocked MenuItem item,
+                                                                           @SuppressWarnings("UnusedParameters") @Mocked Snackbar snackbar) {
+        givenActivityCreated();
+        givenNavigationListener();
+        givenMenuItemId(item, -1);
+
+        whenNavigationItemSelected(item);
+
+        thenShouldHandleHomePressed(item);
+    }
+
+    private void thenShouldTrackEvent(final String eventName, final String additionalDetails) {
+        new Verifications() {{
+            //noinspection WrongConstant
+            new AnalyticsEvent(withEqual(eventName), withEqual(additionalDetails));
+        }};
+    }
+
+    private void thenShouldHandleHomePressed(final MenuItem item) {
+        new Verifications() {{
+            uut.homePressed(item);
+        }};
+    }
+
+    private void whenNavigationItemSelected(MenuItem item) {
+        mNavigationListener.onNavigationItemSelected(item);
+    }
+
+    private void givenNavigationListener() {
+        mNavigationListener = uut.getNavigationListener();
+    }
+
+    private void thenShouldSearchByManualInput(final CharSequence editable) {
+        new Verifications() {{
+            uut.searchByManualInput(withAny(editable));
+        }};
+    }
+
+    private void givenOkClickListener(CharSequence editable) {
+        mDialogClickListener = uut.getOkClickListener(editable);
+    }
+
+    private void thenShouldCancel(final DialogInterface dialog) {
+        new Verifications() {{
+            dialog.cancel();
+        }};
+    }
+
+    private void whenClickingDialog(DialogInterface dialog) {
+        mDialogClickListener.onClick(dialog, 1);
+    }
+
+    private void givenCancelClickListener() {
+        mDialogClickListener = uut.getCancelListener();
+    }
+
+    private void thenShouldCreateDialogToSearch() {
+        new Verifications() {{
+            new AlertDialog.Builder(withInstanceLike(uut));
+        }};
+    }
+
+    private void whenClickingTheFab() {
+        mFabClickListener.onClick(null);
+    }
+
+    private void givenFabClickListener() {
+        mFabClickListener = uut.getFabClickListener();
+    }
+
+    private void thenShouldCloseDrawer() {
+        new Verifications() {{
+            mDrawerLayout.closeDrawers();
+        }};
+    }
+
+    private void whenPressingHome(MenuItem item) {
+        uut.homePressed(item);
+    }
+
+    private void givenInvalidEditableInput(final Editable editable)
+            throws UnsupportedEncodingException {
+        mUserInput = editable;
+        new Expectations() {{
+            URLEncoder.encode(editable.toString(), "UTF-8");
+            result = new UnsupportedEncodingException("");
+        }};
+    }
+
+    private void thenShouldInformNoInternet() {
+        new Verifications() {{
+            uut.informNoInternet();
+        }};
+    }
+
+    private void thenShouldSearchByQuery(boolean expected) {
+        assertEquals(expected, mSearchingByQuery);
+    }
+
+    private void whenSearchingByManualInput() {
+        uut.searchByManualInput(mUserInput);
+    }
+
+    private void givenHasInternet(final boolean hasInternet) {
+        //noinspection unused
+        new MockUp<WeatherUtils>() {
+            @Mock
+            boolean hasInternetConnection(Context context) {
+                return hasInternet;
+            }
+        };
+    }
+
+    private void givenValidEditableInput(CharSequence editable) {
+        mUserInput = editable;
+    }
+
+    private void thenShouldDelegateThePermissionsResult(final LocationManager locationManager) {
+        new Verifications() {{
+            locationManager.onRequestPermissionsResult(mRequestCode, mPermissions, mGrantResults);
+        }};
+    }
+
+    private void whenHandlingRequestPermissionsResult() {
+        uut.onRequestPermissionsResult(mRequestCode, mPermissions, mGrantResults);
+    }
+
+    private void givenPermissionResultParameters() {
+        this.mRequestCode = 1;
+        this.mPermissions = new String[]{""};
+        this.mGrantResults = new int[]{1};
+    }
+
+    private void thenShouldHaveStoredData(List<WeatherInfo> storedData) {
+        assertNotNull(storedData);
+    }
+
+    private List<WeatherInfo> whenGettingTheSavedData() {
+        return uut.getPreviousForecastList();
+    }
+
+    private void givenSharedPreferenceWithStoredData() {
+        new Expectations() {{
+            mSharedPreferences.getString(FORECASTS, null);
+            result = mStoredData;
+        }};
+    }
+
+    private void givenEmptyForecastListStoredData() {
+        List<WeatherInfo> dataToStore = new ArrayList<>();
+        dataToStore.add(new WeatherInfo());
+        mStoredData = new Gson().toJson(dataToStore);
+    }
+
+    private void thenShouldLoadData() {
+        assertTrue(mRetrievingFromCache);
+    }
+
+    private void thenShouldShowTheToast(final Toast toast) {
+        new Verifications() {{
+            toast.show();
+        }};
+    }
+
+    private void whenInformingNoInternet() {
+        uut.informNoInternet();
+    }
+
+    private void thenAlertDialogShouldBeShown(final AlertDialog alertDialog) {
+        new Verifications() {{
+            alertDialog.show();
+        }};
+    }
+
+    private void whenPerformingFabAction() {
+        uut.performFabAction();
+    }
+
+    private void givenNullUserDisplayName() {
+        mIsNullUserDisplayName = true;
+    }
+
+    private void whenSettingUpTheDrawer() {
+        uut.setupDrawerLayout();
+    }
+
+    private void thenNoTextViewInteractions(TextView mTextView) {
+        Mockito.verifyNoMoreInteractions(mTextView);
+    }
+
+    private void thenNoActionBarInteractions(final ActionBar actionBar) {
+        new FullVerifications(actionBar) {
+        };
+    }
+
+    private void whenInitializingTheToolBar() {
+        uut.initToolbar();
+    }
+
+    private void givenNullActionBar() {
+        new Expectations() {{
+            mDelegate.getSupportActionBar();
+            result = null;
+        }};
+    }
+
+    private void thenShouldCallSuperOnOptionsItemSelected(boolean expected) {
+        assertEquals(expected, mSuperOnOptionsItemSelectedCalled);
+    }
+
+    private void thenShouldNavigateToSettings(final Intent intent) {
+        new Verifications() {{
+            new Intent(uut, SettingsActivity.class);
+            uut.startActivity(withAny(intent));
+        }};
+    }
+
+    private void thenShouldOpenDrawer() {
+        new Verifications() {{
+            mDrawerLayout.openDrawer(GravityCompat.START);
+        }};
+    }
+
+    private void whenOptionItemIsSelected(MenuItem item) {
+        uut.onOptionsItemSelected(item);
+    }
+
+    private void givenMenuItemId(final MenuItem item, final int itemId) {
+        new Expectations() {{
+            item.getItemId();
+            result = itemId;
+        }};
+    }
+
+    private void thenMenuShouldBeCreated(boolean createOptionsMenu) {
+        assertTrue(createOptionsMenu);
+    }
+
+    private boolean whenCreatingOptionsMenu() {
+        return uut.onCreateOptionsMenu(mock(Menu.class));
+    }
+
+    private void thenLocationManagerShouldBeDisconnected(final LocationManager mLocationManager) {
+        new Verifications() {{
+            mLocationManager.disconnect();
+        }};
+    }
+
+    private void whenStoppingTheActivity() {
+        uut.onStop();
+    }
+
+    private void givenActivityCreated() {
+        uut.onCreate(bundle);
+    }
+
+    private void thenLocationManagerShouldBeConnected(final LocationManager mLocationManager) {
+        new Verifications() {{
+            mLocationManager.connect();
+        }};
+    }
+
+    private void whenStartingTheActivity() {
+        uut.onStart();
+    }
+
+    private void thenLocationManagerShouldBeInstantiated(final View view) {
+        new Verifications() {{
+            new LocationManager(uut, withAny(view));
+        }};
+    }
+
+    private void whenCreatingTheActivity() {
+        uut.onCreate(null);
+    }
 }

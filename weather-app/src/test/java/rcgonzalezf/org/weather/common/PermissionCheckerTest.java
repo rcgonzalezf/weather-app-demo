@@ -12,7 +12,6 @@ import com.google.android.material.snackbar.Snackbar;
 import mockit.Mock;
 import mockit.MockUp;
 import mockit.Mocked;
-import mockit.Tested;
 import mockit.Verifications;
 import mockit.integration.junit4.JMockit;
 import org.junit.Before;
@@ -32,7 +31,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @RunWith(JMockit.class) public class PermissionCheckerTest {
 
-  @Tested private PermissionChecker uut;
+  private PermissionChecker uut;
 
   @SuppressWarnings("unused") @Mocked private Snackbar mSnackbar;
 
@@ -243,7 +242,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
   }
 
   private void whenRequestingPermission() {
-    uut.requestPermission(null);
+    uut.requestPermission(mPermissionListener);
   }
 
   private void givenActivityCompatShouldShowPermissionRationale(final boolean shouldShowRationale) {
