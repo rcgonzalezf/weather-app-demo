@@ -41,7 +41,8 @@ public class WeatherInfoMapper {
         weatherInfo.setHumidity(String.valueOf(weather.getHumidity()));
         weatherInfo.setDateTime(weather.getDateTime());
         weatherInfo.setWeatherId(weather.getWeatherId());
-        weatherInfo.setCountry(forecastData.getCity().getCountry() == null ? "" : forecastData.getCity().getCountry());
+        weatherInfo.setCountry(forecastData.getCity().getCountry() == null
+                ? "" : forecastData.getCity().getCountry());
         weatherInfo.setDeg(weather.getDeg());
         weatherInfo.setDescription(weather.getDescription());
 
