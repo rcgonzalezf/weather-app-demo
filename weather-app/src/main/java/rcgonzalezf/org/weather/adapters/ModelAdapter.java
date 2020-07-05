@@ -18,11 +18,12 @@ import org.rcgonzalezf.weather.WeatherLibApp;
 import org.rcgonzalezf.weather.common.models.WeatherViewModel;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
+import rcgonzalezf.org.weather.utils.WeatherArtUtils;
+import rcgonzalezf.org.weather.utils.WeatherUtils;
 
 import static rcgonzalezf.org.weather.utils.WeatherArtUtils.getArtResourceForWeatherCondition;
 import static rcgonzalezf.org.weather.utils.WeatherUtils.formatDate;
 import static rcgonzalezf.org.weather.utils.WeatherUtils.formatTemperature;
-import static rcgonzalezf.org.weather.utils.WeatherUtils.getDayName;
 import static rcgonzalezf.org.weather.utils.WeatherWindUtils.getFormattedWind;
 
 public class ModelAdapter<T extends WeatherViewModel>
@@ -50,7 +51,7 @@ public class ModelAdapter<T extends WeatherViewModel>
         String.format(getString(R.string.location_display_format), mainModel.getCityName(),
             mainModel.getCountry()));
 
-    holder.dayTextView.setText(getDayName(mContext, mainModel.getDateTime()));
+    holder.dayTextView.setText(WeatherUtils.getDayName(mContext, mainModel.getDateTime()));
     holder.humidityTextView.setText(
         String.format(getString(R.string.key_value_display_format), getString(R.string.humidity),
             mainModel.getHumidity() + " %"));
