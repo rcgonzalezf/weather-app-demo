@@ -210,7 +210,7 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
   }
 
   private void givenPermissionChecker() {
-    uut.mPermissionChecker = mPermissionChecker;
+    uut.permissionChecker = mPermissionChecker;
   }
 
   private void givenSdk(int sdk) {

@@ -42,7 +42,7 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
     private lateinit var progress: ProgressBar
     private val executor: Executor = Executors.newSingleThreadExecutor()
 
-    public override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         openWeatherApiCallback = OpenWeatherApiCallback(this)
         setupRecyclerView()
@@ -208,7 +208,7 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
 
     @VisibleForTesting
     fun createSwipeToRefreshListener(): OnRefreshListener {
-        return OnRefreshListener { searchByManualInput(cityNameToSearchOnSwipe) }
+        return OnRefreshListener { searchByManualInput(cityNameToSearchOnSwipe?:"") }
     }
 
     @VisibleForTesting

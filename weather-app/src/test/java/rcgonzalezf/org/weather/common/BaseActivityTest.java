@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.view.Menu;
@@ -43,6 +44,8 @@ import mockit.integration.junit4.JMockit;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.rcgonzalezf.weather.common.models.WeatherInfo;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
@@ -71,7 +74,8 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   @SuppressWarnings("unused") @Mocked private Toolbar mToolbar;
   @SuppressWarnings("unused") @Mocked private DrawerLayout mDrawerLayout;
   @SuppressWarnings("unused") @Mocked private NavigationView mNavigationView;
-  @SuppressWarnings("unused") @Mocked private TextView mTextView;
+  @org.mockito.Mock
+  private TextView mTextView;
   @SuppressWarnings("unused") @Mocked private EditText mEditText;
   @SuppressWarnings("unused") @Mocked private SharedPreferences mSharedPreferences;
   @SuppressWarnings("unused") @Mocked private PreferenceManager mPreferenceManager;
@@ -90,8 +94,13 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   private View.OnClickListener mFabClickListener;
   private DialogInterface.OnClickListener mDialogClickListener;
   private NavigationView.OnNavigationItemSelectedListener mNavigationListener;
+  @org.mockito.Mock
+  private View content;
+  @org.mockito.Mock
+  private Bundle bundle;
 
   @Before public void setUp() {
+    MockitoAnnotations.initMocks(this);
     //noinspection unused
     new MockUp<View>() {
       @Mock View inflate(Context context, int resource, ViewGroup root) {
@@ -115,6 +124,10 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
           view = mIsNullUserDisplayName ? null : mTextView;
         } else if (id == R.id.main_fab) {
           view = mFloatingActionButton;
+        } else if (id == R.id.content) {
+          view = content;
+        } else if (id == R.id.user_display_name) {
+          view = mTextView;
         }
         return view;
       }
@@ -533,8 +546,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   private void thenNoTextViewInteractions(TextView mTextView) {
-    new FullVerifications(mTextView) {
-    };
+    Mockito.verifyNoMoreInteractions(mTextView);
   }
 
   private void thenNoActionBarInteractions(final ActionBar actionBar) {
@@ -600,7 +612,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
   }
 
   private void givenActivityCreated() {
-    uut.onCreate(null);
+    uut.onCreate(bundle);
   }
 
   private void thenLocationManagerShouldBeConnected(final LocationManager mLocationManager) {
