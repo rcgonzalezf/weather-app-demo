@@ -1,29 +1,29 @@
 package rcgonzalezf.org.weather.common.analytics;
 
-import mockit.Mocked;
-import mockit.Tested;
-import mockit.Verifications;
-import mockit.integration.junit4.JMockit;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.NO_NETWORK_SEARCH;
 
-@RunWith(JMockit.class)
+@RunWith(MockitoJUnitRunner.class)
 public class AnalyticsTest {
 
-  @Tested
   private Analytics uut;
-  @SuppressWarnings("unused") @Mocked private AnalyticsManager mAnalyticsManager;
-  private String mScreenName;
-  private AnalyticsEvent mAnalyticsEvent;
+  @SuppressWarnings("unused")
+  @Mock
+  private AnalyticsManager analyticsManager;
+  private String screenName;
+  private AnalyticsEvent analyticsEvent;
 
-  @Before public void setUp() throws Exception {
-    uut = new Analytics();
+  @Before public void setUp() {
+    uut = new Analytics(analyticsManager);
   }
 
-  @Test public void shouldTrackOnScreen() throws Exception {
+  @Test public void shouldTrackOnScreen() {
     givenScreenName("someScreen");
 
     whenTrackingOnScreen();
@@ -32,12 +32,10 @@ public class AnalyticsTest {
   }
 
   private void thenAnalyticsManagerShouldNotifyOnScreen() {
-    new Verifications() {{
-      mAnalyticsManager.notifyOnScreenLoad(mScreenName);
-    }};
+    Mockito.verify(analyticsManager, Mockito.atLeastOnce()).notifyOnScreenLoad(screenName);
   }
 
-  @Test public void shouldTrackOnActionEvent() throws Exception {
+  @Test public void shouldTrackOnActionEvent() {
     givenAnalyticsEvent();
 
     whenTrackingOnActionEvent();
@@ -46,25 +44,22 @@ public class AnalyticsTest {
   }
 
   private void thenAnalyticsManagerShouldNotifyOnAction() {
-    new Verifications() {{
-      mAnalyticsManager.notifyOnAction(mAnalyticsEvent);
-    }};
+    Mockito.verify(analyticsManager, Mockito.atLeastOnce()).notifyOnAction(analyticsEvent);
   }
 
   private void whenTrackingOnActionEvent() {
-    uut.trackOnActionEvent(mAnalyticsEvent);
+    uut.trackOnActionEvent(analyticsEvent);
   }
 
   private void givenAnalyticsEvent() {
-    mAnalyticsEvent = new AnalyticsEvent(NO_NETWORK_SEARCH, null);
+    analyticsEvent = new AnalyticsEvent(NO_NETWORK_SEARCH, null);
   }
 
   private void givenScreenName(String someScreen) {
-    mScreenName = someScreen;
+    screenName = someScreen;
   }
 
   private void whenTrackingOnScreen() {
-    uut.trackOnScreen(mScreenName);
+    uut.trackOnScreen(screenName);
   }
-
 }

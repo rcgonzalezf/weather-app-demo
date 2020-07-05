@@ -26,7 +26,7 @@ class GoogleAnalyticsObserver : AnalyticsObserver {
     private val defaultTracker: Tracker?
         private get() {
             if (tracker == null) {
-                val analytics = GoogleAnalytics.getInstance(WeatherApp.getInstance())
+                val analytics = GoogleAnalytics.getInstance(WeatherApp.getAppInstance())
                 // To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
                 tracker = analytics.newTracker(R.xml.global_tracker)
                 tracker?.setAnonymizeIp(true)

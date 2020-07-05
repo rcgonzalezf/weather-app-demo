@@ -29,7 +29,7 @@ public abstract class WeatherLibApp extends Application {
     return sAppInstance;
   }
 
-  protected static void setAppInstance(WeatherLibApp appInstance) {
+  public static void setAppInstance(WeatherLibApp appInstance) {
     sAppInstance = appInstance;
   }
 

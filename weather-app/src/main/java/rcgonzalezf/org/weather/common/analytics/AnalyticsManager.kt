@@ -8,7 +8,7 @@ import rcgonzalezf.org.weather.BuildConfig
 import rcgonzalezf.org.weather.utils.WeatherUtils.isXLargeTablet
 import java.util.HashSet
 
-class AnalyticsManager(private val mContext: Context) {
+open class AnalyticsManager(private val context: Context) {
     private val analyticsObservers: MutableSet<AnalyticsObserver> = HashSet()
     private val analyticsBaseData: AnalyticsBaseData = AnalyticsBaseData()
     private var screenName: String? = null
@@ -43,9 +43,9 @@ class AnalyticsManager(private val mContext: Context) {
     }
 
     private val isMultipane: Boolean
-        get() = isXLargeTablet(mContext)
+        get() = isXLargeTablet(context)
 
-    fun notifyOnScreenLoad(screenName: String) {
+    open fun notifyOnScreenLoad(screenName: String) {
         this.screenName = screenName
         addBaseData()
         for (analyticsObserver in analyticsObservers) {
@@ -56,7 +56,7 @@ class AnalyticsManager(private val mContext: Context) {
     @get:NetworkType
     private val networkType: String
         get() {
-            val connectivityManager = mContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val activeNetwork = connectivityManager.activeNetworkInfo
             val networkType: String
             networkType = if (activeNetwork != null) {
@@ -77,7 +77,7 @@ class AnalyticsManager(private val mContext: Context) {
         analyticsObservers.remove(analyticsObserver)
     }
 
-    fun notifyOnAction(analyticsEvent: AnalyticsEvent?) {
+    open fun notifyOnAction(analyticsEvent: AnalyticsEvent?) {
         addBaseData()
         for (analyticsObserver in analyticsObservers) {
             analyticsObserver.onAction(analyticsEvent!!, screenName!!, analyticsBaseData)
