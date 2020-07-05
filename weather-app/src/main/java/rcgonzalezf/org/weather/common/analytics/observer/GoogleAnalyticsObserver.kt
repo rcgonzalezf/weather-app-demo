@@ -12,7 +12,7 @@ import rcgonzalezf.org.weather.common.analytics.AnalyticsManager
 import rcgonzalezf.org.weather.common.analytics.AnalyticsObserver
 
 class GoogleAnalyticsObserver : AnalyticsObserver {
-    private var mTracker: Tracker? = null
+    private var tracker: Tracker? = null
 
     companion object {
         private const val OS_VERSION = 1
@@ -25,19 +25,19 @@ class GoogleAnalyticsObserver : AnalyticsObserver {
     @get:Synchronized
     private val defaultTracker: Tracker?
         private get() {
-            if (mTracker == null) {
+            if (tracker == null) {
                 val analytics = GoogleAnalytics.getInstance(WeatherApp.getInstance())
                 // To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
-                mTracker = analytics.newTracker(R.xml.global_tracker)
-                mTracker?.setAnonymizeIp(true)
+                tracker = analytics.newTracker(R.xml.global_tracker)
+                tracker?.setAnonymizeIp(true)
             }
-            return mTracker
+            return tracker
         }
 
     override fun onScreen(screenName: String, analyticsBaseData: AnalyticsBaseData) {
-        mTracker = defaultTracker
-        mTracker?.setScreenName(screenName)
-        mTracker?.send(ScreenViewBuilder().build())
+        tracker = defaultTracker
+        tracker?.setScreenName(screenName)
+        tracker?.send(ScreenViewBuilder().build())
     }
 
     override fun onAction(analyticsEvent: AnalyticsEvent, screenName: String,
@@ -54,8 +54,8 @@ class GoogleAnalyticsObserver : AnalyticsObserver {
         builder.setCustomDimension(MULTIPANE,
                 analyticsBaseData.data()[AnalyticsManager.MULTIPANE])
 
-        mTracker = defaultTracker
-        mTracker?.setScreenName(screenName)
-        mTracker?.send(builder.build())
+        tracker = defaultTracker
+        tracker?.setScreenName(screenName)
+        tracker?.send(builder.build())
     }
 }
