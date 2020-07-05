@@ -35,16 +35,15 @@ class WeatherInfoMapper {
             for (weather in forecastData.getWeatherList()) {
                 val weatherInfo = WeatherInfo()
                 weatherInfo.setCityId(forecastData.city.id)
-                weatherInfo.setCityName(forecastData.city.name)
-                weatherInfo.setSpeed(weather.speed)
-                weatherInfo.setTemperature(weather.temp)
-                weatherInfo.setHumidity(weather.humidity.toString())
-                weatherInfo.setDateTime(weather.dateTime)
-                weatherInfo.setWeatherId(weather.weatherId)
-                weatherInfo.setCountry(
-                        if (forecastData.city.country == null) "" else forecastData.city.country)
-                weatherInfo.setDeg(weather.deg)
-                weatherInfo.setDescription(weather.description)
+                weatherInfo.cityName = forecastData.city.name
+                weatherInfo.speed = weather.speed
+                weatherInfo.temperature = weather.temp
+                weatherInfo.humidity = weather.humidity.toString()
+                weatherInfo.dateTime = weather.dateTime
+                weatherInfo.weatherId = weather.weatherId
+                weatherInfo.country = if (forecastData.city.country == null) "" else forecastData.city.country
+                weatherInfo.deg = weather.deg
+                weatherInfo.description = weather.description
                 weatherInfoList.add(weatherInfo)
                 ++counter
                 if (counter == howMany) {
