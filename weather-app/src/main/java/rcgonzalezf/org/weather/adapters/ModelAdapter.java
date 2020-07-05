@@ -13,14 +13,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.annotation.VisibleForTesting;
 import androidx.recyclerview.widget.RecyclerView;
-import java.util.List;
 import org.rcgonzalezf.weather.WeatherLibApp;
 import org.rcgonzalezf.weather.common.models.WeatherViewModel;
+import java.util.List;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
-import rcgonzalezf.org.weather.utils.WeatherArtUtils;
 import rcgonzalezf.org.weather.utils.WeatherUtils;
-
 import static rcgonzalezf.org.weather.utils.WeatherArtUtils.getArtResourceForWeatherCondition;
 import static rcgonzalezf.org.weather.utils.WeatherUtils.formatDate;
 import static rcgonzalezf.org.weather.utils.WeatherUtils.formatTemperature;
@@ -49,7 +47,7 @@ public class ModelAdapter<T extends WeatherViewModel>
     holder.itemImage.setImageResource(getArtResourceForWeatherCondition(mainModel.getWeatherId()));
     holder.detailLocationNameTextView.setText(
         String.format(getString(R.string.location_display_format), mainModel.getCityName(),
-            mainModel.getCountry()));
+                mainModel.getCountry()));
 
     holder.dayTextView.setText(WeatherUtils.getDayName(mContext, mainModel.getDateTime()));
     holder.humidityTextView.setText(
