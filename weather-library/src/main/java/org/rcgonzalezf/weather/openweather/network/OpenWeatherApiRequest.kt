@@ -12,11 +12,11 @@ import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
 open // for Mockito
-class OpenWeatherApiRequest @VisibleForTesting internal constructor(private val apiKey: String?,
+class OpenWeatherApiRequest @VisibleForTesting internal constructor(private val apiKey: String,
                                                                     private val modelConverter: ModelConverter<OpenWeatherForecastData, ForecastData, OpenWeatherCurrentData>) : ApiRequest<OpenWeatherApiRequestParameters, OpenWeatherApiCallback> {
-    private var requestParameters: OpenWeatherApiRequestParameters? = null
+    private lateinit var requestParameters: OpenWeatherApiRequestParameters
 
-    constructor(apiKey: String?) : this(apiKey, OpenWeatherApiModelConverter()) {}
+    constructor(apiKey: String) : this(apiKey, OpenWeatherApiModelConverter()) {}
 
     override fun execute(apiCallback: OpenWeatherApiCallback) {
         val mOpenWeatherExecutor = OpenWeatherExecutor(apiCallback, executor, apiKey)
