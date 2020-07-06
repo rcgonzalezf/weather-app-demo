@@ -22,6 +22,7 @@ import retrofit2.Retrofit;
 import static org.rcgonzalezf.weather.openweather.api.OpenWeatherApiService.BASE_URL;
 import static org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder.LIKE;
 
+// TODO transforming this to Kotlin with the tool made tests to fail.
 class OpenWeatherExecutor {
 
   private final Executor executor;

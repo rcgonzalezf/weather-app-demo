@@ -24,6 +24,7 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.formatDate;
 import static rcgonzalezf.org.weather.utils.WeatherUtils.formatTemperature;
 import static rcgonzalezf.org.weather.utils.WeatherWindUtils.getFormattedWind;
 
+// TODO Revisit this class to do an upgrade to Kotlin
 public class ModelAdapter<T extends WeatherViewModel>
     extends RecyclerView.Adapter<ModelAdapter.ModelViewHolder> implements View.OnClickListener {
 
