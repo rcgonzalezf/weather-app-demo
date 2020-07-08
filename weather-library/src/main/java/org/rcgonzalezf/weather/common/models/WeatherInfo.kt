@@ -4,7 +4,7 @@ import android.os.Parcel
 import android.os.Parcelable
 
 class WeatherInfo : WeatherViewModel {
-    constructor() {}
+    constructor()
 
     override var weatherId = 0
     override var id = 0
