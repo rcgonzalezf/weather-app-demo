@@ -9,8 +9,8 @@ import org.rcgonzalezf.weather.openweather.OpenWeatherApiRepository;
 
 public class ServiceConfig {
   private static ServiceConfig sInstance = new ServiceConfig();
-  private String mApiKey;
-  private WeatherProvider mWeatherProvider;
+  private String apiKey;
+  private WeatherProvider weatherProvider;
 
   ServiceConfig() {
   }
@@ -24,12 +24,12 @@ public class ServiceConfig {
   }
 
   public ServiceConfig setApiKey(@NonNull String apiKey) {
-    mApiKey = apiKey;
+    this.apiKey = apiKey;
     return this;
   }
 
   public ServiceConfig setWeatherProvider(@NonNull WeatherProvider weatherProvider) {
-    mWeatherProvider = weatherProvider;
+    this.weatherProvider = weatherProvider;
     return this;
   }
 
@@ -50,11 +50,11 @@ public class ServiceConfig {
 
   @NonNull
   public String getApiKey() {
-    return mApiKey;
+    return apiKey;
   }
 
   @NonNull
   private WeatherProvider getWeatherProvider() {
-    return mWeatherProvider;
+    return weatherProvider;
   }
 }

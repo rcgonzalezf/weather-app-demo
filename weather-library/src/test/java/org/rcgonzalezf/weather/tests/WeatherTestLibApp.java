@@ -8,14 +8,14 @@ import org.rcgonzalezf.weather.common.WeatherProvider;
 
 public class WeatherTestLibApp extends WeatherLibApp {
 
-  private ServiceConfig mServiceConfig;
+  private ServiceConfig serviceConfig;
 
   @Override public void onCreate() {
     super.onCreate();
     setAppInstance(this);
-    mServiceConfig = ServiceConfig.getInstance();
-    mServiceConfig.setApiKey(getString(R.string.open_weather_map_api_key));
-    mServiceConfig.setWeatherProvider(WeatherProvider.OpenWeather);
+    serviceConfig = ServiceConfig.getInstance();
+    serviceConfig.setApiKey(getString(R.string.open_weather_map_api_key));
+    serviceConfig.setWeatherProvider(WeatherProvider.OpenWeather);
 
     WeatherProvider.valueOf("OpenWeather");
   }
