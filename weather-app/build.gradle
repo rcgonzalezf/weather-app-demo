@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 apply plugin: "com.vanniktech.android.junit.jacoco"
 
 android {
@@ -28,6 +29,11 @@ android {
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
       testCoverageEnabled false
     }
+  }
+
+  buildFeatures{
+    dataBinding = true
+    viewBinding = true
   }
 
   lintOptions {
@@ -85,6 +91,10 @@ junitJacoco {
       '**/BuildConfig.*',
       '**/Manifest*.*',
       // Data binding
+      '**/DataBind*.class',
+      '**/databinding/*Binding.class',
+      '**/*BinderMapperImpl.*',
+      '**/databinding/*Impl.class',
       'android/databinding/**/*.class',
       '**/android/databinding/*Binding.class',
       '**/BR.*',
@@ -95,7 +105,7 @@ junitJacoco {
       '**/*Module_*Factory.class',
       '**/AutoValue_*.*', '**/*JavascriptBridge.class', 'jdk.internal.*', '*$Impl_*']
   includeNoLocationClasses = true
-  includeInstrumentationCoverageInMergedReport = false
+  includeInstrumentationCoverageInMergedReport = true
 }
 
 apply plugin: 'com.google.gms.google-services'

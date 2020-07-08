@@ -184,7 +184,7 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
     }
 
     private fun setupRecyclerView() {
-        adapter = ModelAdapter(ArrayList(), this)
+        adapter = ModelAdapter(ArrayList())
         adapter.setOnItemClickListener(this)
         recyclerView = findViewById<View>(id.main_recycler_view) as RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -197,7 +197,7 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
     }
 
     @VisibleForTesting
-    fun createNotifyRunnable(weatherInfoList: List<WeatherInfo>?): Runnable {
+    fun createNotifyRunnable(weatherInfoList: List<WeatherInfo>): Runnable {
         return Runnable {
             adapter.setItems(weatherInfoList)
             adapter.notifyDataSetChanged()
