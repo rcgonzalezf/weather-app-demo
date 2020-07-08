@@ -571,7 +571,7 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   private void thenAdapterShouldBeInitialized() {
     new Verifications() {{
-      new ModelAdapter<>(new ArrayList<WeatherInfo>(), uut);
+      new ModelAdapter<>(new ArrayList<WeatherInfo>());
       mAdapter.setOnItemClickListener(uut);
     }};
   }

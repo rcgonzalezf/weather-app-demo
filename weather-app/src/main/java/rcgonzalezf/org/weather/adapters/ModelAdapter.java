@@ -24,13 +24,11 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.formatTemperature;
 public class ModelAdapter<T extends WeatherViewModel>
         extends RecyclerView.Adapter<ModelAdapter.ModelViewHolder> implements View.OnClickListener {
 
-    private final Context context;
     private List<T> models;
     private OnItemClickListener<WeatherViewModel> onItemClickListener;
 
-    public ModelAdapter(List<T> models, Context context) {
+    public ModelAdapter(List<T> models) {
         this.models = models;
-        this.context = context;
     }
 
     @NonNull
@@ -46,7 +44,8 @@ public class ModelAdapter<T extends WeatherViewModel>
     public void onBindViewHolder(ModelAdapter.ModelViewHolder holder, int position) {
         T mainModel = models.get(position);
         holder.bind(mainModel);
-        populateTemperatureViews(holder, mainModel);
+        populateTemperatureViews(holder.itemView.getContext(), holder, mainModel);
+        holder.itemView.setOnClickListener(this);
         holder.itemView.setTag(mainModel);
     }
 
@@ -56,7 +55,8 @@ public class ModelAdapter<T extends WeatherViewModel>
     }
 
     @VisibleForTesting
-    void populateTemperatureViews(ModelAdapter.ModelViewHolder holder,
+    void populateTemperatureViews(Context context,
+            ModelAdapter.ModelViewHolder holder,
                                   T mainModel) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         boolean celsiusPreferred = prefs.getBoolean(SettingsActivity.PREF_TEMPERATURE_UNITS, true);
@@ -101,7 +101,7 @@ public class ModelAdapter<T extends WeatherViewModel>
         };
     }
 
-    class ModelViewHolder extends RecyclerView.ViewHolder {
+    static class ModelViewHolder extends RecyclerView.ViewHolder {
 
         TextView secondaryTempTextView;
         TextView primaryTempTextView;
@@ -112,7 +112,6 @@ public class ModelAdapter<T extends WeatherViewModel>
             super(weatherRowBinding.getRoot());
             this.weatherRowBinding = weatherRowBinding;
             this.itemView = weatherRowBinding.getRoot();
-            this.itemView.setOnClickListener(ModelAdapter.this);
             secondaryTempTextView =
                     (TextView) itemView.findViewById(R.id.secondary_temperature_text_view);
             primaryTempTextView = (TextView) itemView.findViewById(R.id.preferred_temperature_text_view);

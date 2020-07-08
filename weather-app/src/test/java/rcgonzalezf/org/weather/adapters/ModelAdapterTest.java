@@ -40,28 +40,28 @@ public class ModelAdapterTest {
     @Tested
     private ModelAdapter<WeatherInfo> uut;
 
-    private List<WeatherInfo> mModels;
+    private List<WeatherInfo> models;
     @Mocked
-    WeatherLibApp mWeatherLipApp;
+    WeatherLibApp weatherLibApp;
     @Mocked
-    private Context mContext;
+    private Context context;
     @Mocked
-    private RecyclerView.ViewHolder mRecyclerViewHolder;
+    private RecyclerView.ViewHolder recyclerViewHolder;
     @Mocked
-    private TextView mTextView;
+    private TextView textView;
     @Mocked
-    private SharedPreferences mSharedPreferences;
+    private SharedPreferences sharedPreferences;
     @Mocked
-    private PreferenceManager mPreferenceManager;
-    private ModelAdapter.ModelViewHolder mModelViewHolder;
-    private int mItemCount;
-    private Runnable mItemClickListenerRunnable;
-    private ModelAdapter.OnItemClickListener mItemClickListener;
+    private PreferenceManager preferenceManager;
+    private ModelAdapter.ModelViewHolder modelViewHolder;
+    private int itemCount;
+    private Runnable itemClickListenerRunnable;
+    private ModelAdapter.OnItemClickListener itemClickListener;
 
     @Before
     public void setUp() throws Exception {
-        mModels = new ArrayList<>();
-        uut = new ModelAdapter<>(mModels, mContext);
+        models = new ArrayList<>();
+        uut = new ModelAdapter<>(models);
     }
 
     @SuppressWarnings("UnusedParameters")
@@ -73,7 +73,6 @@ public class ModelAdapterTest {
         whenCreatingViewHolder();
 
         thenModelViewHolderIsNotNull();
-        thenItemViewShouldListenToClicks(view);
     }
 
     @SuppressWarnings("UnusedParameters")
@@ -155,16 +154,16 @@ public class ModelAdapterTest {
 
     private void thenItemClickListenerShouldHandleItemClick() {
         //noinspection unchecked
-        verify(mItemClickListener, times(1)).onItemClick(eq(mTextView),
+        verify(itemClickListener, times(1)).onItemClick(eq(textView),
                 any(WeatherViewModel.class));
     }
 
     private void whenRunning() {
-        mItemClickListenerRunnable.run();
+        itemClickListenerRunnable.run();
     }
 
     private void givenRunnable() {
-        mItemClickListenerRunnable = uut.createClickRunnable(mTextView);
+        itemClickListenerRunnable = uut.createClickRunnable(textView);
     }
 
     private void thenNoInteractionsOnHandler(Handler handler) {
@@ -179,12 +178,12 @@ public class ModelAdapterTest {
     }
 
     private void whenClicking() {
-        uut.onClick(mTextView);
+        uut.onClick(textView);
     }
 
     private void givenItemClickListener() {
-        mItemClickListener = mock(ModelAdapter.OnItemClickListener.class);
-        uut.setOnItemClickListener(mItemClickListener);
+        itemClickListener = mock(ModelAdapter.OnItemClickListener.class);
+        uut.setOnItemClickListener(itemClickListener);
     }
 
     @Test
@@ -203,15 +202,15 @@ public class ModelAdapterTest {
     }
 
     private void whenSettingItemsList() {
-        uut.setItems(mModels);
+        uut.setItems(models);
     }
 
     private void thenItemCountShouldBe(int expected) {
-        assertEquals(expected, mItemCount);
+        assertEquals(expected, itemCount);
     }
 
     private void whenGettingItemCount() {
-        mItemCount = uut.getItemCount();
+        itemCount = uut.getItemCount();
     }
 
     private void thenShouldBindModelTemperatureToViewHolder(final WeatherInfo weatherInfo) {
@@ -221,13 +220,13 @@ public class ModelAdapterTest {
     }
 
     private void whenPopulatingTheTemperatureViews(WeatherInfo weatherInfo) {
-        uut.populateTemperatureViews(mModelViewHolder, weatherInfo);
+        uut.populateTemperatureViews(context, modelViewHolder, weatherInfo);
     }
 
     private void givenSharedPreferenceForCelsius(final boolean celsiusPreferred) {
         new Expectations() {{
-            PreferenceManager.getDefaultSharedPreferences(mContext);
-            mSharedPreferences.getBoolean(SettingsActivity.PREF_TEMPERATURE_UNITS, true);
+            PreferenceManager.getDefaultSharedPreferences(context);
+            sharedPreferences.getBoolean(SettingsActivity.PREF_TEMPERATURE_UNITS, true);
             result = celsiusPreferred;
         }};
     }
@@ -239,38 +238,32 @@ public class ModelAdapterTest {
     }
 
     private void whenBindingViewHolder() {
-        uut.onBindViewHolder(mModelViewHolder, 0);
+        uut.onBindViewHolder(modelViewHolder, 0);
     }
 
     private void givenModel(WeatherInfo weatherInfo) {
-        mModels.add(weatherInfo);
+        models.add(weatherInfo);
     }
 
     private void givenViewHolder(View view) {
         givenViewsFound(view);
-        mModelViewHolder = uut.onCreateViewHolder(mock(ViewGroup.class), 0);
+        modelViewHolder = uut.onCreateViewHolder(mock(ViewGroup.class), 0);
     }
 
     private void givenViewsFound(final View view) {
         new Expectations() {{
             view.findViewById(R.id.secondary_temperature_text_view);
-            result = mTextView;
+            result = textView;
             view.findViewById(R.id.preferred_temperature_text_view);
-            result = mTextView;
-        }};
-    }
-
-    private void thenItemViewShouldListenToClicks(final View view) {
-        new Verifications() {{
-            view.setOnClickListener(withEqual(uut));
+            result = textView;
         }};
     }
 
     private void thenModelViewHolderIsNotNull() {
-        assertNotNull(mModelViewHolder);
+        assertNotNull(modelViewHolder);
     }
 
     private void whenCreatingViewHolder() {
-        mModelViewHolder = uut.onCreateViewHolder(mock(ViewGroup.class), 0);
+        modelViewHolder = uut.onCreateViewHolder(mock(ViewGroup.class), 0);
     }
 }

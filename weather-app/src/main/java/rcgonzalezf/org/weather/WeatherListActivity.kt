@@ -184,7 +184,7 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
     }
 
     private fun setupRecyclerView() {
-        adapter = ModelAdapter(ArrayList(), this)
+        adapter = ModelAdapter(ArrayList())
         adapter.setOnItemClickListener(this)
         recyclerView = findViewById<View>(id.main_recycler_view) as RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(this)
