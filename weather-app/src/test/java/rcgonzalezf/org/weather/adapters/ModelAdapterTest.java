@@ -19,7 +19,6 @@ import org.rcgonzalezf.weather.common.models.WeatherViewModel;
 import java.util.ArrayList;
 import java.util.List;
 import mockit.Expectations;
-import mockit.FullVerifications;
 import mockit.Mocked;
 import mockit.Tested;
 import mockit.Verifications;
@@ -135,15 +134,6 @@ public class ModelAdapterTest {
     }
 
     @Test
-    public void shouldNotPostDelayedItemClickOnClickForNullItemClickListener(
-            @SuppressWarnings("UnusedParameters") @Mocked Handler handler) {
-
-        whenClicking();
-
-        thenNoInteractionsOnHandler(handler);
-    }
-
-    @Test
     public void shouldCallItemClickListenerOnItemClick() {
         givenItemClickListener();
         givenRunnable();
@@ -169,11 +159,6 @@ public class ModelAdapterTest {
             result = Mockito.mock(WeatherViewModel.class);
         }};
         itemClickListenerRunnable = uut.createClickRunnable(textView);
-    }
-
-    private void thenNoInteractionsOnHandler(Handler handler) {
-        new FullVerifications(handler) {
-        };
     }
 
     private void thenHandlerShouldPostRunnable() {

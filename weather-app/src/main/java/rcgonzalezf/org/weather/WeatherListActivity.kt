@@ -62,7 +62,9 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
     fun onItemsLoadComplete() {
         toggleProgressIndicator()
         enableSwipeToRefreshLayout()
-        swipeToRefreshLayout.isRefreshing = !swipeToRefreshLayout.isRefreshing
+        if (swipeToRefreshLayout.isRefreshing) {
+            swipeToRefreshLayout.isRefreshing = false
+        }
     }
 
     @VisibleForTesting
