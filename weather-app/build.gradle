@@ -91,6 +91,10 @@ junitJacoco {
       '**/BuildConfig.*',
       '**/Manifest*.*',
       // Data binding
+      '**/DataBind*.class',
+      '**/databinding/*Binding.class',
+      '**/*BinderMapperImpl.*',
+      '**/databinding/*Impl.class',
       'android/databinding/**/*.class',
       '**/android/databinding/*Binding.class',
       '**/BR.*',
@@ -101,7 +105,7 @@ junitJacoco {
       '**/*Module_*Factory.class',
       '**/AutoValue_*.*', '**/*JavascriptBridge.class', 'jdk.internal.*', '*$Impl_*']
   includeNoLocationClasses = true
-  includeInstrumentationCoverageInMergedReport = false
+  includeInstrumentationCoverageInMergedReport = true
 }
 
 apply plugin: 'com.google.gms.google-services'
