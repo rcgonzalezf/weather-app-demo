@@ -197,7 +197,7 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
     }
 
     @VisibleForTesting
-    fun createNotifyRunnable(weatherInfoList: List<WeatherInfo>?): Runnable {
+    fun createNotifyRunnable(weatherInfoList: List<WeatherInfo>): Runnable {
         return Runnable {
             adapter.setItems(weatherInfoList)
             adapter.notifyDataSetChanged()

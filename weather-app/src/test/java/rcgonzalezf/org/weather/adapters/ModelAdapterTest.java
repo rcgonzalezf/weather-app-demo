@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.rcgonzalezf.weather.WeatherLibApp;
 import org.rcgonzalezf.weather.common.models.WeatherInfo;
 import org.rcgonzalezf.weather.common.models.WeatherViewModel;
@@ -163,6 +164,10 @@ public class ModelAdapterTest {
     }
 
     private void givenRunnable() {
+        new Expectations() {{
+            textView.getTag();
+            result = Mockito.mock(WeatherViewModel.class);
+        }};
         itemClickListenerRunnable = uut.createClickRunnable(textView);
     }
 
