@@ -53,7 +53,7 @@ public class ModelAdapterTest {
     private SharedPreferences sharedPreferences;
     @Mocked
     private PreferenceManager preferenceManager;
-    private ModelAdapter.ModelViewHolder modelViewHolder;
+    private WeatherModelViewHolder modelViewHolder;
     private int itemCount;
     private Runnable itemClickListenerRunnable;
     private ModelAdapter.OnItemClickListener itemClickListener;
@@ -116,7 +116,7 @@ public class ModelAdapterTest {
     @SuppressWarnings("UnusedParameters")
     @Test
     public void shouldNotifyDataSetChangedWhenSettingItems(
-            @Mocked RecyclerView.Adapter<ModelAdapter.ModelViewHolder> adapter) {
+            @Mocked RecyclerView.Adapter<WeatherModelViewHolder> adapter) {
 
         whenSettingItemsList();
 

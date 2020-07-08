@@ -22,7 +22,7 @@ import static rcgonzalezf.org.weather.utils.WeatherUtils.formatTemperature;
 
 // TODO Revisit this class to do an upgrade to Kotlin
 public class ModelAdapter<T extends WeatherViewModel>
-        extends RecyclerView.Adapter<ModelAdapter.ModelViewHolder> implements View.OnClickListener {
+        extends RecyclerView.Adapter<WeatherModelViewHolder> implements View.OnClickListener {
 
     private List<T> models;
     private OnItemClickListener<WeatherViewModel> onItemClickListener;
@@ -33,20 +33,20 @@ public class ModelAdapter<T extends WeatherViewModel>
 
     @NonNull
     @Override
-    public ModelViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public WeatherModelViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         WeatherRowBinding weatherRowBinding =
                 WeatherRowBinding.inflate(layoutInflater, parent, false);
-        return new ModelViewHolder(weatherRowBinding);
+        return new WeatherModelViewHolder(weatherRowBinding);
     }
 
     @Override
-    public void onBindViewHolder(ModelAdapter.ModelViewHolder holder, int position) {
+    public void onBindViewHolder(WeatherModelViewHolder holder, int position) {
         T mainModel = models.get(position);
         holder.bind(mainModel);
-        populateTemperatureViews(holder.itemView.getContext(), holder, mainModel);
-        holder.itemView.setOnClickListener(this);
-        holder.itemView.setTag(mainModel);
+        populateTemperatureViews(holder.getItemView().getContext(), holder, mainModel);
+        holder.getItemView().setOnClickListener(this);
+        holder.getItemView().setTag(mainModel);
     }
 
     @BindingAdapter("android:src")
@@ -55,8 +55,7 @@ public class ModelAdapter<T extends WeatherViewModel>
     }
 
     @VisibleForTesting
-    void populateTemperatureViews(Context context,
-            ModelAdapter.ModelViewHolder holder,
+    void populateTemperatureViews(Context context, WeatherModelViewHolder holder,
                                   T mainModel) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         boolean celsiusPreferred = prefs.getBoolean(SettingsActivity.PREF_TEMPERATURE_UNITS, true);
@@ -64,8 +63,8 @@ public class ModelAdapter<T extends WeatherViewModel>
         final String celsiusText = formatTemperature(mainModel.getTemperature(), true, "C");
         final String fahrenheitText = formatTemperature(mainModel.getTemperature(), false, "F");
 
-        holder.primaryTempTextView.setText(celsiusPreferred ? celsiusText : fahrenheitText);
-        holder.secondaryTempTextView.setText(celsiusPreferred ? fahrenheitText : celsiusText);
+        holder.getPrimaryTempTextView().setText(celsiusPreferred ? celsiusText : fahrenheitText);
+        holder.getSecondaryTempTextView().setText(celsiusPreferred ? fahrenheitText : celsiusText);
     }
 
     @Override
@@ -99,28 +98,6 @@ public class ModelAdapter<T extends WeatherViewModel>
                 onItemClickListener.onItemClick(view, (WeatherViewModel) view.getTag());
             }
         };
-    }
-
-    static class ModelViewHolder extends RecyclerView.ViewHolder {
-
-        TextView secondaryTempTextView;
-        TextView primaryTempTextView;
-        final View itemView;
-        private WeatherRowBinding weatherRowBinding;
-
-        ModelViewHolder(WeatherRowBinding weatherRowBinding) {
-            super(weatherRowBinding.getRoot());
-            this.weatherRowBinding = weatherRowBinding;
-            this.itemView = weatherRowBinding.getRoot();
-            secondaryTempTextView =
-                    (TextView) itemView.findViewById(R.id.secondary_temperature_text_view);
-            primaryTempTextView = (TextView) itemView.findViewById(R.id.preferred_temperature_text_view);
-        }
-
-        public void bind(WeatherViewModel weatherViewModel) {
-            weatherRowBinding.setWeather(weatherViewModel);
-            weatherRowBinding.executePendingBindings();
-        }
     }
 
     public interface OnItemClickListener<VM extends WeatherViewModel> {
