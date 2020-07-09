@@ -213,24 +213,6 @@ public class BaseActivityTest {
     }
 
     @Test
-    public void shouldConnectLocationManagerOnStart(@Mocked LocationManager mLocationManager) {
-        givenActivityCreated();
-
-        whenStartingTheActivity();
-
-        thenLocationManagerShouldBeConnected(mLocationManager);
-    }
-
-    @Test
-    public void shouldDisconnectLocationManagerOnStop(@Mocked LocationManager mLocationManager) {
-        givenActivityCreated();
-
-        whenStoppingTheActivity();
-
-        thenLocationManagerShouldBeDisconnected(mLocationManager);
-    }
-
-    @Test
     public void shouldCreateOptionsMenu() {
         boolean createOptionsMenu = whenCreatingOptionsMenu();
 
@@ -670,28 +652,8 @@ public class BaseActivityTest {
         return uut.onCreateOptionsMenu(mock(Menu.class));
     }
 
-    private void thenLocationManagerShouldBeDisconnected(final LocationManager mLocationManager) {
-        new Verifications() {{
-            mLocationManager.disconnect();
-        }};
-    }
-
-    private void whenStoppingTheActivity() {
-        uut.onStop();
-    }
-
     private void givenActivityCreated() {
         uut.onCreate(bundle);
-    }
-
-    private void thenLocationManagerShouldBeConnected(final LocationManager mLocationManager) {
-        new Verifications() {{
-            mLocationManager.connect();
-        }};
-    }
-
-    private void whenStartingTheActivity() {
-        uut.onStart();
     }
 
     private void thenLocationManagerShouldBeInstantiated(final View view) {

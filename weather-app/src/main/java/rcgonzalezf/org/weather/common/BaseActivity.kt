@@ -30,6 +30,7 @@ import rcgonzalezf.org.weather.SettingsActivity
 import rcgonzalezf.org.weather.common.analytics.Analytics
 import rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.WeatherListActivity.Companion.MANUAL_SEARCH
 import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent
+import rcgonzalezf.org.weather.location.LocationLifecycleObserver
 import rcgonzalezf.org.weather.location.LocationManager
 import rcgonzalezf.org.weather.utils.WeatherUtils
 import java.io.UnsupportedEncodingException
@@ -58,17 +59,9 @@ abstract class BaseActivity : AppCompatActivity(),
         findViewById<View>(R.id.main_fab).setOnClickListener(fabClickListener)
         content = findViewById(R.id.content)
         locationManager = LocationManager(this, content)
+        val locationLifecycleObserver = LocationLifecycleObserver(locationManager)
+        lifecycle.addObserver(locationLifecycleObserver)
         trackOnScreen()
-    }
-
-    public override fun onStart() {
-        super.onStart()
-        locationManager.connect()
-    }
-
-    public override fun onStop() {
-        locationManager.disconnect()
-        super.onStop()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

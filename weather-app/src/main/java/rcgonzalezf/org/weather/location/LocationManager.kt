@@ -13,6 +13,7 @@ import rcgonzalezf.org.weather.common.PermissionChecker.Companion.LOCATION
 import rcgonzalezf.org.weather.common.PermissionResultListener
 import java.lang.ref.WeakReference
 
+open // for Mockito
 class LocationManager(baseActivity: BaseActivity, content: View) : LocationRetrieverListener {
     private val baseActivityWeakReference: WeakReference<BaseActivity> = WeakReference(baseActivity)
     private val contentWeakReference: WeakReference<View> = WeakReference(content)
@@ -53,11 +54,11 @@ class LocationManager(baseActivity: BaseActivity, content: View) : LocationRetri
         }
     }
 
-    fun connect() {
+    open fun connect() {
         locationRetriever.connect()
     }
 
-    fun disconnect() {
+    open fun disconnect() {
         locationRetriever.disconnect()
     }
 
