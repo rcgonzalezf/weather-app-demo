@@ -15,8 +15,6 @@ class LocationLifecycleObserverTest {
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        //Mockito.doNothing().`when`(locationManager).connect()
-        //Mockito.`when`(locationManager.connect())
         uut = LocationLifecycleObserver(locationManager)
     }
 
