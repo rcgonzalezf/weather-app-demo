@@ -11,6 +11,7 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
@@ -28,7 +29,6 @@ import org.rcgonzalezf.weather.common.models.WeatherViewModel
 import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder
-import rcgonzalezf.org.weather.R.id
 import rcgonzalezf.org.weather.R.string
 import rcgonzalezf.org.weather.adapters.ModelAdapter
 import rcgonzalezf.org.weather.adapters.ModelAdapter.OnItemClickListener
@@ -37,6 +37,7 @@ import rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog
 import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent
 import rcgonzalezf.org.weather.common.analytics.AnalyticsLifecycleObserver
 import rcgonzalezf.org.weather.databinding.WeatherListBinding
+import rcgonzalezf.org.weather.list.WeatherListViewModel
 import rcgonzalezf.org.weather.location.LocationLifecycleObserver
 import rcgonzalezf.org.weather.location.LocationManager
 import rcgonzalezf.org.weather.location.LocationSearch
@@ -55,15 +56,14 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
     private lateinit var adapter: ModelAdapter<WeatherInfo>
     private lateinit var locationManager: LocationManager
     private var openWeatherApiCallback: OpenWeatherApiCallback? = null
-    private var cityNameToSearchOnSwipe: CharSequence? = null
     private lateinit var progress: ProgressBar
     private val executor: Executor = Executors.newSingleThreadExecutor()
     private lateinit var weatherListBinding: WeatherListBinding
+    private val weatherListViewModel: WeatherListViewModel by viewModels()
 
     companion object {
         private val TAG = WeatherListActivity::class.java.simpleName
         const val FORECASTS = "FORECASTS"
-        const val CITY_NAME_TO_SEARCH_ON_SWIPE = "mCityNameToSearchOnSwipe"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,7 +72,6 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
                 weatherBinding.content, true)
         openWeatherApiCallback = OpenWeatherApiCallback(this)
         setupRecyclerView()
-        cityNameToSearchOnSwipe = savedInstanceState?.getCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE)
         progress = weatherBinding.progressBar
         swipeToRefreshLayout = weatherBinding.swipeToRefreshLayout
         enableSwipeToRefreshLayout()
@@ -85,15 +84,10 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
     }
 
     override fun informNoInternet() {
-        Toast.makeText(this, getString(R.string.no_internet_msg),
+        Toast.makeText(this, getString(string.no_internet_msg),
                 Toast.LENGTH_SHORT).show()
         val weatherInfoList = previousForecastList
         loadOldData(weatherInfoList)
-    }
-
-    public override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE, cityNameToSearchOnSwipe)
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -177,11 +171,7 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
                         .build(), openWeatherApiCallback)
         Toast.makeText(this, getString(string.searching) + " " + userInput + "...", Toast.LENGTH_SHORT)
                 .show()
-        updateCityNameForSwipeToRefresh(userInput)
-    }
-
-    private fun updateCityNameForSwipeToRefresh(cityName: CharSequence) {
-        cityNameToSearchOnSwipe = cityName
+        weatherListViewModel.updateCityNameForSwipeToRefresh(userInput)
     }
 
     private fun cityNameFromLatLon(lat: Double, lon: Double): String? {
@@ -231,7 +221,9 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
 
     @VisibleForTesting
     fun createSwipeToRefreshListener(): OnRefreshListener {
-        return OnRefreshListener { searchByManualInput(cityNameToSearchOnSwipe ?: "") }
+        return OnRefreshListener {
+            searchByManualInput(weatherListViewModel.cityNameToSearchOnSwipe.value ?: "")
+        }
     }
 
     @VisibleForTesting
@@ -240,7 +232,7 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
     }
 
     private fun enableSwipeToRefreshLayout() {
-        swipeToRefreshLayout.isEnabled = cityNameToSearchOnSwipe != null
+        swipeToRefreshLayout.isEnabled = weatherListViewModel.cityNameToSearchOnSwipe.value != null
     }
 
     val previousForecastList: List<WeatherInfo>?
@@ -326,7 +318,7 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
                 analytics.trackOnActionEvent(
                         AnalyticsEvent(
                                 AnalyticsDataCatalog.WeatherListActivity.LOCATION_SEARCH, cityName))
-                updateCityNameForSwipeToRefresh(cityName)
+                weatherListViewModel.updateCityNameForSwipeToRefresh(cityName)
             }
         }
     }
