@@ -2,7 +2,6 @@ package rcgonzalezf.org.weather
 
 import android.content.Context
 import android.content.DialogInterface
-import android.location.Address
 import android.location.Geocoder
 import android.os.Build
 import android.os.Bundle
@@ -16,6 +15,7 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -38,6 +38,7 @@ import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent
 import rcgonzalezf.org.weather.common.analytics.AnalyticsLifecycleObserver
 import rcgonzalezf.org.weather.databinding.WeatherListBinding
 import rcgonzalezf.org.weather.list.WeatherListViewModel
+import rcgonzalezf.org.weather.list.WeatherListViewModelFactory
 import rcgonzalezf.org.weather.location.LocationLifecycleObserver
 import rcgonzalezf.org.weather.location.LocationManager
 import rcgonzalezf.org.weather.location.LocationSearch
@@ -55,11 +56,14 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
     private lateinit var swipeToRefreshLayout: SwipeRefreshLayout
     private lateinit var adapter: ModelAdapter<WeatherInfo>
     private lateinit var locationManager: LocationManager
-    private var openWeatherApiCallback: OpenWeatherApiCallback? = null
+    private var openWeatherApiCallback: OpenWeatherApiCallback = OpenWeatherApiCallback(this)
     private lateinit var progress: ProgressBar
     private val executor: Executor = Executors.newSingleThreadExecutor()
     private lateinit var weatherListBinding: WeatherListBinding
-    private val weatherListViewModel: WeatherListViewModel by viewModels()
+    private val weatherListViewModel: WeatherListViewModel by viewModels {
+        val geoCoder = Geocoder(this, Locale.getDefault())
+        WeatherListViewModelFactory(openWeatherApiCallback, geoCoder)
+    }
 
     companion object {
         private val TAG = WeatherListActivity::class.java.simpleName
@@ -70,7 +74,6 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
         super.onCreate(savedInstanceState)
         weatherListBinding = DataBindingUtil.inflate(layoutInflater, R.layout.weather_list,
                 weatherBinding.content, true)
-        openWeatherApiCallback = OpenWeatherApiCallback(this)
         setupRecyclerView()
         progress = weatherBinding.progressBar
         swipeToRefreshLayout = weatherBinding.swipeToRefreshLayout
@@ -81,13 +84,26 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
         locationManager = LocationManager(this, weatherLocationSearch ,content)
         val locationLifecycleObserver = LocationLifecycleObserver(locationManager)
         lifecycle.addObserver(locationLifecycleObserver)
-    }
 
-    override fun informNoInternet() {
-        Toast.makeText(this, getString(string.no_internet_msg),
-                Toast.LENGTH_SHORT).show()
-        val weatherInfoList = previousForecastList
-        loadOldData(weatherInfoList)
+        // off line
+        weatherListViewModel.offline.observe(this, Observer {
+
+            val weatherInfoList = weatherListViewModel.weatherInfoList.value
+
+            if (weatherInfoList != null && weatherInfoList.isNotEmpty()) {
+                notifyAdapter(weatherInfoList)
+                analyticsLifecycleObserver.trackOnActionEvent(
+                        AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.NO_NETWORK_SEARCH,
+                                weatherInfoList[0].cityName))
+            } else {
+                Log.d(TAG, "No data even in offline mode :(")
+                analyticsLifecycleObserver.trackOnActionEvent(
+                        AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.NO_NETWORK_SEARCH,
+                                "EMPTY"))
+                //cancel swipe to refresh loading
+                onItemsLoadComplete()
+            }
+        })
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -128,22 +144,6 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
                 .show()
     }
 
-    override fun loadOldData(weatherInfoList: List<WeatherInfo>?) {
-        if (weatherInfoList != null && weatherInfoList.isNotEmpty()) {
-            notifyAdapter(weatherInfoList)
-            analyticsLifecycleObserver.trackOnActionEvent(
-                    AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.NO_NETWORK_SEARCH,
-                            weatherInfoList[0].cityName))
-        } else {
-            Log.d(TAG, "No data even in offline mode :(")
-            analyticsLifecycleObserver.trackOnActionEvent(
-                    AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.NO_NETWORK_SEARCH,
-                            "EMPTY"))
-            //cancel swipe to refresh loading
-            onItemsLoadComplete()
-        }
-    }
-
     override fun updateList(weatherInfoList: List<WeatherInfo>) {
         val cityName = if (weatherInfoList.isEmpty()) "" else weatherInfoList[0].cityName
         analyticsLifecycleObserver.trackOnActionEvent(
@@ -162,34 +162,18 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
     }
 
     fun searchByQuery(query: String, userInput: CharSequence) {
+        // TODO extract toggle to Interface to move this to VM, toast with Application Context
         toggleProgressIndicator()
-        val weatherRepository = ServiceConfig.getInstance()
-                .getWeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback?>()
-        weatherRepository.findWeather(
-                OpenWeatherApiRequestBuilder()
-                        .withCityName(query)
-                        .build(), openWeatherApiCallback)
+        weatherListViewModel.searchByQuery(query, userInput)
         Toast.makeText(this, getString(string.searching) + " " + userInput + "...", Toast.LENGTH_SHORT)
                 .show()
         weatherListViewModel.updateCityNameForSwipeToRefresh(userInput)
     }
 
-    private fun cityNameFromLatLon(lat: Double, lon: Double): String? {
-        var cityName: String? = null
-        val geocoder = Geocoder(this, Locale.getDefault())
-        val addresses: List<Address>
-        try {
-            addresses = geocoder.getFromLocation(lat, lon, 1)
-            cityName = addresses[0].locality
-        } catch (e: Exception) {
-            Log.d(TAG, "error retrieving the cityName with Geocoder")
-        }
-        return cityName
-    }
-
     private fun saveForecastList(weatherInfoList: List<WeatherInfo>) {
         executor.execute {
-            val prefs = getSharedPreferences(OFFLINE_FILE, Context.MODE_PRIVATE)
+            // TODO Replace with Room?
+            val prefs = this.getSharedPreferences(OFFLINE_FILE, Context.MODE_PRIVATE)
             val editor = prefs.edit()
             editor.putString(FORECASTS, Gson().toJson(weatherInfoList))
             editor.apply()
@@ -237,6 +221,7 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
 
     val previousForecastList: List<WeatherInfo>?
         get() {
+            // TODO Room and LiveData?
             val sharedPreferences = getSharedPreferences(OFFLINE_FILE, 0)
             val serializedData = sharedPreferences.getString(FORECASTS, null)
             var storedData: List<WeatherInfo>? = null
@@ -282,6 +267,7 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
 
     @VisibleForTesting
     fun searchByManualInput(userInput: CharSequence) {
+        // TODO move this to VM, toast with App Context, internet connection as well with App
         val query: String
         query = try {
             URLEncoder.encode(userInput.toString(), "UTF-8")
@@ -292,18 +278,23 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
             return
         }
         if (!WeatherUtils.hasInternetConnection(this)) {
-            informNoInternet()
+            Toast.makeText(this, getString(string.no_internet_msg),
+                    Toast.LENGTH_SHORT).show()
+            weatherListViewModel.loadOldData(previousForecastList)
         } else {
+            // TODO set this in ViewModel
+            weatherListViewModel.offline.value = false
             searchByQuery(query, userInput)
         }
     }
 
+    // TODO Move this to VM, pass analytics
     inner class WeatherListLocationSearch(val analytics: AnalyticsLifecycleObserver): LocationSearch {
         override fun searchByLatLon(lat: Double, lon: Double) {
             toggleProgressIndicator()
             val weatherRepository = ServiceConfig.getInstance()
                     .getWeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback?>()
-            val cityName = cityNameFromLatLon(lat, lon)
+            val cityName = weatherListViewModel.cityNameFromLatLon(lat, lon)
             if (cityName == null) {
                 weatherRepository.findWeather(
                         OpenWeatherApiRequestBuilder().withLatLon(lat, lon).build(),

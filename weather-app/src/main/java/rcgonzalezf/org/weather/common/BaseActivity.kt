@@ -22,7 +22,7 @@ import rcgonzalezf.org.weather.common.analytics.AnalyticsLifecycleObserver
 import rcgonzalezf.org.weather.databinding.WeatherBinding
 
 abstract class BaseActivity : AppCompatActivity(),
-        ActivityCompat.OnRequestPermissionsResultCallback, OnOfflineLoader {
+        ActivityCompat.OnRequestPermissionsResultCallback {
     private lateinit var drawerLayout: DrawerLayout
     protected lateinit var content: View
     protected lateinit var analyticsLifecycleObserver: AnalyticsLifecycleObserver
@@ -31,8 +31,6 @@ abstract class BaseActivity : AppCompatActivity(),
     companion object {
         const val OFFLINE_FILE = "OFFLINE_WEATHER"
     }
-
-    abstract fun informNoInternet()
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
