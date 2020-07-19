@@ -24,9 +24,10 @@ import rcgonzalezf.org.weather.R.string
 import rcgonzalezf.org.weather.adapters.ModelAdapter
 import rcgonzalezf.org.weather.adapters.ModelAdapter.OnItemClickListener
 import rcgonzalezf.org.weather.common.BaseActivity
-import rcgonzalezf.org.weather.common.ProgressIndicationStateChanger
+import rcgonzalezf.org.weather.common.ToggleBehavior
 import rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog
 import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent
+import rcgonzalezf.org.weather.common.ext.toggleVisibility
 import rcgonzalezf.org.weather.databinding.WeatherListBinding
 import rcgonzalezf.org.weather.list.WeatherListViewModel
 import rcgonzalezf.org.weather.list.WeatherListViewModelFactory
@@ -35,7 +36,7 @@ import rcgonzalezf.org.weather.location.LocationManager
 import java.util.Locale
 
 class WeatherListActivity : BaseActivity(),
-        OnItemClickListener<WeatherViewModel>, ProgressIndicationStateChanger,
+        OnItemClickListener<WeatherViewModel>, ToggleBehavior,
         OnUpdateWeatherListListener {
 
     private lateinit var adapter: ModelAdapter<WeatherInfo>
@@ -62,7 +63,7 @@ class WeatherListActivity : BaseActivity(),
         weatherBinding.mainFab.setOnClickListener(fabClickListener)
         val weatherLocationSearch =
                 weatherListViewModel.WeatherListLocationSearch(analyticsLifecycleObserver)
-        locationManager = LocationManager(this, weatherLocationSearch ,content)
+        locationManager = LocationManager(this, weatherLocationSearch, content)
         val locationLifecycleObserver = LocationLifecycleObserver(locationManager)
         lifecycle.addObserver(locationLifecycleObserver)
 
@@ -91,7 +92,7 @@ class WeatherListActivity : BaseActivity(),
 
     @VisibleForTesting
     fun onItemsLoadComplete() {
-        toggleProgressIndicator()
+        toggle()
         enableSwipeToRefreshLayout()
         if (weatherBinding.swipeToRefreshLayout.isRefreshing) {
             weatherBinding.swipeToRefreshLayout.isRefreshing = false
@@ -99,13 +100,8 @@ class WeatherListActivity : BaseActivity(),
     }
 
     @VisibleForTesting
-    override fun toggleProgressIndicator() {
-        val progressBar = weatherBinding.progressBar
-        progressBar.visibility = if (progressBar.visibility == View.VISIBLE) {
-            View.GONE
-        } else {
-            View.VISIBLE
-        }
+    override fun toggle() {
+        weatherBinding.progressBar.toggleVisibility()
     }
 
     override fun onEnterAnimationComplete() {
@@ -172,7 +168,7 @@ class WeatherListActivity : BaseActivity(),
 
     @VisibleForTesting
     fun createRunnableToggleProgressIndicator(): Runnable {
-        return Runnable { toggleProgressIndicator() }
+        return Runnable { toggle() }
     }
 
     private fun enableSwipeToRefreshLayout() {

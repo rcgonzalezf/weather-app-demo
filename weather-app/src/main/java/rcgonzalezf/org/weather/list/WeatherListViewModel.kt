@@ -17,7 +17,7 @@ import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters
 import rcgonzalezf.org.weather.R
 import rcgonzalezf.org.weather.common.OnOfflineLoader
-import rcgonzalezf.org.weather.common.ProgressIndicationStateChanger
+import rcgonzalezf.org.weather.common.ToggleBehavior
 import rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog
 import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent
 import rcgonzalezf.org.weather.common.analytics.AnalyticsLifecycleObserver
@@ -31,7 +31,7 @@ import java.util.concurrent.Executors
 class WeatherListViewModel(
         private val openWeatherApiCallback: OpenWeatherApiCallback,
         private val geoCoder: Geocoder,
-        private val progressIndicationStateChanger: ProgressIndicationStateChanger,
+        private val toggleBehavior: ToggleBehavior,
         private val app: Application)
     : AndroidViewModel(app), OnOfflineLoader {
 
@@ -78,7 +78,7 @@ class WeatherListViewModel(
     }
 
     fun searchByQuery(query: String, userInput: CharSequence) {
-        progressIndicationStateChanger.toggleProgressIndicator()
+        toggleBehavior.toggle()
         val weatherRepository = ServiceConfig.getInstance()
                 .getWeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback?>()
         weatherRepository.findWeather(
@@ -136,9 +136,9 @@ class WeatherListViewModel(
         }
     }
 
-    inner class WeatherListLocationSearch(val analytics: AnalyticsLifecycleObserver): LocationSearch {
+    inner class WeatherListLocationSearch(val analytics: AnalyticsLifecycleObserver) : LocationSearch {
         override fun searchByLatLon(lat: Double, lon: Double) {
-            progressIndicationStateChanger.toggleProgressIndicator()
+            toggleBehavior.toggle()
             val weatherRepository = ServiceConfig.getInstance()
                     .getWeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback?>()
             val cityName = cityNameFromLatLon(lat, lon)
