@@ -33,6 +33,7 @@ import rcgonzalezf.org.weather.R.string
 import rcgonzalezf.org.weather.adapters.ModelAdapter
 import rcgonzalezf.org.weather.adapters.ModelAdapter.OnItemClickListener
 import rcgonzalezf.org.weather.common.BaseActivity
+import rcgonzalezf.org.weather.common.ProgressIndicationStateChanger
 import rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog
 import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent
 import rcgonzalezf.org.weather.common.analytics.AnalyticsLifecycleObserver
@@ -49,7 +50,8 @@ import java.util.Locale
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
-class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel>,
+class WeatherListActivity : BaseActivity(),
+        OnItemClickListener<WeatherViewModel>, ProgressIndicationStateChanger,
         OnUpdateWeatherListListener {
 
     private lateinit var recyclerView: RecyclerView
@@ -62,7 +64,8 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
     private lateinit var weatherListBinding: WeatherListBinding
     private val weatherListViewModel: WeatherListViewModel by viewModels {
         val geoCoder = Geocoder(this, Locale.getDefault())
-        WeatherListViewModelFactory(openWeatherApiCallback, geoCoder)
+        WeatherListViewModelFactory(openWeatherApiCallback,
+                geoCoder, this, WeatherApp.getAppInstance())
     }
 
     companion object {
@@ -122,7 +125,7 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
     }
 
     @VisibleForTesting
-    fun toggleProgressIndicator() {
+    override fun toggleProgressIndicator() {
         progress.visibility = if (progress.visibility == View.VISIBLE) {
             View.GONE
         } else {
@@ -159,15 +162,6 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
         analyticsLifecycleObserver.trackOnActionEvent(
                 AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.SEARCH_COMPLETED,
                         "error: $error"))
-    }
-
-    fun searchByQuery(query: String, userInput: CharSequence) {
-        // TODO extract toggle to Interface to move this to VM, toast with Application Context
-        toggleProgressIndicator()
-        weatherListViewModel.searchByQuery(query, userInput)
-        Toast.makeText(this, getString(string.searching) + " " + userInput + "...", Toast.LENGTH_SHORT)
-                .show()
-        weatherListViewModel.updateCityNameForSwipeToRefresh(userInput)
     }
 
     private fun saveForecastList(weatherInfoList: List<WeatherInfo>) {
@@ -284,7 +278,7 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
         } else {
             // TODO set this in ViewModel
             weatherListViewModel.offline.value = false
-            searchByQuery(query, userInput)
+            weatherListViewModel.searchByQuery(query, userInput)
         }
     }
 
