@@ -31,6 +31,8 @@ import rcgonzalezf.org.weather.common.ext.toggleVisibility
 import rcgonzalezf.org.weather.databinding.WeatherListBinding
 import rcgonzalezf.org.weather.list.WeatherListViewModel
 import rcgonzalezf.org.weather.list.WeatherListViewModelFactory
+import rcgonzalezf.org.weather.location.CityFromLatLongRetriever
+import rcgonzalezf.org.weather.location.GeoCodeRetriever
 import rcgonzalezf.org.weather.location.LocationLifecycleObserver
 import rcgonzalezf.org.weather.location.LocationManager
 import java.util.Locale
@@ -45,8 +47,9 @@ class WeatherListActivity : BaseActivity(),
     private lateinit var weatherListBinding: WeatherListBinding
     private val weatherListViewModel: WeatherListViewModel by viewModels {
         val geoCoder = Geocoder(this, Locale.getDefault())
+        val cityFromLatLongRetriever: CityFromLatLongRetriever = GeoCodeRetriever(geoCoder)
         WeatherListViewModelFactory(openWeatherApiCallback,
-                geoCoder, this, WeatherApp.getAppInstance())
+                cityFromLatLongRetriever, this, WeatherApp.getAppInstance())
     }
 
     companion object {

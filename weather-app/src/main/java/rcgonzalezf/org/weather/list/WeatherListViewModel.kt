@@ -2,8 +2,6 @@ package rcgonzalezf.org.weather.list
 
 import android.app.Application
 import android.content.Context
-import android.location.Address
-import android.location.Geocoder
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
@@ -21,6 +19,7 @@ import rcgonzalezf.org.weather.common.ToggleBehavior
 import rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog
 import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent
 import rcgonzalezf.org.weather.common.analytics.AnalyticsLifecycleObserver
+import rcgonzalezf.org.weather.location.CityFromLatLongRetriever
 import rcgonzalezf.org.weather.location.LocationSearch
 import rcgonzalezf.org.weather.utils.WeatherUtils
 import java.io.UnsupportedEncodingException
@@ -30,7 +29,7 @@ import java.util.concurrent.Executors
 
 class WeatherListViewModel(
         private val openWeatherApiCallback: OpenWeatherApiCallback,
-        private val geoCoder: Geocoder,
+        private val cityNameFromLatLong: CityFromLatLongRetriever,
         private val toggleBehavior: ToggleBehavior,
         private val app: Application)
     : AndroidViewModel(app), OnOfflineLoader {
@@ -94,15 +93,7 @@ class WeatherListViewModel(
     }
 
     fun cityNameFromLatLon(lat: Double, lon: Double): String? {
-        var cityName: String? = null
-        val addresses: List<Address>
-        try {
-            addresses = geoCoder.getFromLocation(lat, lon, 1)
-            cityName = addresses[0].locality
-        } catch (e: Exception) {
-            Log.d(TAG, "error retrieving the cityName with Geocoder")
-        }
-        return cityName
+        return cityNameFromLatLong.getFromLatLong(lat, lon)
     }
 
     fun saveForecastList(weatherInfoList: List<WeatherInfo>) {

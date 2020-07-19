@@ -31,7 +31,6 @@ abstract class BaseActivity : AppCompatActivity(),
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         weatherBinding = DataBindingUtil.setContentView(this, R.layout.weather)
-        //setContentView(R.layout.weather)
         initToolbar()
         setupDrawerLayout()
         content = weatherBinding.content
