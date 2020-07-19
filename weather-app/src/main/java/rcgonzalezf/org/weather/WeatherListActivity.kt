@@ -1,6 +1,5 @@
 package rcgonzalezf.org.weather
 
-import android.content.Context
 import android.content.DialogInterface
 import android.location.Geocoder
 import android.os.Build
@@ -20,8 +19,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import org.rcgonzalezf.weather.common.ServiceConfig
 import org.rcgonzalezf.weather.common.listeners.OnUpdateWeatherListListener
 import org.rcgonzalezf.weather.common.models.WeatherInfo
@@ -43,12 +40,7 @@ import rcgonzalezf.org.weather.list.WeatherListViewModelFactory
 import rcgonzalezf.org.weather.location.LocationLifecycleObserver
 import rcgonzalezf.org.weather.location.LocationManager
 import rcgonzalezf.org.weather.location.LocationSearch
-import rcgonzalezf.org.weather.utils.WeatherUtils
-import java.io.UnsupportedEncodingException
-import java.net.URLEncoder
 import java.util.Locale
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
 
 class WeatherListActivity : BaseActivity(),
         OnItemClickListener<WeatherViewModel>, ProgressIndicationStateChanger,
@@ -60,7 +52,6 @@ class WeatherListActivity : BaseActivity(),
     private lateinit var locationManager: LocationManager
     private var openWeatherApiCallback: OpenWeatherApiCallback = OpenWeatherApiCallback(this)
     private lateinit var progress: ProgressBar
-    private val executor: Executor = Executors.newSingleThreadExecutor()
     private lateinit var weatherListBinding: WeatherListBinding
     private val weatherListViewModel: WeatherListViewModel by viewModels {
         val geoCoder = Geocoder(this, Locale.getDefault())
@@ -70,7 +61,6 @@ class WeatherListActivity : BaseActivity(),
 
     companion object {
         private val TAG = WeatherListActivity::class.java.simpleName
-        const val FORECASTS = "FORECASTS"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -164,16 +154,6 @@ class WeatherListActivity : BaseActivity(),
                         "error: $error"))
     }
 
-    private fun saveForecastList(weatherInfoList: List<WeatherInfo>) {
-        executor.execute {
-            // TODO Replace with Room?
-            val prefs = this.getSharedPreferences(OFFLINE_FILE, Context.MODE_PRIVATE)
-            val editor = prefs.edit()
-            editor.putString(FORECASTS, Gson().toJson(weatherInfoList))
-            editor.apply()
-        }
-    }
-
     private fun setupRecyclerView() {
         adapter = ModelAdapter(ArrayList())
         adapter.setOnItemClickListener(this)
@@ -183,7 +163,7 @@ class WeatherListActivity : BaseActivity(),
     }
 
     private fun notifyAdapter(weatherInfoList: List<WeatherInfo>) {
-        saveForecastList(weatherInfoList)
+        weatherListViewModel.saveForecastList(weatherInfoList)
         runOnUiThread(createNotifyRunnable(weatherInfoList))
     }
 
@@ -200,7 +180,8 @@ class WeatherListActivity : BaseActivity(),
     @VisibleForTesting
     fun createSwipeToRefreshListener(): OnRefreshListener {
         return OnRefreshListener {
-            searchByManualInput(weatherListViewModel.cityNameToSearchOnSwipe.value ?: "")
+            weatherListViewModel
+                    .searchByManualInput(weatherListViewModel.cityNameToSearchOnSwipe.value ?: "")
         }
     }
 
@@ -212,19 +193,6 @@ class WeatherListActivity : BaseActivity(),
     private fun enableSwipeToRefreshLayout() {
         swipeToRefreshLayout.isEnabled = weatherListViewModel.cityNameToSearchOnSwipe.value != null
     }
-
-    val previousForecastList: List<WeatherInfo>?
-        get() {
-            // TODO Room and LiveData?
-            val sharedPreferences = getSharedPreferences(OFFLINE_FILE, 0)
-            val serializedData = sharedPreferences.getString(FORECASTS, null)
-            var storedData: List<WeatherInfo>? = null
-            if (serializedData != null) {
-                storedData = Gson()
-                        .fromJson(serializedData, object : TypeToken<List<WeatherInfo?>?>() {}.type)
-            }
-            return storedData
-        }
 
     @get:VisibleForTesting
     val fabClickListener: View.OnClickListener
@@ -244,7 +212,7 @@ class WeatherListActivity : BaseActivity(),
         return DialogInterface.OnClickListener { dialog, id ->
             analyticsLifecycleObserver
                     .trackOnActionEvent(AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.MANUAL_SEARCH, userInput.toString()))
-            searchByManualInput(userInput)
+            weatherListViewModel.searchByManualInput(userInput)
         }
     }
 
@@ -257,29 +225,6 @@ class WeatherListActivity : BaseActivity(),
                 .setNegativeButton("Cancel", cancelListener)
                 .create()
                 .show()
-    }
-
-    @VisibleForTesting
-    fun searchByManualInput(userInput: CharSequence) {
-        // TODO move this to VM, toast with App Context, internet connection as well with App
-        val query: String
-        query = try {
-            URLEncoder.encode(userInput.toString(), "UTF-8")
-        } catch (e: UnsupportedEncodingException) {
-            Log.e(TAG, "Can't encode URL", e)
-            Toast.makeText(this@WeatherListActivity, "${getString(R.string.invalid_input)}: $userInput...",
-                    Toast.LENGTH_SHORT).show()
-            return
-        }
-        if (!WeatherUtils.hasInternetConnection(this)) {
-            Toast.makeText(this, getString(string.no_internet_msg),
-                    Toast.LENGTH_SHORT).show()
-            weatherListViewModel.loadOldData(previousForecastList)
-        } else {
-            // TODO set this in ViewModel
-            weatherListViewModel.offline.value = false
-            weatherListViewModel.searchByQuery(query, userInput)
-        }
     }
 
     // TODO Move this to VM, pass analytics

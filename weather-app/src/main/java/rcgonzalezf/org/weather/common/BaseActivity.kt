@@ -28,10 +28,6 @@ abstract class BaseActivity : AppCompatActivity(),
     protected lateinit var analyticsLifecycleObserver: AnalyticsLifecycleObserver
     protected lateinit var weatherBinding: WeatherBinding
 
-    companion object {
-        const val OFFLINE_FILE = "OFFLINE_WEATHER"
-    }
-
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         weatherBinding = DataBindingUtil.setContentView(this, R.layout.weather)
