@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.EditText
-import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -16,16 +15,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
-import org.rcgonzalezf.weather.common.ServiceConfig
 import org.rcgonzalezf.weather.common.listeners.OnUpdateWeatherListListener
 import org.rcgonzalezf.weather.common.models.WeatherInfo
 import org.rcgonzalezf.weather.common.models.WeatherViewModel
 import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback
-import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters
-import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder
 import rcgonzalezf.org.weather.R.string
 import rcgonzalezf.org.weather.adapters.ModelAdapter
 import rcgonzalezf.org.weather.adapters.ModelAdapter.OnItemClickListener
@@ -33,25 +27,20 @@ import rcgonzalezf.org.weather.common.BaseActivity
 import rcgonzalezf.org.weather.common.ProgressIndicationStateChanger
 import rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog
 import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent
-import rcgonzalezf.org.weather.common.analytics.AnalyticsLifecycleObserver
 import rcgonzalezf.org.weather.databinding.WeatherListBinding
 import rcgonzalezf.org.weather.list.WeatherListViewModel
 import rcgonzalezf.org.weather.list.WeatherListViewModelFactory
 import rcgonzalezf.org.weather.location.LocationLifecycleObserver
 import rcgonzalezf.org.weather.location.LocationManager
-import rcgonzalezf.org.weather.location.LocationSearch
 import java.util.Locale
 
 class WeatherListActivity : BaseActivity(),
         OnItemClickListener<WeatherViewModel>, ProgressIndicationStateChanger,
         OnUpdateWeatherListListener {
 
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var swipeToRefreshLayout: SwipeRefreshLayout
     private lateinit var adapter: ModelAdapter<WeatherInfo>
     private lateinit var locationManager: LocationManager
     private var openWeatherApiCallback: OpenWeatherApiCallback = OpenWeatherApiCallback(this)
-    private lateinit var progress: ProgressBar
     private lateinit var weatherListBinding: WeatherListBinding
     private val weatherListViewModel: WeatherListViewModel by viewModels {
         val geoCoder = Geocoder(this, Locale.getDefault())
@@ -68,31 +57,26 @@ class WeatherListActivity : BaseActivity(),
         weatherListBinding = DataBindingUtil.inflate(layoutInflater, R.layout.weather_list,
                 weatherBinding.content, true)
         setupRecyclerView()
-        progress = weatherBinding.progressBar
-        swipeToRefreshLayout = weatherBinding.swipeToRefreshLayout
         enableSwipeToRefreshLayout()
-        swipeToRefreshLayout.setOnRefreshListener(createSwipeToRefreshListener())
+        weatherBinding.swipeToRefreshLayout.setOnRefreshListener(createSwipeToRefreshListener())
         weatherBinding.mainFab.setOnClickListener(fabClickListener)
-        val weatherLocationSearch = WeatherListLocationSearch(analyticsLifecycleObserver)
+        val weatherLocationSearch =
+                weatherListViewModel.WeatherListLocationSearch(analyticsLifecycleObserver)
         locationManager = LocationManager(this, weatherLocationSearch ,content)
         val locationLifecycleObserver = LocationLifecycleObserver(locationManager)
         lifecycle.addObserver(locationLifecycleObserver)
 
         // off line
         weatherListViewModel.offline.observe(this, Observer {
-
             val weatherInfoList = weatherListViewModel.weatherInfoList.value
-
+            val noNetwork = AnalyticsDataCatalog.WeatherListActivity.NO_NETWORK_SEARCH
             if (weatherInfoList != null && weatherInfoList.isNotEmpty()) {
                 notifyAdapter(weatherInfoList)
                 analyticsLifecycleObserver.trackOnActionEvent(
-                        AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.NO_NETWORK_SEARCH,
-                                weatherInfoList[0].cityName))
+                        AnalyticsEvent(noNetwork, weatherInfoList[0].cityName))
             } else {
                 Log.d(TAG, "No data even in offline mode :(")
-                analyticsLifecycleObserver.trackOnActionEvent(
-                        AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.NO_NETWORK_SEARCH,
-                                "EMPTY"))
+                analyticsLifecycleObserver.trackOnActionEvent(AnalyticsEvent(noNetwork, "EMPTY"))
                 //cancel swipe to refresh loading
                 onItemsLoadComplete()
             }
@@ -109,14 +93,15 @@ class WeatherListActivity : BaseActivity(),
     fun onItemsLoadComplete() {
         toggleProgressIndicator()
         enableSwipeToRefreshLayout()
-        if (swipeToRefreshLayout.isRefreshing) {
-            swipeToRefreshLayout.isRefreshing = false
+        if (weatherBinding.swipeToRefreshLayout.isRefreshing) {
+            weatherBinding.swipeToRefreshLayout.isRefreshing = false
         }
     }
 
     @VisibleForTesting
     override fun toggleProgressIndicator() {
-        progress.visibility = if (progress.visibility == View.VISIBLE) {
+        val progressBar = weatherBinding.progressBar
+        progressBar.visibility = if (progressBar.visibility == View.VISIBLE) {
             View.GONE
         } else {
             View.VISIBLE
@@ -125,7 +110,7 @@ class WeatherListActivity : BaseActivity(),
 
     override fun onEnterAnimationComplete() {
         super.onEnterAnimationComplete()
-        recyclerView.scheduleLayoutAnimation()
+        weatherListBinding.mainRecyclerView.scheduleLayoutAnimation()
     }
 
     override fun onItemClick(view: View, viewModel: WeatherViewModel) {
@@ -157,7 +142,7 @@ class WeatherListActivity : BaseActivity(),
     private fun setupRecyclerView() {
         adapter = ModelAdapter(ArrayList())
         adapter.setOnItemClickListener(this)
-        recyclerView = weatherListBinding.mainRecyclerView
+        val recyclerView = weatherListBinding.mainRecyclerView
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
     }
@@ -191,7 +176,8 @@ class WeatherListActivity : BaseActivity(),
     }
 
     private fun enableSwipeToRefreshLayout() {
-        swipeToRefreshLayout.isEnabled = weatherListViewModel.cityNameToSearchOnSwipe.value != null
+        weatherBinding.swipeToRefreshLayout.isEnabled =
+                weatherListViewModel.cityNameToSearchOnSwipe.value != null
     }
 
     @get:VisibleForTesting
@@ -225,31 +211,5 @@ class WeatherListActivity : BaseActivity(),
                 .setNegativeButton("Cancel", cancelListener)
                 .create()
                 .show()
-    }
-
-    // TODO Move this to VM, pass analytics
-    inner class WeatherListLocationSearch(val analytics: AnalyticsLifecycleObserver): LocationSearch {
-        override fun searchByLatLon(lat: Double, lon: Double) {
-            toggleProgressIndicator()
-            val weatherRepository = ServiceConfig.getInstance()
-                    .getWeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback?>()
-            val cityName = weatherListViewModel.cityNameFromLatLon(lat, lon)
-            if (cityName == null) {
-                weatherRepository.findWeather(
-                        OpenWeatherApiRequestBuilder().withLatLon(lat, lon).build(),
-                        openWeatherApiCallback)
-                analytics.trackOnActionEvent(
-                        AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.LOCATION_SEARCH,
-                                "Geocoder Failure"))
-            } else {
-                weatherRepository.findWeather(
-                        OpenWeatherApiRequestBuilder().withCityName(cityName).build(),
-                        openWeatherApiCallback)
-                analytics.trackOnActionEvent(
-                        AnalyticsEvent(
-                                AnalyticsDataCatalog.WeatherListActivity.LOCATION_SEARCH, cityName))
-                weatherListViewModel.updateCityNameForSwipeToRefresh(cityName)
-            }
-        }
     }
 }

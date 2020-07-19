@@ -18,6 +18,10 @@ import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParamete
 import rcgonzalezf.org.weather.R
 import rcgonzalezf.org.weather.common.OnOfflineLoader
 import rcgonzalezf.org.weather.common.ProgressIndicationStateChanger
+import rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog
+import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent
+import rcgonzalezf.org.weather.common.analytics.AnalyticsLifecycleObserver
+import rcgonzalezf.org.weather.location.LocationSearch
 import rcgonzalezf.org.weather.utils.WeatherUtils
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
@@ -113,7 +117,6 @@ class WeatherListViewModel(
 
     @VisibleForTesting
     fun searchByManualInput(userInput: CharSequence) {
-        // TODO move this to VM, toast with App Context, internet connection as well with App
         val query: String
         query = try {
             URLEncoder.encode(userInput.toString(), "UTF-8")
@@ -128,9 +131,33 @@ class WeatherListViewModel(
                     Toast.LENGTH_SHORT).show()
             loadOldData(previousForecastList)
         } else {
-            // TODO set this in ViewModel
             offline.value = false
             searchByQuery(query, userInput)
+        }
+    }
+
+    inner class WeatherListLocationSearch(val analytics: AnalyticsLifecycleObserver): LocationSearch {
+        override fun searchByLatLon(lat: Double, lon: Double) {
+            progressIndicationStateChanger.toggleProgressIndicator()
+            val weatherRepository = ServiceConfig.getInstance()
+                    .getWeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback?>()
+            val cityName = cityNameFromLatLon(lat, lon)
+            if (cityName == null) {
+                weatherRepository.findWeather(
+                        OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withLatLon(lat, lon).build(),
+                        openWeatherApiCallback)
+                analytics.trackOnActionEvent(
+                        AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.LOCATION_SEARCH,
+                                "Geocoder Failure"))
+            } else {
+                weatherRepository.findWeather(
+                        OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withCityName(cityName).build(),
+                        openWeatherApiCallback)
+                analytics.trackOnActionEvent(
+                        AnalyticsEvent(
+                                AnalyticsDataCatalog.WeatherListActivity.LOCATION_SEARCH, cityName))
+                updateCityNameForSwipeToRefresh(cityName)
+            }
         }
     }
 }
