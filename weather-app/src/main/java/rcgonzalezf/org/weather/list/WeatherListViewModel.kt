@@ -33,7 +33,8 @@ class WeatherListViewModel(
         private val toggleBehavior: ToggleBehavior,
         private val app: Application,
         private val userNotifier: UserNotifier,
-        private val serviceConfig: ServiceConfig = ServiceConfig.getInstance())
+        private val serviceConfig: ServiceConfig = ServiceConfig.getInstance(),
+        private val executor: Executor = Executors.newSingleThreadExecutor())
     : AndroidViewModel(app), OnOfflineLoader {
 
     companion object {
@@ -41,8 +42,6 @@ class WeatherListViewModel(
         const val OFFLINE_FILE = "OFFLINE_WEATHER"
         const val FORECASTS = "FORECASTS"
     }
-
-    private val executor: Executor = Executors.newSingleThreadExecutor()
 
     val cityNameToSearchOnSwipe: MutableLiveData<CharSequence> by lazy {
         MutableLiveData<CharSequence>()
@@ -129,8 +128,8 @@ class WeatherListViewModel(
     inner class WeatherListLocationSearch(val analytics: AnalyticsLifecycleObserver) : LocationSearch {
         override fun searchByLatLon(lat: Double, lon: Double) {
             toggleBehavior.toggle()
-            val weatherRepository = ServiceConfig.getInstance()
-                    .getWeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback?>()
+            val weatherRepository = serviceConfig.getWeatherRepository<
+                    OpenWeatherApiRequestParameters, OpenWeatherApiCallback?>()
             val cityName = cityNameFromLatLon(lat, lon)
             if (cityName == null) {
                 weatherRepository.findWeather(

@@ -1,11 +1,15 @@
 package rcgonzalezf.org.weather.list
 
 import android.app.Application
+import android.content.Context
 import android.content.SharedPreferences
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.gson.Gson
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertThat
@@ -21,11 +25,14 @@ import org.rcgonzalezf.weather.common.WeatherRepository
 import org.rcgonzalezf.weather.common.models.WeatherInfo
 import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters
+import rcgonzalezf.org.weather.R
 import rcgonzalezf.org.weather.common.ToggleBehavior
+import rcgonzalezf.org.weather.common.analytics.AnalyticsLifecycleObserver
 import rcgonzalezf.org.weather.list.WeatherListViewModel.Companion.FORECASTS
 import rcgonzalezf.org.weather.list.WeatherListViewModel.Companion.OFFLINE_FILE
 import rcgonzalezf.org.weather.location.CityFromLatLongRetriever
 import rcgonzalezf.org.weather.utils.UserNotifier
+import java.util.concurrent.Executor
 
 class WeatherListViewModelTest {
 
@@ -51,6 +58,12 @@ class WeatherListViewModelTest {
     @Mock
     lateinit var app: Application
 
+    @Mock
+    lateinit var serviceConfig: ServiceConfig
+
+    @Mock
+    lateinit var analytics: AnalyticsLifecycleObserver
+
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
@@ -58,7 +71,7 @@ class WeatherListViewModelTest {
     fun setUp() {
         MockitoAnnotations.initMocks(this)
         uut = WeatherListViewModel(openWeatherApiCallback,
-                cityFromLatLongRetriever, toggleBehavior, app, userNotifier)
+                cityFromLatLongRetriever, toggleBehavior, app, userNotifier, serviceConfig)
     }
 
     @Test
@@ -123,16 +136,13 @@ class WeatherListViewModelTest {
     }
 
     @Test
-    fun willSearchByQuery() {
+    fun viewModelSearchByQueryWillCallRepository() {
         val someCityName = "someCityName"
-        val serviceConfig = Mockito.mock(ServiceConfig::class.java)
         val weatherRepository: WeatherRepository<*, *>? = Mockito.mock(WeatherRepository::class.java)
         Mockito.`when`(serviceConfig
                 .getWeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback?>())
                 .thenReturn(weatherRepository as WeatherRepository
                 <OpenWeatherApiRequestParameters, OpenWeatherApiCallback?>?)
-        uut = WeatherListViewModel(openWeatherApiCallback,
-                cityFromLatLongRetriever, toggleBehavior, app, userNotifier, serviceConfig)
 
         uut.searchByQuery(someCityName, someCityName)
 
@@ -140,6 +150,95 @@ class WeatherListViewModelTest {
         Mockito.verify(userNotifier).notify(Mockito.anyString())
         Mockito.verify(weatherRepository)?.findWeather(Mockito.any(OpenWeatherApiRequestParameters::class.java),
                 Mockito.eq(openWeatherApiCallback))
+    }
+
+    @Test
+    fun saveForecastListWillSaveTheList() {
+        givenForecastList()
+        givenForecastElement("someCityName")
+        val executor = Executor { command -> command?.run() }
+        Mockito.`when`(app.getSharedPreferences(OFFLINE_FILE, 0)).thenReturn(sharedPreferences)
+        val editor = Mockito.mock(SharedPreferences.Editor::class.java)
+        Mockito.`when`(sharedPreferences.edit()).thenReturn(editor)
+        uut = WeatherListViewModel(openWeatherApiCallback, cityFromLatLongRetriever,
+                toggleBehavior, app, userNotifier, serviceConfig, executor)
+
+        uut.saveForecastList(weatherInfoList as List<WeatherInfo>)
+
+        Mockito.verify(editor).putString(Mockito.eq(FORECASTS), Mockito.any())
+        Mockito.verify(editor).apply()
+    }
+
+    @Test
+    fun searchByManualInputNoInternetWillLoadOldData() {
+        val someCityName = "someCityName"
+        val noInternetMessage = "noInternetMessage"
+        val connectivityManager = Mockito.mock(ConnectivityManager::class.java)
+        Mockito.`when`(app.getSystemService(Context.CONNECTIVITY_SERVICE))
+                .thenReturn(connectivityManager)
+        Mockito.`when`(app.getString(R.string.no_internet_msg)).thenReturn(noInternetMessage)
+        givenSharedPreferenceWithStoredData()
+
+        uut.searchByManualInput(someCityName)
+
+        assertTrue(uut.offline.value as Boolean)
+        Mockito.verify(userNotifier).notify(noInternetMessage)
+    }
+
+    @Test
+    fun searchByManualInputWithInternetWillSearchByQuery() {
+        val someCityName = "someCityName"
+        val connectivityManager = Mockito.mock(ConnectivityManager::class.java)
+        val networkInfo = Mockito.mock(NetworkInfo::class.java)
+        Mockito.`when`(app.getSystemService(Context.CONNECTIVITY_SERVICE))
+                .thenReturn(connectivityManager)
+        Mockito.`when`(connectivityManager.activeNetworkInfo).thenReturn(networkInfo)
+        Mockito.`when`(networkInfo.isConnectedOrConnecting).thenReturn(true)
+        val weatherRepository: WeatherRepository<*, *>? = Mockito.mock(WeatherRepository::class.java)
+        Mockito.`when`(serviceConfig
+                .getWeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback?>())
+                .thenReturn(weatherRepository as WeatherRepository
+                <OpenWeatherApiRequestParameters, OpenWeatherApiCallback?>?)
+
+        uut.searchByManualInput(someCityName)
+
+        assertFalse(uut.offline.value as Boolean)
+        Mockito.verify(userNotifier).notify(Mockito.contains(someCityName))
+    }
+
+    @Test
+    fun weatherListLocationSearchNullCityName() {
+        val lat = 0.0
+        val lon = 0.0
+        val weatherRepository: WeatherRepository<*, *>? = Mockito.mock(WeatherRepository::class.java)
+        Mockito.`when`(serviceConfig
+                .getWeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback?>())
+                .thenReturn(weatherRepository as WeatherRepository
+                <OpenWeatherApiRequestParameters, OpenWeatherApiCallback?>?)
+        val weatherListLocationSearch = uut.WeatherListLocationSearch(analytics)
+
+        weatherListLocationSearch.searchByLatLon(lat, lon)
+
+        assertNull(uut.cityNameToSearchOnSwipe.value)
+    }
+
+    @Test
+    fun weatherListLocationSearchCityName() {
+        val lat = 0.0
+        val lon = 0.0
+        val cityName = "someCity"
+        val weatherRepository: WeatherRepository<*, *>? = Mockito.mock(WeatherRepository::class.java)
+        Mockito.`when`(serviceConfig
+                .getWeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback?>())
+                .thenReturn(weatherRepository as WeatherRepository
+                <OpenWeatherApiRequestParameters, OpenWeatherApiCallback?>?)
+        Mockito.`when`(cityFromLatLongRetriever.getFromLatLong(lat, lon)).thenReturn(cityName)
+        val weatherListLocationSearch = uut.WeatherListLocationSearch(analytics)
+
+        weatherListLocationSearch.searchByLatLon(lat, lon)
+
+        assertNotNull(uut.cityNameToSearchOnSwipe.value)
+        assertEquals(cityName, uut.cityNameToSearchOnSwipe.value)
     }
 
     ///// Given-When-Then section
