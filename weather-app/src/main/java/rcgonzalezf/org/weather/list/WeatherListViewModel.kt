@@ -3,7 +3,6 @@ package rcgonzalezf.org.weather.list
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -21,6 +20,7 @@ import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent
 import rcgonzalezf.org.weather.common.analytics.AnalyticsLifecycleObserver
 import rcgonzalezf.org.weather.location.CityFromLatLongRetriever
 import rcgonzalezf.org.weather.location.LocationSearch
+import rcgonzalezf.org.weather.utils.UserNotifier
 import rcgonzalezf.org.weather.utils.WeatherUtils
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
@@ -31,7 +31,9 @@ class WeatherListViewModel(
         private val openWeatherApiCallback: OpenWeatherApiCallback,
         private val cityNameFromLatLong: CityFromLatLongRetriever,
         private val toggleBehavior: ToggleBehavior,
-        private val app: Application)
+        private val app: Application,
+        private val userNotifier: UserNotifier,
+        private val serviceConfig: ServiceConfig = ServiceConfig.getInstance())
     : AndroidViewModel(app), OnOfflineLoader {
 
     companion object {
@@ -78,16 +80,15 @@ class WeatherListViewModel(
 
     fun searchByQuery(query: String, userInput: CharSequence) {
         toggleBehavior.toggle()
-        val weatherRepository = ServiceConfig.getInstance()
+        val weatherRepository = serviceConfig
                 .getWeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback?>()
         weatherRepository.findWeather(
                 OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder()
                         .withCityName(query)
                         .build(), openWeatherApiCallback)
         with(app) {
-            Toast.makeText(this,
-                    getString(R.string.searching) + " " + userInput + "...", Toast.LENGTH_SHORT)
-                    .show()
+            val message = getString(R.string.searching) + " " + userInput + "..."
+            userNotifier.notify(message)
         }
         updateCityNameForSwipeToRefresh(userInput)
     }
@@ -113,13 +114,11 @@ class WeatherListViewModel(
             URLEncoder.encode(userInput.toString(), "UTF-8")
         } catch (e: UnsupportedEncodingException) {
             Log.e(TAG, "Can't encode URL", e)
-            Toast.makeText(app, "${app.getString(R.string.invalid_input)}: $userInput...",
-                    Toast.LENGTH_SHORT).show()
+            userNotifier.notify("${app.getString(R.string.invalid_input)}: $userInput...")
             return
         }
         if (!WeatherUtils.hasInternetConnection(app)) {
-            Toast.makeText(app, app.getString(R.string.no_internet_msg),
-                    Toast.LENGTH_SHORT).show()
+            userNotifier.notify(app.getString(R.string.no_internet_msg))
             loadOldData(previousForecastList)
         } else {
             offline.value = false
