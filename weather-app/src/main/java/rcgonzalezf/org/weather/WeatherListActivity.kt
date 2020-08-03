@@ -44,7 +44,8 @@ class WeatherListActivity : BaseActivity(),
     private lateinit var adapter: ModelAdapter<WeatherInfo>
     private lateinit var locationManager: LocationManager
     private var openWeatherApiCallback: OpenWeatherApiCallback = OpenWeatherApiCallback(this)
-    private lateinit var weatherListBinding: WeatherListBinding
+    @VisibleForTesting
+    lateinit var weatherListBinding: WeatherListBinding
     private val weatherListViewModel: WeatherListViewModel by viewModels {
         val geoCoder = Geocoder(this, Locale.getDefault())
         val cityFromLatLongRetriever: CityFromLatLongRetriever = GeoCodeRetriever(geoCoder)
