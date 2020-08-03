@@ -39,8 +39,7 @@ public class LocationRetrieverTest {
     private GoogleApiClient googleApiClient;
     @SuppressWarnings("unused")
     @Mocked
-    private LocationRetrieverListener
-            locationRetrieverListener;
+    private LocationRetrieverListener locationRetrieverListener;
     @SuppressWarnings("unused")
     @Mocked
     private LocationServices locationServices;
@@ -119,26 +118,6 @@ public class LocationRetrieverTest {
     }
 
     @Test
-    public void shouldInformNoInternet() {
-        givenLocationRetriever();
-        givenInternet(false);
-
-        whenLocationPermissionsGranted();
-
-        thenShouldInformNoInternet();
-    }
-
-    @Test
-    public void shouldNotInteractIfNoBaseActivity() {
-        givenLocationRetriever();
-        givenInternet(false);
-
-        whenTryingToGetTheLastKnowLocationWithBaseActivity(baseActivity);
-
-        thenNoMoreInteractionAreExpected();
-    }
-
-    @Test
     public void shouldNotifyEmptyLocationListener() {
         givenLocationRetriever();
         givenInternet(true);
@@ -158,16 +137,6 @@ public class LocationRetrieverTest {
         whenLocationPermissionsGranted();
 
         thenShouldNotifyLocationFound();
-    }
-
-    @Test
-    public void shouldNotInteractOnLocationFoundListenerNull() {
-        givenNullLocationRetrieverListener();
-        givenInternet(true);
-
-        whenTryingToGetTheLastKnowLocationWithBaseActivity(baseActivity);
-
-        thenNoMoreInteractionAreExpected();
     }
 
     @Test
@@ -208,13 +177,6 @@ public class LocationRetrieverTest {
     private void thenShouldNotifyEmptyLocation() {
         new Verifications() {{
             locationRetrieverListener.onEmptyLocation();
-            times = 1;
-        }};
-    }
-
-    private void thenShouldInformNoInternet() {
-        new Verifications() {{
-            baseActivity.informNoInternet();
             times = 1;
         }};
     }
@@ -315,10 +277,5 @@ public class LocationRetrieverTest {
 
     private void thenNoMoreInteractionAreExpected() {
         verifyNoMoreInteractions(uut);
-    }
-
-    private void whenTryingToGetTheLastKnowLocationWithBaseActivity(BaseActivity baseActivity) {
-        uut.tryToUseLastKnownLocation(baseActivity);
-        verify(uut).tryToUseLastKnownLocation(any(BaseActivity.class));
     }
 }
