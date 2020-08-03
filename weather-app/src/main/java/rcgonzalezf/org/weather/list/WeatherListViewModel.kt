@@ -20,7 +20,9 @@ import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent
 import rcgonzalezf.org.weather.common.analytics.AnalyticsLifecycleObserver
 import rcgonzalezf.org.weather.location.CityFromLatLongRetriever
 import rcgonzalezf.org.weather.location.LocationSearch
+import rcgonzalezf.org.weather.utils.UrlEncoder
 import rcgonzalezf.org.weather.utils.UserNotifier
+import rcgonzalezf.org.weather.utils.WeatherAppUrlEncoder
 import rcgonzalezf.org.weather.utils.WeatherUtils
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
@@ -34,6 +36,7 @@ class WeatherListViewModel(
         private val app: Application,
         private val userNotifier: UserNotifier,
         private val serviceConfig: ServiceConfig = ServiceConfig.getInstance(),
+        private val urlEncoder: UrlEncoder = WeatherAppUrlEncoder(),
         private val executor: Executor = Executors.newSingleThreadExecutor())
     : AndroidViewModel(app), OnOfflineLoader {
 
@@ -85,10 +88,8 @@ class WeatherListViewModel(
                 OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder()
                         .withCityName(query)
                         .build(), openWeatherApiCallback)
-        with(app) {
-            val message = getString(R.string.searching) + " " + userInput + "..."
-            userNotifier.notify(message)
-        }
+        val message = app.getString(R.string.searching) + " " + userInput + "..."
+        userNotifier.notify(message)
         updateCityNameForSwipeToRefresh(userInput)
     }
 
@@ -110,7 +111,7 @@ class WeatherListViewModel(
     fun searchByManualInput(userInput: CharSequence) {
         val query: String
         query = try {
-            URLEncoder.encode(userInput.toString(), "UTF-8")
+            urlEncoder.encodeUtf8(userInput.toString())
         } catch (e: UnsupportedEncodingException) {
             Log.e(TAG, "Can't encode URL", e)
             userNotifier.notify("${app.getString(R.string.invalid_input)}: $userInput...")

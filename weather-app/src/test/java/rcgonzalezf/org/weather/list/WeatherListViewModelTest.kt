@@ -31,7 +31,9 @@ import rcgonzalezf.org.weather.common.analytics.AnalyticsLifecycleObserver
 import rcgonzalezf.org.weather.list.WeatherListViewModel.Companion.FORECASTS
 import rcgonzalezf.org.weather.list.WeatherListViewModel.Companion.OFFLINE_FILE
 import rcgonzalezf.org.weather.location.CityFromLatLongRetriever
+import rcgonzalezf.org.weather.utils.UrlEncoder
 import rcgonzalezf.org.weather.utils.UserNotifier
+import java.io.UnsupportedEncodingException
 import java.util.concurrent.Executor
 
 class WeatherListViewModelTest {
@@ -39,6 +41,9 @@ class WeatherListViewModelTest {
     private var storedData: String? = null
     lateinit var uut: WeatherListViewModel
     private var weatherInfoList: ArrayList<WeatherInfo>? = null
+
+    @Mock
+    lateinit var urlEncoder: UrlEncoder
 
     @Mock
     lateinit var sharedPreferences: SharedPreferences
@@ -71,7 +76,8 @@ class WeatherListViewModelTest {
     fun setUp() {
         MockitoAnnotations.initMocks(this)
         uut = WeatherListViewModel(openWeatherApiCallback,
-                cityFromLatLongRetriever, toggleBehavior, app, userNotifier, serviceConfig)
+                cityFromLatLongRetriever, toggleBehavior, app, userNotifier,
+                serviceConfig)
     }
 
     @Test
@@ -161,7 +167,7 @@ class WeatherListViewModelTest {
         val editor = Mockito.mock(SharedPreferences.Editor::class.java)
         Mockito.`when`(sharedPreferences.edit()).thenReturn(editor)
         uut = WeatherListViewModel(openWeatherApiCallback, cityFromLatLongRetriever,
-                toggleBehavior, app, userNotifier, serviceConfig, executor)
+                toggleBehavior, app, userNotifier, serviceConfig, urlEncoder, executor)
 
         uut.saveForecastList(weatherInfoList as List<WeatherInfo>)
 
@@ -203,6 +209,28 @@ class WeatherListViewModelTest {
         uut.searchByManualInput(someCityName)
 
         assertFalse(uut.offline.value as Boolean)
+        Mockito.verify(userNotifier).notify(Mockito.contains(someCityName))
+    }
+
+    @Test
+    fun searchByManualInputThrowUnsupportedEncodingExceptionNotifyUser() {
+        val someCityName = "someCityName"
+        val connectivityManager = Mockito.mock(ConnectivityManager::class.java)
+        val networkInfo = Mockito.mock(NetworkInfo::class.java)
+        Mockito.`when`(app.getSystemService(Context.CONNECTIVITY_SERVICE))
+                .thenReturn(connectivityManager)
+        Mockito.`when`(connectivityManager.activeNetworkInfo).thenReturn(networkInfo)
+        Mockito.`when`(networkInfo.isConnectedOrConnecting).thenReturn(true)
+        val weatherRepository: WeatherRepository<*, *>? = Mockito.mock(WeatherRepository::class.java)
+        Mockito.`when`(serviceConfig
+                .getWeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback?>())
+                .thenReturn(weatherRepository as WeatherRepository
+                <OpenWeatherApiRequestParameters, OpenWeatherApiCallback?>?)
+        Mockito.`when`(urlEncoder.encodeUtf8(someCityName))
+                .thenThrow(UnsupportedEncodingException())
+
+        uut.searchByManualInput(someCityName)
+
         Mockito.verify(userNotifier).notify(Mockito.contains(someCityName))
     }
 
