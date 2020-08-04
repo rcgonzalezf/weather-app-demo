@@ -17,7 +17,8 @@ import rcgonzalezf.org.weather.utils.WeatherUtils.formatTemperature
 
 class ModelAdapter<T : WeatherViewModel>(private var models: List<T>)
     : RecyclerView.Adapter<WeatherModelViewHolder>(), View.OnClickListener {
-    private var onItemClickListener: OnItemClickListener<WeatherViewModel>? = null
+    private lateinit var onItemClickListener: OnItemClickListener<WeatherViewModel>
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WeatherModelViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val weatherRowBinding = WeatherRowBinding.inflate(layoutInflater, parent, false)
@@ -52,20 +53,18 @@ class ModelAdapter<T : WeatherViewModel>(private var models: List<T>)
         notifyDataSetChanged()
     }
 
-    fun setOnItemClickListener(onItemClickListener: OnItemClickListener<WeatherViewModel>?) {
+    fun setOnItemClickListener(onItemClickListener: OnItemClickListener<WeatherViewModel>) {
         this.onItemClickListener = onItemClickListener
     }
 
     override fun onClick(view: View) {
         // Give some time to the ripple to finish the effect
-        if (onItemClickListener != null) {
-            Handler().postDelayed(createClickRunnable(view), 200)
-        }
+        Handler().postDelayed(createClickRunnable(view), 200)
     }
 
     @VisibleForTesting
     fun createClickRunnable(view: View): Runnable {
-        return Runnable { onItemClickListener?.onItemClick(view, view.tag as WeatherViewModel) }
+        return Runnable { onItemClickListener.onItemClick(view, view.tag as WeatherViewModel) }
     }
 
     interface OnItemClickListener<VM : WeatherViewModel> {

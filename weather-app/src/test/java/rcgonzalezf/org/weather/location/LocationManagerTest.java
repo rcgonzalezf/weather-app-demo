@@ -14,6 +14,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import rcgonzalezf.org.weather.common.BaseActivity;
 import rcgonzalezf.org.weather.common.PermissionChecker;
 import rcgonzalezf.org.weather.common.PermissionResultListener;
@@ -21,24 +23,27 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
 @RunWith(JMockit.class) public class LocationManagerTest {
 
   @Tested private LocationManager uut;
-  @SuppressWarnings("unused") @Mocked private View mContent;
-  @SuppressWarnings("unused") @Mocked private BaseActivity mBaseActivity;
-  @SuppressWarnings("unused") @Mocked private LocationRetriever mLocationRetriever;
-  @SuppressWarnings("unused") @Mocked private PermissionChecker mPermissionChecker;
-  private int mRequestCode;
-  private String[] mPermissions;
-  private int[] mGrantResults;
-  private double mLon;
-  private double mLat;
-  private int mEnvironmentSdk;
+  @SuppressWarnings("unused") @Mocked private View content;
+  @SuppressWarnings("unused") @Mocked private BaseActivity baseActivity;
+  @SuppressWarnings("unused") @Mocked private LocationRetriever locationRetriever;
+  @SuppressWarnings("unused") @Mocked private PermissionChecker permissionChecker;
+  private int requestCode;
+  private String[] permissions;
+  private int[] grantResults;
+  private double lon;
+  private double lat;
+  private int environmentSdk;
+  @org.mockito.Mock
+  private LocationSearch locationSearch;
 
   @Before public void settingUpLocationManager() {
-    uut = new LocationManager(mBaseActivity, mContent);
-    mEnvironmentSdk = LocationManager.CURRENT_SDK_INT;
+    MockitoAnnotations.initMocks(this);
+    uut = new LocationManager(baseActivity, locationSearch, content);
+    environmentSdk = LocationManager.CURRENT_SDK_INT;
   }
 
   @After public void setDefaultValueForSdk() {
-    LocationManager.CURRENT_SDK_INT = mEnvironmentSdk;
+    LocationManager.CURRENT_SDK_INT = environmentSdk;
   }
 
   @Test public void shouldNotifyOnLocationsPermissionGranted() {
@@ -54,15 +59,15 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
 
     whenCheckingPermissions(null, null);
 
-    thenShouldNotInteractWith(mPermissionChecker);
+    thenShouldNotInteractWith(permissionChecker);
   }
 
   @Test public void shouldNotInteractOnLocationsPermissionGrantedWithBaseActivityAndNullContent() {
     givenPermissionChecker();
 
-    whenCheckingPermissions(mBaseActivity, null);
+    whenCheckingPermissions(baseActivity, null);
 
-    thenShouldNotInteractWith(mPermissionChecker);
+    thenShouldNotInteractWith(permissionChecker);
   }
 
   @Test public void shouldRequestPermissionsIfAppDoesNotHaveGrantedLocationPermission(
@@ -92,7 +97,7 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
   @Test public void shouldNotInteractIfEmptyLocationAndBaseActivityWithNullContent(
       @Mocked Snackbar snackbar) {
 
-    whenEmptyLocationReceived(mBaseActivity, null);
+    whenEmptyLocationReceived(baseActivity, null);
 
     thenShouldNotInteractWith(snackbar);
   }
@@ -108,9 +113,9 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
   @Test public void shouldNotInteractIfNullBaseActivityOnLocationFound() {
     givenLatLonLocation();
 
-    whenFindingLocation(null);
+    whenFindingLocation();
 
-    thenShouldNotInteractWith(mBaseActivity);
+    thenShouldNotInteractWith(baseActivity);
   }
 
   @Test public void shouldDelegateRequestPermissionResultForMApiAndAbove() {
@@ -138,7 +143,7 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
 
     whenRequestingPermissionResult();
 
-    thenShouldNotInteractWith(mPermissionChecker);
+    thenShouldNotInteractWith(permissionChecker);
   }
 
   @Test public void shouldDelegateConnect() {
@@ -195,13 +200,13 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
 
   private void thenShouldDelegateDisconnect() {
     new Verifications() {{
-      mLocationRetriever.disconnect();
+      locationRetriever.disconnect();
     }};
   }
 
   private void thenShouldDelegateConnect() {
     new Verifications() {{
-      mLocationRetriever.connect();
+      locationRetriever.connect();
     }};
   }
 
@@ -210,7 +215,7 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
   }
 
   private void givenPermissionChecker() {
-    uut.permissionChecker = mPermissionChecker;
+    uut.permissionChecker = permissionChecker;
   }
 
   private void givenSdk(int sdk) {
@@ -218,46 +223,40 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
   }
 
   private void givenLatLonLocation() {
-    mLat = 1d;
-    mLon = 1d;
+    lat = 1d;
+    lon = 1d;
   }
 
   private void givenPermissionResultParameters() {
-    this.mRequestCode = 1;
-    this.mPermissions = new String[] { "" };
-    this.mGrantResults = new int[] { 1 };
+    this.requestCode = 1;
+    this.permissions = new String[] { "" };
+    this.grantResults = new int[] { 1 };
   }
 
   @TargetApi(Build.VERSION_CODES.M)
   private void thenShouldDelegateOnRequestPermissionResult(boolean shouldDelegate) {
     if (shouldDelegate) {
       new Verifications() {{
-        mPermissionChecker.onRequestPermissionsResult(mRequestCode, mPermissions, mGrantResults);
+        permissionChecker.onRequestPermissionsResult(requestCode, permissions, grantResults);
       }};
     } else {
       new Verifications() {{
-        mPermissionChecker.onRequestPermissionsResult(mRequestCode, mPermissions, mGrantResults);
+        permissionChecker.onRequestPermissionsResult(requestCode, permissions, grantResults);
         times = 0;
       }};
     }
   }
 
   private void whenRequestingPermissionResult() {
-    uut.onRequestPermissionsResult(mRequestCode, mPermissions, mGrantResults);
+    uut.onRequestPermissionsResult(requestCode, permissions, grantResults);
   }
 
   private void thenShouldSearchByLocation() {
-    new Verifications() {{
-      mBaseActivity.searchByLocation(mLat, mLon);
-    }};
+    Mockito.verify(locationSearch, Mockito.atLeastOnce()).searchByLatLon(lat, lon);
   }
 
   private void whenFindingLocation() {
-    uut.onLocationFound(mLat, mLon);
-  }
-
-  private void whenFindingLocation(BaseActivity baseActivity) {
-    uut.onLocationFound(baseActivity, mLat, mLon);
+    uut.onLocationFound(lat, lon);
   }
 
   private void thenShouldNotifyUser(final Snackbar snackbar) {
@@ -277,19 +276,19 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
   private void thenShouldRequestPermissions(
       final PermissionResultListener permissionResultListener) {
     new Verifications() {{
-      mPermissionChecker.requestPermission(withAny(permissionResultListener));
+      permissionChecker.requestPermission(withAny(permissionResultListener));
     }};
   }
 
   private void thenShouldNotifyOnLocationPermissionFailure() {
     new Verifications() {{
-      mLocationRetriever.onLocationPermissionFailure();
+      locationRetriever.onLocationPermissionFailure();
     }};
   }
 
   private void thenShouldNotifyOnLocationPermissionGranted() {
     new Verifications() {{
-      mLocationRetriever.onLocationPermissionsGranted();
+      locationRetriever.onLocationPermissionsGranted();
     }};
   }
 
@@ -303,7 +302,7 @@ import rcgonzalezf.org.weather.common.PermissionResultListener;
 
   private void givenPermissionGranted(final boolean hasPermission) {
     new Expectations() {{
-      mPermissionChecker.hasPermission();
+      permissionChecker.hasPermission();
       result = hasPermission;
     }};
   }

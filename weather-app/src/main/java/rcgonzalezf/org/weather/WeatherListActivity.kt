@@ -1,82 +1,117 @@
 package rcgonzalezf.org.weather
 
-import android.content.Context
-import android.location.Address
+import android.content.DialogInterface
 import android.location.Geocoder
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ProgressBar
+import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
+import androidx.appcompat.app.AlertDialog
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
-import com.google.gson.Gson
-import org.rcgonzalezf.weather.common.ServiceConfig
 import org.rcgonzalezf.weather.common.listeners.OnUpdateWeatherListListener
 import org.rcgonzalezf.weather.common.models.WeatherInfo
 import org.rcgonzalezf.weather.common.models.WeatherViewModel
 import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback
-import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters
-import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder
-import rcgonzalezf.org.weather.R.id
 import rcgonzalezf.org.weather.R.string
 import rcgonzalezf.org.weather.adapters.ModelAdapter
 import rcgonzalezf.org.weather.adapters.ModelAdapter.OnItemClickListener
 import rcgonzalezf.org.weather.common.BaseActivity
+import rcgonzalezf.org.weather.common.ToggleBehavior
 import rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog
 import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent
+import rcgonzalezf.org.weather.common.ext.toggleVisibility
+import rcgonzalezf.org.weather.databinding.WeatherListBinding
+import rcgonzalezf.org.weather.list.WeatherListViewModel
+import rcgonzalezf.org.weather.list.WeatherListViewModelFactory
+import rcgonzalezf.org.weather.location.CityFromLatLongRetriever
+import rcgonzalezf.org.weather.location.GeoCodeRetriever
+import rcgonzalezf.org.weather.location.LocationLifecycleObserver
+import rcgonzalezf.org.weather.location.LocationManager
+import rcgonzalezf.org.weather.utils.ToastUserNotifier
 import java.util.Locale
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
 
-class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel>,
-        OnUpdateWeatherListListener {
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var swipeToRefreshLayout: SwipeRefreshLayout
+class WeatherListActivity : BaseActivity(),
+        OnItemClickListener<WeatherViewModel>, ToggleBehavior, OnUpdateWeatherListListener {
+
     private lateinit var adapter: ModelAdapter<WeatherInfo>
-    private var openWeatherApiCallback: OpenWeatherApiCallback? = null
-    private var cityNameToSearchOnSwipe: CharSequence? = null
-    private lateinit var progress: ProgressBar
-    private val executor: Executor = Executors.newSingleThreadExecutor()
+    private lateinit var locationManager: LocationManager
+    private var openWeatherApiCallback: OpenWeatherApiCallback = OpenWeatherApiCallback(this)
+    @VisibleForTesting
+    lateinit var weatherListBinding: WeatherListBinding
+    private val weatherListViewModel: WeatherListViewModel by viewModels {
+        val geoCoder = Geocoder(this, Locale.getDefault())
+        val cityFromLatLongRetriever: CityFromLatLongRetriever = GeoCodeRetriever(geoCoder)
+        val userNotifier = ToastUserNotifier(this)
+        WeatherListViewModelFactory(openWeatherApiCallback,
+                cityFromLatLongRetriever, this, WeatherApp.getAppInstance(), userNotifier)
+    }
+
+    companion object {
+        private val TAG = WeatherListActivity::class.java.simpleName
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        openWeatherApiCallback = OpenWeatherApiCallback(this)
+        weatherListBinding = DataBindingUtil.inflate(layoutInflater, R.layout.weather_list,
+                weatherBinding.content, true)
         setupRecyclerView()
-        cityNameToSearchOnSwipe = savedInstanceState?.getCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE)
-        progress = findViewById(id.progress_bar)
-        swipeToRefreshLayout = findViewById(id.swipe_to_refresh_layout)
         enableSwipeToRefreshLayout()
-        swipeToRefreshLayout.setOnRefreshListener(createSwipeToRefreshListener())
+        weatherBinding.swipeToRefreshLayout.setOnRefreshListener(createSwipeToRefreshListener())
+        weatherBinding.mainFab.setOnClickListener(fabClickListener)
+        val weatherLocationSearch =
+                weatherListViewModel.WeatherListLocationSearch(analyticsLifecycleObserver)
+        locationManager = LocationManager(this, weatherLocationSearch, content)
+        val locationLifecycleObserver = LocationLifecycleObserver(locationManager)
+        lifecycle.addObserver(locationLifecycleObserver)
+
+        // off line
+        weatherListViewModel.offline.observe(this, Observer {
+            val weatherInfoList = weatherListViewModel.weatherInfoList.value
+            val noNetwork = AnalyticsDataCatalog.WeatherListActivity.NO_NETWORK_SEARCH
+            if (weatherInfoList != null && weatherInfoList.isNotEmpty()) {
+                notifyAdapter(weatherInfoList)
+                analyticsLifecycleObserver.trackOnActionEvent(
+                        AnalyticsEvent(noNetwork, weatherInfoList[0].cityName))
+            } else {
+                Log.d(TAG, "No data even in offline mode :(")
+                analyticsLifecycleObserver.trackOnActionEvent(AnalyticsEvent(noNetwork, "EMPTY"))
+                //cancel swipe to refresh loading
+                onItemsLoadComplete()
+            }
+        })
     }
 
-    public override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putCharSequence(CITY_NAME_TO_SEARCH_ON_SWIPE, cityNameToSearchOnSwipe)
+    @RequiresApi(Build.VERSION_CODES.M)
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
+                                            grantResults: IntArray) {
+        locationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     @VisibleForTesting
     fun onItemsLoadComplete() {
-        toggleProgressIndicator()
+        toggle()
         enableSwipeToRefreshLayout()
-        swipeToRefreshLayout.isRefreshing = !swipeToRefreshLayout.isRefreshing
+        if (weatherBinding.swipeToRefreshLayout.isRefreshing) {
+            weatherBinding.swipeToRefreshLayout.isRefreshing = false
+        }
     }
 
     @VisibleForTesting
-    fun toggleProgressIndicator() {
-        progress.visibility = if (progress.visibility == View.VISIBLE) {
-            View.GONE
-        } else {
-            View.VISIBLE
-        }
+    override fun toggle() {
+        weatherBinding.progressBar.toggleVisibility()
     }
 
     override fun onEnterAnimationComplete() {
         super.onEnterAnimationComplete()
-        recyclerView.scheduleLayoutAnimation()
+        weatherListBinding.mainRecyclerView.scheduleLayoutAnimation()
     }
 
     override fun onItemClick(view: View, viewModel: WeatherViewModel) {
@@ -88,25 +123,9 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
                 .show()
     }
 
-    override fun loadOldData(weatherInfoList: List<WeatherInfo>?) {
-        if (weatherInfoList != null && weatherInfoList.isNotEmpty()) {
-            notifyAdapter(weatherInfoList)
-            trackOnActionEvent(
-                    AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.NO_NETWORK_SEARCH,
-                            weatherInfoList[0].cityName))
-        } else {
-            Log.d(TAG, "No data even in offline mode :(")
-            trackOnActionEvent(
-                    AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.NO_NETWORK_SEARCH,
-                            "EMPTY"))
-            //cancel swipe to refresh loading
-            onItemsLoadComplete()
-        }
-    }
-
     override fun updateList(weatherInfoList: List<WeatherInfo>) {
         val cityName = if (weatherInfoList.isEmpty()) "" else weatherInfoList[0].cityName
-        trackOnActionEvent(
+        analyticsLifecycleObserver.trackOnActionEvent(
                 AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.SEARCH_COMPLETED,
                         "cityName: $cityName"))
         notifyAdapter(weatherInfoList)
@@ -116,83 +135,21 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
         // TODO implement error handling
         runOnUiThread(createRunnableToggleProgressIndicator())
         Log.d(TAG, error)
-        trackOnActionEvent(
+        analyticsLifecycleObserver.trackOnActionEvent(
                 AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.SEARCH_COMPLETED,
                         "error: $error"))
-    }
-
-    public override fun searchByQuery(query: String, userInput: CharSequence) {
-        toggleProgressIndicator()
-        val weatherRepository = ServiceConfig.getInstance()
-                .getWeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback?>()
-        weatherRepository.findWeather(
-                OpenWeatherApiRequestBuilder()
-                        .withCityName(query)
-                        .build(), openWeatherApiCallback)
-        Toast.makeText(this, getString(string.searching) + " " + userInput + "...", Toast.LENGTH_SHORT)
-                .show()
-        updateCityNameForSwipeToRefresh(userInput)
-    }
-
-    override fun searchByLocation(lat: Double, lon: Double) {
-        toggleProgressIndicator()
-        val weatherRepository = ServiceConfig.getInstance()
-                .getWeatherRepository<OpenWeatherApiRequestParameters, OpenWeatherApiCallback?>()
-        val cityName = cityNameFromLatLon(lat, lon)
-        if (cityName == null) {
-            weatherRepository.findWeather(
-                    OpenWeatherApiRequestBuilder().withLatLon(lat, lon).build(),
-                    openWeatherApiCallback)
-            trackOnActionEvent(
-                    AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.LOCATION_SEARCH,
-                            "Geocoder Failure"))
-        } else {
-            weatherRepository.findWeather(
-                    OpenWeatherApiRequestBuilder().withCityName(cityName).build(),
-                    openWeatherApiCallback)
-            trackOnActionEvent(
-                    AnalyticsEvent(
-                            AnalyticsDataCatalog.WeatherListActivity.LOCATION_SEARCH, cityName))
-            updateCityNameForSwipeToRefresh(cityName)
-        }
-    }
-
-    private fun updateCityNameForSwipeToRefresh(cityName: CharSequence) {
-        cityNameToSearchOnSwipe = cityName
-    }
-
-    private fun cityNameFromLatLon(lat: Double, lon: Double): String? {
-        var cityName: String? = null
-        val geocoder = Geocoder(this, Locale.getDefault())
-        val addresses: List<Address>
-        try {
-            addresses = geocoder.getFromLocation(lat, lon, 1)
-            cityName = addresses[0].locality
-        } catch (e: Exception) {
-            Log.d(TAG, "error retrieving the cityName with Geocoder")
-        }
-        return cityName
-    }
-
-    private fun saveForecastList(weatherInfoList: List<WeatherInfo>) {
-        executor.execute {
-            val prefs = getSharedPreferences(OFFLINE_FILE, Context.MODE_PRIVATE)
-            val editor = prefs.edit()
-            editor.putString(FORECASTS, Gson().toJson(weatherInfoList))
-            editor.apply()
-        }
     }
 
     private fun setupRecyclerView() {
         adapter = ModelAdapter(ArrayList())
         adapter.setOnItemClickListener(this)
-        recyclerView = findViewById<View>(id.main_recycler_view) as RecyclerView
+        val recyclerView = weatherListBinding.mainRecyclerView
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
     }
 
     private fun notifyAdapter(weatherInfoList: List<WeatherInfo>) {
-        saveForecastList(weatherInfoList)
+        weatherListViewModel.saveForecastList(weatherInfoList)
         runOnUiThread(createNotifyRunnable(weatherInfoList))
     }
 
@@ -208,20 +165,52 @@ class WeatherListActivity : BaseActivity(), OnItemClickListener<WeatherViewModel
 
     @VisibleForTesting
     fun createSwipeToRefreshListener(): OnRefreshListener {
-        return OnRefreshListener { searchByManualInput(cityNameToSearchOnSwipe?:"") }
+        return OnRefreshListener {
+            weatherListViewModel
+                    .searchByManualInput(weatherListViewModel.cityNameToSearchOnSwipe.value ?: "")
+        }
     }
 
     @VisibleForTesting
     fun createRunnableToggleProgressIndicator(): Runnable {
-        return Runnable { toggleProgressIndicator() }
+        return Runnable { toggle() }
     }
 
     private fun enableSwipeToRefreshLayout() {
-        swipeToRefreshLayout.isEnabled = cityNameToSearchOnSwipe != null
+        weatherBinding.swipeToRefreshLayout.isEnabled =
+                weatherListViewModel.cityNameToSearchOnSwipe.value != null
     }
 
-    companion object {
-        private val TAG = WeatherListActivity::class.java.simpleName
-        const val CITY_NAME_TO_SEARCH_ON_SWIPE = "mCityNameToSearchOnSwipe"
+    @get:VisibleForTesting
+    val fabClickListener: View.OnClickListener
+        get() = View.OnClickListener { performFabAction() }
+
+    @get:VisibleForTesting
+    val cancelListener: DialogInterface.OnClickListener
+        get() = DialogInterface.OnClickListener { dialog, id ->
+            analyticsLifecycleObserver
+                    .trackOnActionEvent(AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.MANUAL_SEARCH, "CANCEL"))
+            dialog.cancel()
+        }
+
+    @VisibleForTesting
+    fun getOkClickListener(
+            userInput: CharSequence): DialogInterface.OnClickListener {
+        return DialogInterface.OnClickListener { dialog, id ->
+            analyticsLifecycleObserver
+                    .trackOnActionEvent(AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.MANUAL_SEARCH, userInput.toString()))
+            weatherListViewModel.searchByManualInput(userInput)
+        }
+    }
+
+    fun performFabAction() {
+        val promptsView = View.inflate(this, R.layout.dialog_city_query, null)
+        val userInput = promptsView.findViewById<View>(R.id.city_input_edit_text) as EditText
+        AlertDialog.Builder(this).setView(promptsView)
+                .setCancelable(false)
+                .setPositiveButton("OK", getOkClickListener(userInput.text))
+                .setNegativeButton("Cancel", cancelListener)
+                .create()
+                .show()
     }
 }

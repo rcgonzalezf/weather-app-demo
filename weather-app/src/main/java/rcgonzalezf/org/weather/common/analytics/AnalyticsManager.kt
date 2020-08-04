@@ -11,7 +11,7 @@ import java.util.HashSet
 open class AnalyticsManager(private val context: Context) {
     private val analyticsObservers: MutableSet<AnalyticsObserver> = HashSet()
     private val analyticsBaseData: AnalyticsBaseData = AnalyticsBaseData()
-    private var screenName: String? = null
+    private lateinit var screenName: String
 
     init {
         analyticsBaseData.data()[ANDROID_VERSION] = BUILD_ANDROID_VERSION
@@ -77,10 +77,10 @@ open class AnalyticsManager(private val context: Context) {
         analyticsObservers.remove(analyticsObserver)
     }
 
-    open fun notifyOnAction(analyticsEvent: AnalyticsEvent?) {
+    open fun notifyOnAction(analyticsEvent: AnalyticsEvent) {
         addBaseData()
         for (analyticsObserver in analyticsObservers) {
-            analyticsObserver.onAction(analyticsEvent!!, screenName!!, analyticsBaseData)
+            analyticsObserver.onAction(analyticsEvent, screenName, analyticsBaseData)
         }
     }
 

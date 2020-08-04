@@ -13,7 +13,10 @@ import rcgonzalezf.org.weather.common.PermissionChecker.Companion.LOCATION
 import rcgonzalezf.org.weather.common.PermissionResultListener
 import java.lang.ref.WeakReference
 
-class LocationManager(baseActivity: BaseActivity, content: View) : LocationRetrieverListener {
+open // for Mockito
+class LocationManager(baseActivity: BaseActivity,
+                      private val locationSearch: LocationSearch, content: View)
+    : LocationRetrieverListener {
     private val baseActivityWeakReference: WeakReference<BaseActivity> = WeakReference(baseActivity)
     private val contentWeakReference: WeakReference<View> = WeakReference(content)
     private val locationRetriever: LocationRetriever = LocationRetriever(baseActivity, this)
@@ -41,8 +44,7 @@ class LocationManager(baseActivity: BaseActivity, content: View) : LocationRetri
     }
 
     override fun onLocationFound(lat: Double, lon: Double) {
-        val baseActivity = baseActivityWeakReference.get()
-        onLocationFound(baseActivity, lat, lon)
+        locationSearch.searchByLatLon(lat, lon)
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -53,11 +55,11 @@ class LocationManager(baseActivity: BaseActivity, content: View) : LocationRetri
         }
     }
 
-    fun connect() {
+    open fun connect() {
         locationRetriever.connect()
     }
 
-    fun disconnect() {
+    open fun disconnect() {
         locationRetriever.disconnect()
     }
 
@@ -96,10 +98,5 @@ class LocationManager(baseActivity: BaseActivity, content: View) : LocationRetri
             Snackbar.make(content, baseActivity.getString(R.string.location_off_msg),
                     Snackbar.LENGTH_SHORT).show()
         }
-    }
-
-    @VisibleForTesting
-    fun onLocationFound(baseActivity: BaseActivity?, lat: Double, lon: Double) {
-        baseActivity?.searchByLocation(lat, lon)
     }
 }
