@@ -44,6 +44,7 @@ class WeatherListActivity : BaseActivity(),
     private lateinit var adapter: ModelAdapter<WeatherInfo>
     private lateinit var locationManager: LocationManager
     private var openWeatherApiCallback: OpenWeatherApiCallback = OpenWeatherApiCallback(this)
+
     @VisibleForTesting
     lateinit var weatherListBinding: WeatherListBinding
     private val weatherListViewModel: WeatherListViewModel by viewModels {
@@ -133,7 +134,7 @@ class WeatherListActivity : BaseActivity(),
 
     override fun onError(error: String) {
         // TODO implement error handling
-        runOnUiThread(createRunnableToggleProgressIndicator())
+        runOnUiThread { toggle() }
         Log.d(TAG, error)
         analyticsLifecycleObserver.trackOnActionEvent(
                 AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.SEARCH_COMPLETED,
@@ -150,14 +151,8 @@ class WeatherListActivity : BaseActivity(),
 
     private fun notifyAdapter(weatherInfoList: List<WeatherInfo>) {
         weatherListViewModel.saveForecastList(weatherInfoList)
-        runOnUiThread(createNotifyRunnable(weatherInfoList))
-    }
-
-    @VisibleForTesting
-    fun createNotifyRunnable(weatherInfoList: List<WeatherInfo>): Runnable {
-        return Runnable {
+        runOnUiThread {
             adapter.setItems(weatherInfoList)
-            adapter.notifyDataSetChanged()
 
             onItemsLoadComplete()
         }
@@ -171,11 +166,6 @@ class WeatherListActivity : BaseActivity(),
         }
     }
 
-    @VisibleForTesting
-    fun createRunnableToggleProgressIndicator(): Runnable {
-        return Runnable { toggle() }
-    }
-
     private fun enableSwipeToRefreshLayout() {
         weatherBinding.swipeToRefreshLayout.isEnabled =
                 weatherListViewModel.cityNameToSearchOnSwipe.value != null
@@ -183,34 +173,31 @@ class WeatherListActivity : BaseActivity(),
 
     @get:VisibleForTesting
     val fabClickListener: View.OnClickListener
-        get() = View.OnClickListener { performFabAction() }
+        get() = View.OnClickListener {
+            val promptsView = View.inflate(this, R.layout.dialog_city_query, null)
+            val userInput = promptsView.findViewById<View>(R.id.city_input_edit_text) as EditText
+            AlertDialog.Builder(this).setView(promptsView)
+                    .setCancelable(false)
+                    .setPositiveButton("OK", getOkClickListener(userInput.text))
+                    .setNegativeButton("Cancel", cancelListener)
+                    .create()
+                    .show()
+        }
 
     @get:VisibleForTesting
     val cancelListener: DialogInterface.OnClickListener
-        get() = DialogInterface.OnClickListener { dialog, id ->
+        get() = DialogInterface.OnClickListener { dialog, _ ->
             analyticsLifecycleObserver
                     .trackOnActionEvent(AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.MANUAL_SEARCH, "CANCEL"))
             dialog.cancel()
         }
 
     @VisibleForTesting
-    fun getOkClickListener(
-            userInput: CharSequence): DialogInterface.OnClickListener {
-        return DialogInterface.OnClickListener { dialog, id ->
+    fun getOkClickListener(userInput: CharSequence): DialogInterface.OnClickListener {
+        return DialogInterface.OnClickListener { _, _ ->
             analyticsLifecycleObserver
                     .trackOnActionEvent(AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.MANUAL_SEARCH, userInput.toString()))
             weatherListViewModel.searchByManualInput(userInput)
         }
-    }
-
-    fun performFabAction() {
-        val promptsView = View.inflate(this, R.layout.dialog_city_query, null)
-        val userInput = promptsView.findViewById<View>(R.id.city_input_edit_text) as EditText
-        AlertDialog.Builder(this).setView(promptsView)
-                .setCancelable(false)
-                .setPositiveButton("OK", getOkClickListener(userInput.text))
-                .setNegativeButton("Cancel", cancelListener)
-                .create()
-                .show()
     }
 }
