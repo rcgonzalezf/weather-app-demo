@@ -12,6 +12,7 @@ import org.rcgonzalezf.weather.openweather.model.WeatherInfoMapper;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiError;
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiResponse;
 
+// TODO change generics here
 public class OpenWeatherApiCallback
     implements ApiCallback<OpenWeatherApiResponse<ForecastData>, OpenWeatherApiError> {
 

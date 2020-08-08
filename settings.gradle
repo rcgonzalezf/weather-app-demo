@@ -1,2 +1,3 @@
+include ':weather-interface'
 include ':weather-library'
 include ':weather-app'

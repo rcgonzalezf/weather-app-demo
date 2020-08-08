@@ -25,7 +25,6 @@ import rcgonzalezf.org.weather.utils.UserNotifier
 import rcgonzalezf.org.weather.utils.WeatherAppUrlEncoder
 import rcgonzalezf.org.weather.utils.WeatherUtils
 import java.io.UnsupportedEncodingException
-import java.net.URLEncoder
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
