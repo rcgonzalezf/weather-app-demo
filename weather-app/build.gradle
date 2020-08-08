@@ -57,6 +57,7 @@ android {
 dependencies {
   implementation project(':weather-library')
   implementation project(':weather-interface')
+  api project(':weather-app:model')
   implementation fileTree(dir: 'libs', include: ['*.jar'])
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
 
