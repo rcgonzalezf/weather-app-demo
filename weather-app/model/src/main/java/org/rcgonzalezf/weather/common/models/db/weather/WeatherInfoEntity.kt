@@ -1,11 +1,13 @@
-package org.rcgonzalezf.weather.common.models.db
+package org.rcgonzalezf.weather.common.models.db.weather
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import org.rcgonzalezf.weather.common.models.db.weather.WeatherInfoDao.Companion.DATE_TIME
+import org.rcgonzalezf.weather.common.models.db.weather.WeatherInfoDao.Companion.WEATHER_INFO_TABLE
 import java.util.UUID
 
-@Entity(tableName = "weather_entries")
+@Entity(tableName = WEATHER_INFO_TABLE)
 data class WeatherInfoEntity(
         @PrimaryKey
         val id: String = UUID.randomUUID().toString(),
@@ -21,7 +23,7 @@ data class WeatherInfoEntity(
         val temperature: Double = 0.0,
         @ColumnInfo
         val humidity: String? = null,
-        @ColumnInfo
+        @ColumnInfo(name = DATE_TIME)
         val dateTime: String? = null,
         @ColumnInfo
         val country: String? = null,
