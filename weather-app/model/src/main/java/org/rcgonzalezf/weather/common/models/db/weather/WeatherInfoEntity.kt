@@ -10,25 +10,25 @@ import java.util.UUID
 @Entity(tableName = WEATHER_INFO_TABLE)
 data class WeatherInfoEntity(
         @PrimaryKey
-        val id: String = UUID.randomUUID().toString(),
+        var id: String = UUID.randomUUID().toString(),
         @ColumnInfo
-        val cityId:Int = 0,
+        var cityId:Int = 0,
         @ColumnInfo
-        val weatherId: Int = 0,
+        var weatherId: Int = 0,
         @ColumnInfo
-        val cityName: String? = null,
+        var cityName: String? = null,
         @ColumnInfo
-        val speed: Double = 0.0,
+        var speed: Double = 0.0,
         @ColumnInfo
-        val temperature: Double = 0.0,
+        var temperature: Double = 0.0,
         @ColumnInfo
-        val humidity: String? = null,
+        var humidity: String? = null,
         @ColumnInfo(name = DATE_TIME)
-        val dateTime: String? = null,
+        var dateTime: String? = null,
         @ColumnInfo
-        val country: String? = null,
+        var country: String? = null,
         @ColumnInfo
-        val deg: Double = 0.0,
+        var deg: Double = 0.0,
         @ColumnInfo
         var description: String? = null
 )
