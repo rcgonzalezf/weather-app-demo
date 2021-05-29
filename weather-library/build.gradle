@@ -1,6 +1,5 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: "com.vanniktech.android.junit.jacoco"
 
 android {
   compileSdkVersion 29
@@ -60,6 +59,8 @@ dependencies {
   testImplementation 'nl.jqno.equalsverifier:equalsverifier:2.1.5'
   testImplementation 'org.meanbean:meanbean:2.0.3'
 }
+
+apply plugin: "com.vanniktech.android.junit.jacoco"
 
 junitJacoco {
   jacocoVersion = "$versions.jacoco"
