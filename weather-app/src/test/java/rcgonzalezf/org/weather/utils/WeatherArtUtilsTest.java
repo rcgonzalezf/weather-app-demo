@@ -52,7 +52,6 @@ public class WeatherArtUtilsTest {
   }
 
   private void whenGettingResourceForWeatherCondition() {
-    new WeatherArtUtils();
     mDrawableWeatherArtIdResult = WeatherArtUtils.getArtResourceForWeatherCondition(weatherId);
   }
 }

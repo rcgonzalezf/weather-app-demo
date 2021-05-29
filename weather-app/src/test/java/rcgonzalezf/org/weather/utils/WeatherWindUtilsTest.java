@@ -66,7 +66,6 @@ import static org.junit.Assert.assertNotNull;
   }
 
   private void whenGettingFormattedWind() {
-    new WeatherWindUtils();
     mFormattedWindStr = WeatherWindUtils.getFormattedWind(mContext, mWindSpeedStr, windDirStr);
   }
 }

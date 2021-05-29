@@ -33,8 +33,7 @@ class WeatherListUi {
 
     class Verifications {
         internal fun checkWeatherResultCity(expectedCity: String) {
-            onIdle()
-            // TODO what next onView is doing?
+            Thread.sleep(1000)
             onView(withId(R.id.main_recycler_view))
             onView(RecyclerViewMatcher(R.id.main_recycler_view).atPosition(1))
                     .check(matches(hasDescendant(withText(expectedCity))))

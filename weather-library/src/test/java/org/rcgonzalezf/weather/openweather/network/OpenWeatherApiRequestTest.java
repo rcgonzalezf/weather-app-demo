@@ -28,26 +28,27 @@ import static org.mockito.Mockito.when;
 public class OpenWeatherApiRequestTest {
 
   private OpenWeatherApiRequest uut;
-  private OpenWeatherApiCallback mTestApiCallback;
-  private boolean mIsSuccess;
-  private boolean mIsError;
-  @Mock private ModelConverter<OpenWeatherForecastData, ForecastData, OpenWeatherCurrentData> mModelConverter;
+  private OpenWeatherApiCallback testApiCallback;
+  private boolean isSuccess;
+  private boolean isError;
+  @Mock private ModelConverter<OpenWeatherForecastData, ForecastData, OpenWeatherCurrentData>
+          modelConverter;
 
   @Before public void createApiRequestBaseObject() {
     MockitoAnnotations.initMocks(this);
 
-    uut = new OpenWeatherApiRequest("someApiKey", mModelConverter);
+    uut = new OpenWeatherApiRequest("someApiKey", modelConverter);
     uut = spy(uut);
 
-    mTestApiCallback = new OpenWeatherApiCallback(mock(OnUpdateWeatherListListener.class)) {
+    testApiCallback = new OpenWeatherApiCallback(mock(OnUpdateWeatherListListener.class)) {
 
       @Override public void onSuccess(OpenWeatherApiResponse apiResponse) {
-        mIsSuccess = true;
+        isSuccess = true;
       }
 
       @Override public void onError(OpenWeatherApiError apiError) {
         ErrorCode.valueOf("EMPTY");
-        mIsError = true;
+        isError = true;
       }
     };
     uut.addRequestParameters(mock(OpenWeatherApiRequestParameters.class));
@@ -79,31 +80,31 @@ public class OpenWeatherApiRequestTest {
   }
 
   private void givenInvalidRequestReturningException() throws IOException {
-    when(mModelConverter.getForecastModel()).thenThrow(new IOException("someExec"));
+    when(modelConverter.getForecastModel()).thenThrow(new IOException("someExec"));
   }
 
   private void givenInvalidRequestReturningEmpty() throws IOException {
-    when(mModelConverter.getForecastModel()).thenReturn(new ArrayList<ForecastData>());
+    when(modelConverter.getForecastModel()).thenReturn(new ArrayList<ForecastData>());
   }
 
   private void thenCallbackShouldBeError() {
-    assertEquals(true, mIsError);
+    assertEquals(true, isError);
   }
 
   private void givenInvalidRequestReturningNull() throws IOException {
-    when(mModelConverter.getForecastModel()).thenReturn(null);
+    when(modelConverter.getForecastModel()).thenReturn(null);
   }
 
   private void whenExecuting() {
-    uut.execute(mTestApiCallback);
+    uut.execute(testApiCallback);
   }
 
   private void thenCallbackShouldBeSuccess() {
-    assertEquals(true, mIsSuccess);
+    assertEquals(true, isSuccess);
   }
 
   private void givenValidRequestReturningModel() throws IOException {
-    when(mModelConverter.getForecastModel()).thenReturn(new ArrayList<ForecastData>() {{
+    when(modelConverter.getForecastModel()).thenReturn(new ArrayList<ForecastData>() {{
       add(mock(ForecastData.class));
     }});
   }

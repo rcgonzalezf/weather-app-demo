@@ -12,15 +12,24 @@ import mockit.integration.junit4.JMockit;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockitoAnnotations;
+import org.rcgonzalezf.weather.WeatherLibApp;
+
 import rcgonzalezf.org.weather.common.analytics.Analytics;
+import rcgonzalezf.org.weather.common.analytics.AnalyticsManager;
 
 @RunWith(JMockit.class) public class AppCompatPreferenceActivityTest {
 
   @Tested private AppCompatPreferenceActivity uut;
 
-  @Mocked private AppCompatDelegate mAppCompatDelegate;
+  @Mocked private AppCompatDelegate appCompatDelegate;
+  @Mocked private AnalyticsManager analyticsManager;
+  @org.mockito.Mock
+  private WeatherApp weatherApp;
 
   @Before public void setUp() {
+    MockitoAnnotations.initMocks(this);
+    WeatherLibApp.setAppInstance(weatherApp);
     uut = new SettingsActivity();
   }
 
@@ -107,7 +116,7 @@ import rcgonzalezf.org.weather.common.analytics.Analytics;
 
   private void thenDelegateShouldTrackScreen() {
     new Verifications() {{
-      new Analytics().trackOnScreen(withAny("string"));
+      new Analytics(withAny(analyticsManager)).trackOnScreen("SettingsActivity");
     }};
   }
 
@@ -117,7 +126,7 @@ import rcgonzalezf.org.weather.common.analytics.Analytics;
 
   private void thenDelegateShouldInvalidateOptionsMenu() {
     new Verifications() {{
-      mAppCompatDelegate.invalidateOptionsMenu();
+      appCompatDelegate.invalidateOptionsMenu();
     }};
   }
 
@@ -127,7 +136,7 @@ import rcgonzalezf.org.weather.common.analytics.Analytics;
 
   private void thenDelegateShouldDestroy() {
     new Verifications() {{
-      mAppCompatDelegate.onDestroy();
+      appCompatDelegate.onDestroy();
     }};
   }
 
@@ -137,7 +146,7 @@ import rcgonzalezf.org.weather.common.analytics.Analytics;
 
   private void thenDelegateShouldStop() {
     new Verifications() {{
-      mAppCompatDelegate.onStop();
+      appCompatDelegate.onStop();
     }};
   }
 
@@ -147,7 +156,7 @@ import rcgonzalezf.org.weather.common.analytics.Analytics;
 
   private void thenDelegateShouldOnConfigurationChanged(final Configuration newConfig) {
     new Verifications() {{
-      mAppCompatDelegate.onConfigurationChanged(newConfig);
+      appCompatDelegate.onConfigurationChanged(newConfig);
     }};
   }
 
@@ -157,7 +166,7 @@ import rcgonzalezf.org.weather.common.analytics.Analytics;
 
   private void thenDelegateShouldChangeTitle() {
     new Verifications() {{
-      mAppCompatDelegate.setTitle("anyTitle");
+      appCompatDelegate.setTitle("anyTitle");
     }};
   }
 
@@ -167,7 +176,7 @@ import rcgonzalezf.org.weather.common.analytics.Analytics;
 
   private void thenDelegateShouldPostResume() {
     new Verifications() {{
-      mAppCompatDelegate.onPostResume();
+      appCompatDelegate.onPostResume();
     }};
   }
 
@@ -178,7 +187,7 @@ import rcgonzalezf.org.weather.common.analytics.Analytics;
   private void thenDelegateShouldAddContentView(final View view,
       final ViewGroup.LayoutParams params) {
     new Verifications() {{
-      mAppCompatDelegate.addContentView(view, params);
+      appCompatDelegate.addContentView(view, params);
     }};
   }
 
@@ -189,7 +198,7 @@ import rcgonzalezf.org.weather.common.analytics.Analytics;
   private void thenDelegateShouldSetContentView(final View view,
       final ViewGroup.LayoutParams params) {
     new Verifications() {{
-      mAppCompatDelegate.setContentView(view, params);
+      appCompatDelegate.setContentView(view, params);
     }};
   }
 
@@ -199,7 +208,7 @@ import rcgonzalezf.org.weather.common.analytics.Analytics;
 
   private void thenDelegateShouldSetContentView(final View view) {
     new Verifications() {{
-      mAppCompatDelegate.setContentView(view);
+      appCompatDelegate.setContentView(view);
     }};
   }
 
@@ -209,7 +218,7 @@ import rcgonzalezf.org.weather.common.analytics.Analytics;
 
   private void thenDelegateShouldSetContentView() {
     new Verifications() {{
-      mAppCompatDelegate.setContentView(R.layout.weather);
+      appCompatDelegate.setContentView(R.layout.weather);
     }};
   }
 
@@ -219,7 +228,7 @@ import rcgonzalezf.org.weather.common.analytics.Analytics;
 
   private void thenDelegateShouldInflateMenu() {
     new Verifications() {{
-      mAppCompatDelegate.getMenuInflater();
+      appCompatDelegate.getMenuInflater();
     }};
   }
 
@@ -229,7 +238,7 @@ import rcgonzalezf.org.weather.common.analytics.Analytics;
 
   private void thenDelegateShouldPostCreate() {
     new Verifications() {{
-      mAppCompatDelegate.onPostCreate(withAny(new Bundle()));
+      appCompatDelegate.onPostCreate(withAny(new Bundle()));
     }};
   }
 

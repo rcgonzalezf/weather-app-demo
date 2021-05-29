@@ -22,21 +22,21 @@ import org.rcgonzalezf.weather.openweather.model.WeatherList;
 public class OpenWeatherApiModelConverter
     implements ModelConverter<OpenWeatherForecastData, ForecastData, OpenWeatherCurrentData> {
 
-  private OpenWeatherForecastData mOpenWeatherForecastData;
-  private OpenWeatherCurrentData mOpenWeatherCurrentData;
+  private OpenWeatherForecastData openWeatherForecastData;
+  private OpenWeatherCurrentData openWeatherCurrentData;
 
   @Override public void fromForecastPojo(OpenWeatherForecastData pojo) {
-    mOpenWeatherForecastData = pojo;
+    openWeatherForecastData = pojo;
   }
 
   @Override public void fromWeatherPojo(OpenWeatherCurrentData pojo) {
-    mOpenWeatherCurrentData = pojo;
+    openWeatherCurrentData = pojo;
   }
 
   @Override public List<ForecastData> getForecastModel() throws IOException {
 
     List<ForecastData> forecastData = new LinkedList<>();
-    if (mOpenWeatherForecastData != null) {
+    if (openWeatherForecastData != null) {
       forecastData = populateForecastFromPojo(forecastData);
     }
     return forecastData;
@@ -44,7 +44,7 @@ public class OpenWeatherApiModelConverter
 
   @Override public List<ForecastData> getWeatherModel() throws IOException {
     List<ForecastData> forecastData = new LinkedList<>();
-    if (mOpenWeatherCurrentData != null) {
+    if (openWeatherCurrentData != null) {
       forecastData = populateWeatherFromPojo(forecastData);
     }
     return forecastData;
@@ -52,31 +52,31 @@ public class OpenWeatherApiModelConverter
 
   private @Nullable
   List<ForecastData> populateWeatherFromPojo(List<ForecastData> forecastData) {
-    if (mOpenWeatherCurrentData.getWeather() != null
-        && mOpenWeatherCurrentData.getWeather().size() > 0) {
+    if (openWeatherCurrentData.getWeather() != null
+        && openWeatherCurrentData.getWeather().size() > 0) {
 
-      for (Weather weather : mOpenWeatherCurrentData.getWeather()) {
+      for (Weather weather : openWeatherCurrentData.getWeather()) {
 
         if (String.valueOf(HttpURLConnection.HTTP_OK)
-            .equalsIgnoreCase(mOpenWeatherCurrentData.getCod())) {
+            .equalsIgnoreCase(openWeatherCurrentData.getCod())) {
 
           City city = new City();
-          city.setName(mOpenWeatherCurrentData.getName());
-          city.setCountry(mOpenWeatherCurrentData.getSys().country);
+          city.setName(openWeatherCurrentData.getName());
+          city.setCountry(openWeatherCurrentData.getSys().country);
 
           ForecastData forecastDatum = new ForecastDataBuilder().setCity(city)
-              .setCount(mOpenWeatherCurrentData.getWeather().size())
+              .setCount(openWeatherCurrentData.getWeather().size())
               .createForecastData();
 
           WeatherData weatherData = new WeatherData();
-          String dateTime = formatDateTime(mOpenWeatherCurrentData.getDt());
+          String dateTime = formatDateTime(openWeatherCurrentData.getDt());
           weatherData.setDateTime(dateTime);
           weatherData.setWeatherId(weather.getId());
           weatherData.setDescription(weather.getDescription());
-          weatherData.setSpeed(mOpenWeatherCurrentData.getWind().getSpeed());
-          weatherData.setDeg(mOpenWeatherCurrentData.getWind().getDeg());
-          weatherData.setTemp(mOpenWeatherCurrentData.getMain().getTemp());
-          weatherData.setHumidity(mOpenWeatherCurrentData.getMain().getHumidity());
+          weatherData.setSpeed(openWeatherCurrentData.getWind().getSpeed());
+          weatherData.setDeg(openWeatherCurrentData.getWind().getDeg());
+          weatherData.setTemp(openWeatherCurrentData.getMain().getTemp());
+          weatherData.setHumidity(openWeatherCurrentData.getMain().getHumidity());
 
           forecastDatum.addWeatherItem(weatherData);
 
@@ -99,16 +99,16 @@ public class OpenWeatherApiModelConverter
 
   private @Nullable List<ForecastData> populateForecastFromPojo(List<ForecastData> forecastData) {
 
-    if (mOpenWeatherForecastData.getWeatherList() != null
-        && mOpenWeatherForecastData.getWeatherList().size() > 0) {
+    if (openWeatherForecastData.getWeatherList() != null
+        && openWeatherForecastData.getWeatherList().size() > 0) {
 
-      for (WeatherList weatherList : mOpenWeatherForecastData.getWeatherList()) {
+      for (WeatherList weatherList : openWeatherForecastData.getWeatherList()) {
 
         if (String.valueOf(HttpURLConnection.HTTP_OK)
-            .equalsIgnoreCase(mOpenWeatherForecastData.getCod())) {
+            .equalsIgnoreCase(openWeatherForecastData.getCod())) {
           ForecastData forecastDatum =
-              new ForecastDataBuilder().setCity(mOpenWeatherForecastData.getCity())
-                  .setCount(Integer.valueOf(mOpenWeatherForecastData.getCnt()))
+              new ForecastDataBuilder().setCity(openWeatherForecastData.getCity())
+                  .setCount(Integer.valueOf(openWeatherForecastData.getCnt()))
                   .createForecastData();
 
           for (Weather weather : weatherList.getWeather()) {

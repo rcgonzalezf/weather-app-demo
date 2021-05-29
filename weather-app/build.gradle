@@ -1,18 +1,19 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'jacoco-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: "com.vanniktech.android.junit.jacoco"
 
 android {
-  compileSdkVersion 28
-  buildToolsVersion "28.0.3"
+  compileSdkVersion 29
+  buildToolsVersion "$versions.build_tools"
 
   defaultConfig {
     applicationId "rcgonzalezf.org.weather"
     minSdkVersion 14
-    targetSdkVersion 28
-    versionCode 5
-    versionName "0.2.1"
+    targetSdkVersion 29
+    versionCode 6
+    versionName "0.2.2"
 
     testApplicationId "org.rcgonzalezf.weather.test"
     testHandleProfiling true
@@ -30,6 +31,11 @@ android {
     }
   }
 
+  buildFeatures{
+    dataBinding = true
+    viewBinding = true
+  }
+
   lintOptions {
     abortOnError false
     lintConfig file("lint.xml")
@@ -38,19 +44,40 @@ android {
   testOptions {
     unitTests.returnDefaultValues = true
     unitTests.includeAndroidResources = true
-    unitTests.all {
-      jacoco {
-        includeNoLocationClasses = true
-      }
-    }
+  }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+  kotlinOptions {
+    jvmTarget = JavaVersion.VERSION_1_8.toString()
   }
 }
 
 dependencies {
   implementation project(':weather-library')
+  implementation project(':weather-interface')
+  api project(':weather-app:model')
   implementation fileTree(dir: 'libs', include: ['*.jar'])
-  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
 
+  def lifecycle_version = "2.2.0"
+
+  // Lifecycles
+  // ViewModel
+  implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+  // LiveData
+  implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
+  // Saved state module for ViewModel
+  implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
+
+  // Annotation processor
+  kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
+  implementation "androidx.core:core-ktx:1.3.0"
+  implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+  implementation "androidx.activity:activity-ktx:1.1.0"
+
+  implementation "androidx.core:core-ktx:1.3.0"
   implementation 'androidx.appcompat:appcompat:1.0.0'
   implementation 'androidx.legacy:legacy-support-v4:1.0.0'
   implementation 'androidx.recyclerview:recyclerview:1.0.0'
@@ -65,8 +92,9 @@ dependencies {
   testImplementation 'org.jmockit:jmockit:1.34'
   testImplementation 'junit:junit:4.12'
   testImplementation 'com.squareup.okhttp3:mockwebserver:3.4.1'
-  testImplementation 'org.mockito:mockito-core:1.10.19'
-  testImplementation 'org.robolectric:robolectric:3.1.2'
+  testImplementation 'org.mockito:mockito-core:3.3.3'
+  // optional - Test helpers for LiveData
+  testImplementation "androidx.arch.core:core-testing:$versions.arch"
 
   androidTestImplementation 'junit:junit:4.12'
   androidTestImplementation 'androidx.annotation:annotation:1.0.0'
@@ -78,14 +106,33 @@ dependencies {
   }
   androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.1.0'
 }
-jacoco {
-  toolVersion = "0.8.3"
+
+junitJacoco {
+  jacocoVersion = "$versions.jacoco"
+  //ignoreProjects = [] // type String array
+  // exclusion lists taken from https://github.com/arturdm/jacoco-android-gradle-plugin
+  excludes = [
+      // Android excludes
+      '**/R.class',
+      '**/R$*.class',
+      '**/BuildConfig.*',
+      '**/Manifest*.*',
+      // Data binding
+      '**/DataBind*.class',
+      '**/databinding/*Binding.class',
+      '**/*BinderMapperImpl.*',
+      '**/databinding/*Impl.class',
+      'android/databinding/**/*.class',
+      '**/android/databinding/*Binding.class',
+      '**/BR.*',
+      // Dagger 2
+      '**/*_MembersInjector.class',
+      '**/Dagger*Component.class',
+      '**/Dagger*Component$Builder.class',
+      '**/*Module_*Factory.class',
+      '**/AutoValue_*.*', '**/*JavascriptBridge.class', 'jdk.internal.*', '*$Impl_*']
+  includeNoLocationClasses = true
+  includeInstrumentationCoverageInMergedReport = true
 }
-jacocoAndroidUnitTestReport {
-  csv.enabled false
-  html.enabled true
-  xml.enabled true
-  excludes += ['**/AutoValue_*.*',
-      '**/*JavascriptBridge.class', 'jdk.internal.*', '*$Impl_*']
-}
+
 apply plugin: 'com.google.gms.google-services'

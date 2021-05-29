@@ -18,16 +18,16 @@ public class OpenWeatherApiCallbackTest {
 
   private OpenWeatherApiCallback uut;
 
-  private boolean mListUpdated;
-  private boolean mOnErrorCalled;
-  private OnUpdateWeatherListListener mOnUpdateWeatherListListener = new OnUpdateWeatherListListener() {
+  private boolean listUpdated;
+  private boolean onErrorCalled;
+  private OnUpdateWeatherListListener onUpdateWeatherListListener = new OnUpdateWeatherListListener() {
 
     @Override public void updateList(@NonNull List<WeatherInfo> weatherInfoList) {
-      mListUpdated = true;
+      listUpdated = true;
     }
 
     @Override public void onError(String error) {
-      mOnErrorCalled = true;
+      onErrorCalled = true;
     }
   };
 
@@ -78,7 +78,7 @@ public class OpenWeatherApiCallbackTest {
   }
 
   private void thenOnErrorIsCalled(boolean expected) {
-    assertEquals(expected, mOnErrorCalled);
+    assertEquals(expected, onErrorCalled);
   }
 
   private void whenCallbackIsNotifiedForError(OpenWeatherApiError openWeatherApiError) {
@@ -86,11 +86,11 @@ public class OpenWeatherApiCallbackTest {
   }
 
   private void givenUut() {
-    uut = new OpenWeatherApiCallback(mOnUpdateWeatherListListener);
+    uut = new OpenWeatherApiCallback(onUpdateWeatherListListener);
   }
 
   private void thenListUpdated(boolean expected) {
-    assertEquals(expected, mListUpdated);
+    assertEquals(expected, listUpdated);
   }
 
   private void whenCallbackIsNotifiedForSuccess(OpenWeatherApiResponse openWeatherApiResponse) {

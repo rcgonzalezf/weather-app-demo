@@ -12,14 +12,13 @@ public abstract class WeatherLibApp extends Application {
 
   private static final String TAG = WeatherLibApp.class.getSimpleName();
 
-  private ServiceConfig mServiceConfig;
   private static WeatherLibApp sAppInstance = null;
 
   @Override public void onCreate() {
     super.onCreate();
-    mServiceConfig = ServiceConfig.getInstance();
-    mServiceConfig.setApiKey(getString(R.string.open_weather_map_api_key));
-    mServiceConfig.setWeatherProvider(WeatherProvider.OpenWeather);
+    ServiceConfig serviceConfig = ServiceConfig.getInstance();
+    serviceConfig.setApiKey(getString(R.string.open_weather_map_api_key));
+    serviceConfig.setWeatherProvider(WeatherProvider.OpenWeather);
 
     enableHttpResponseCache();
     addAnalyticsObservers();
@@ -29,7 +28,7 @@ public abstract class WeatherLibApp extends Application {
     return sAppInstance;
   }
 
-  protected static void setAppInstance(WeatherLibApp appInstance) {
+  public static void setAppInstance(WeatherLibApp appInstance) {
     sAppInstance = appInstance;
   }
 

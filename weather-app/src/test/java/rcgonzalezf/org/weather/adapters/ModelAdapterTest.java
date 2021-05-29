@@ -7,26 +7,25 @@ import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.rcgonzalezf.weather.WeatherLibApp;
+import org.rcgonzalezf.weather.common.models.WeatherInfo;
+import org.rcgonzalezf.weather.common.models.WeatherViewModel;
 import java.util.ArrayList;
 import java.util.List;
 import mockit.Expectations;
-import mockit.FullVerifications;
 import mockit.Mocked;
 import mockit.Tested;
 import mockit.Verifications;
 import mockit.integration.junit4.JMockit;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.rcgonzalezf.weather.WeatherLibApp;
-import org.rcgonzalezf.weather.common.models.WeatherInfo;
-import org.rcgonzalezf.weather.common.models.WeatherViewModel;
 import rcgonzalezf.org.weather.R;
 import rcgonzalezf.org.weather.SettingsActivity;
-
+import rcgonzalezf.org.weather.databinding.WeatherRowBinding;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
@@ -35,260 +34,226 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@RunWith(JMockit.class) public class ModelAdapterTest {
+@RunWith(JMockit.class)
+public class ModelAdapterTest {
 
-  @Tested private ModelAdapter<WeatherInfo> uut;
+    @Tested
+    private ModelAdapter<WeatherInfo> uut;
 
-  private List<WeatherInfo> mModels;
-  @Mocked WeatherLibApp mWeatherLipApp;
-  @Mocked private Context mContext;
-  @Mocked private RecyclerView.ViewHolder mRecyclerViewHolder;
-  @Mocked private TextView mTextView;
-  @Mocked private SharedPreferences mSharedPreferences;
-  @Mocked private PreferenceManager mPreferenceManager;
-  private ModelAdapter.ModelViewHolder mModelViewHolder;
-  private int mItemCount;
-  private Runnable mItemClickListenerRunnable;
-  private ModelAdapter.OnItemClickListener mItemClickListener;
+    private List<WeatherInfo> models;
+    @Mocked
+    WeatherLibApp weatherLibApp;
+    @Mocked
+    private Context context;
+    @Mocked
+    private RecyclerView.ViewHolder recyclerViewHolder;
+    @Mocked
+    private TextView textView;
+    @Mocked
+    private SharedPreferences sharedPreferences;
+    @Mocked
+    private PreferenceManager preferenceManager;
+    private WeatherModelViewHolder modelViewHolder;
+    private int itemCount;
+    private Runnable itemClickListenerRunnable;
+    private ModelAdapter.OnItemClickListener itemClickListener;
 
-  @Before public void setUp() throws Exception {
-    mModels = new ArrayList<>();
-    uut = new ModelAdapter<>(mModels, mContext);
-  }
+    @Before
+    public void setUp() throws Exception {
+        models = new ArrayList<>();
+        uut = new ModelAdapter<>(models);
+    }
 
-  @SuppressWarnings("UnusedParameters") @Test
-  public void shouldCreateViewHolder(@Mocked LayoutInflater layoutInflater, @Mocked View view) {
-    givenViewsFound(view);
+    @SuppressWarnings("UnusedParameters")
+    @Test
+    public void shouldCreateViewHolder(@Mocked LayoutInflater layoutInflater, @Mocked View view,
+                                       @Mocked WeatherRowBinding weatherRowBinding) {
+        givenViewsFound(view);
 
-    whenCreatingViewHolder();
+        whenCreatingViewHolder();
 
-    thenModelViewHolderIsNotNull();
-    thenItemViewShouldListenToClicks(view);
-  }
+        thenModelViewHolderIsNotNull();
+    }
 
-  @SuppressWarnings("UnusedParameters") @Test
-  public void shouldBindViewHolder(@Mocked WeatherInfo weatherInfo, @Mocked View view,
-      @Mocked LayoutInflater layoutInflater) {
-    givenViewHolder(view);
-    givenModel(weatherInfo);
-    givenDateTime(weatherInfo);
-    givenResourceStrings();
-    givenSharedPreferenceForCelsius(true);
+    @SuppressWarnings("UnusedParameters")
+    @Test
+    public void shouldBindViewHolder(@Mocked WeatherInfo weatherInfo, @Mocked View view,
+                                     @Mocked LayoutInflater layoutInflater,
+                                     @Mocked WeatherRowBinding weatherRowBinding) {
+        givenViewHolder(view);
+        givenModel(weatherInfo);
+        givenSharedPreferenceForCelsius(true);
 
-    whenBindingViewHolder();
+        whenBindingViewHolder();
 
-    thenShouldBindModelDataToViewHolder(weatherInfo);
-  }
+        thenShouldBindModelDataToViewHolder(weatherInfo);
+    }
 
-  @SuppressWarnings("UnusedParameters") @Test
-  public void shouldPopulateTemperatureViewInFahrenheit(@Mocked WeatherInfo weatherInfo,
-      @Mocked View view, @Mocked LayoutInflater layoutInflater) {
-    givenViewHolder(view);
-    givenSharedPreferenceForCelsius(false);
+    @SuppressWarnings("UnusedParameters")
+    @Test
+    public void shouldPopulateTemperatureViewInFahrenheit
+            (@Mocked WeatherInfo weatherInfo,
+             @Mocked View view,
+             @Mocked LayoutInflater layoutInflater,
+             @Mocked WeatherRowBinding weatherRowBinding) {
+        givenViewHolder(view);
+        givenSharedPreferenceForCelsius(false);
 
-    whenPopulatingTheTemperatureViews(weatherInfo);
+        whenPopulatingTheTemperatureViews(weatherInfo);
 
-    thenShouldBindModelTemperatureToViewHolder(weatherInfo);
-  }
+        thenShouldBindModelTemperatureToViewHolder(weatherInfo);
+    }
 
-  @Test public void shouldGetItemCount(@Mocked WeatherInfo weatherInfo) {
-    givenModel(weatherInfo);
+    @Test
+    public void shouldGetItemCount(@Mocked WeatherInfo weatherInfo) {
+        givenModel(weatherInfo);
 
-    whenGettingItemCount();
+        whenGettingItemCount();
 
-    thenItemCountShouldBe(1);
-  }
+        thenItemCountShouldBe(1);
+    }
 
-  @SuppressWarnings("UnusedParameters") @Test
-  public void shouldNotifyDataSetChangedWhenSettingItems(
-      @Mocked RecyclerView.Adapter<ModelAdapter.ModelViewHolder> adapter) {
+    @SuppressWarnings("UnusedParameters")
+    @Test
+    public void shouldNotifyDataSetChangedWhenSettingItems(
+            @Mocked RecyclerView.Adapter<WeatherModelViewHolder> adapter) {
 
-    whenSettingItemsList();
+        whenSettingItemsList();
 
-    thenNotifyDataSetChanged();
-  }
+        thenNotifyDataSetChanged();
+    }
 
-  @Test public void shouldPostDelayedItemClickOnClickForNonNullItemClickListener(
-      @SuppressWarnings("UnusedParameters") @Mocked Handler handler) {
-    givenItemClickListener();
+    @Test
+    public void shouldPostDelayedItemClickOnClickForNonNullItemClickListener(
+            @SuppressWarnings("UnusedParameters") @Mocked Handler handler) {
+        givenItemClickListener();
 
-    whenClicking();
+        whenClicking();
 
-    thenHandlerShouldPostRunnable();
-  }
+        thenHandlerShouldPostRunnable();
+    }
 
-  @Test public void shouldNotPostDelayedItemClickOnClickForNullItemClickListener(
-      @SuppressWarnings("UnusedParameters") @Mocked Handler handler) {
+    @Test
+    public void shouldCallItemClickListenerOnItemClick() {
+        givenItemClickListener();
+        givenRunnable();
 
-    whenClicking();
+        whenRunning();
 
-    thenNoInteractionsOnHandler(handler);
-  }
+        thenItemClickListenerShouldHandleItemClick();
+    }
 
-  @Test public void shouldCallItemClickListenerOnItemClick() {
-    givenItemClickListener();
-    givenRunnable();
+    private void thenItemClickListenerShouldHandleItemClick() {
+        //noinspection unchecked
+        verify(itemClickListener, times(1)).onItemClick(eq(textView),
+                any(WeatherViewModel.class));
+    }
 
-    whenRunning();
+    private void whenRunning() {
+        itemClickListenerRunnable.run();
+    }
 
-    thenItemClickListenerShouldHandleItemClick();
-  }
+    private void givenRunnable() {
+        new Expectations() {{
+            textView.getTag();
+            result = Mockito.mock(WeatherViewModel.class);
+        }};
+        itemClickListenerRunnable = uut.createClickRunnable(textView);
+    }
 
-  private void thenItemClickListenerShouldHandleItemClick() {
-    //noinspection unchecked
-    verify(mItemClickListener, times(1)).onItemClick(eq(mTextView), any(WeatherViewModel.class));
-  }
+    private void thenHandlerShouldPostRunnable() {
+        new Verifications() {{
+            new Handler().postDelayed(withAny(mock(Runnable.class)), 200);
+        }};
+    }
 
-  private void whenRunning() {
-    mItemClickListenerRunnable.run();
-  }
+    private void whenClicking() {
+        uut.onClick(textView);
+    }
 
-  private void givenRunnable() {
-    mItemClickListenerRunnable = uut.createClickRunnable(mTextView);
-  }
+    private void givenItemClickListener() {
+        itemClickListener = mock(ModelAdapter.OnItemClickListener.class);
+        uut.setOnItemClickListener(itemClickListener);
+    }
 
-  private void thenNoInteractionsOnHandler(Handler handler) {
-    new FullVerifications(handler) {
-    };
-  }
+    @Test
+    public void shouldSetItemClickListener() {
+        whenSettingOnItemClickListener();
+    }
 
-  private void thenHandlerShouldPostRunnable() {
-    new Verifications() {{
-      new Handler().postDelayed(withAny(mock(Runnable.class)), 200);
-    }};
-  }
+    private void whenSettingOnItemClickListener() {
+        uut.setOnItemClickListener(mock(ModelAdapter.OnItemClickListener.class));
+    }
 
-  private void whenClicking() {
-    uut.onClick(mTextView);
-  }
+    private void thenNotifyDataSetChanged() {
+        new Verifications() {{
+            uut.notifyDataSetChanged();
+        }};
+    }
 
-  private void givenItemClickListener() {
-    mItemClickListener = mock(ModelAdapter.OnItemClickListener.class);
-    uut.setOnItemClickListener(mItemClickListener);
-  }
+    private void whenSettingItemsList() {
+        uut.setItems(models);
+    }
 
-  @Test public void shouldSetItemClickListener() {
-    whenSettingOnItemClickListener();
-  }
+    private void thenItemCountShouldBe(int expected) {
+        assertEquals(expected, itemCount);
+    }
 
-  private void whenSettingOnItemClickListener() {
-    uut.setOnItemClickListener(mock(ModelAdapter.OnItemClickListener.class));
-  }
+    private void whenGettingItemCount() {
+        itemCount = uut.getItemCount();
+    }
 
-  private void thenNotifyDataSetChanged() {
-    new Verifications() {{
-      uut.notifyDataSetChanged();
-    }};
-  }
+    private void thenShouldBindModelTemperatureToViewHolder(final WeatherInfo weatherInfo) {
+        new Verifications() {{
+            weatherInfo.getTemperature();
+        }};
+    }
 
-  private void whenSettingItemsList() {
-    uut.setItems(mModels);
-  }
+    private void whenPopulatingTheTemperatureViews(WeatherInfo weatherInfo) {
+        uut.populateTemperatureViews(context, modelViewHolder, weatherInfo);
+    }
 
-  private void thenItemCountShouldBe(int expected) {
-    assertEquals(expected, mItemCount);
-  }
+    private void givenSharedPreferenceForCelsius(final boolean celsiusPreferred) {
+        new Expectations() {{
+            PreferenceManager.getDefaultSharedPreferences(context);
+            sharedPreferences.getBoolean(SettingsActivity.PREF_TEMPERATURE_UNITS, true);
+            result = celsiusPreferred;
+        }};
+    }
 
-  private void whenGettingItemCount() {
-    mItemCount = uut.getItemCount();
-  }
+    private void thenShouldBindModelDataToViewHolder(final WeatherInfo weatherInfo) {
+        new Verifications() {{
+            weatherInfo.getTemperature();
+        }};
+    }
 
-  private void thenShouldBindModelTemperatureToViewHolder(final WeatherInfo weatherInfo) {
-    new Verifications() {{
-      weatherInfo.getTemperature();
-    }};
-  }
+    private void whenBindingViewHolder() {
+        uut.onBindViewHolder(modelViewHolder, 0);
+    }
 
-  private void whenPopulatingTheTemperatureViews(WeatherInfo weatherInfo) {
-    uut.populateTemperatureViews(mModelViewHolder, weatherInfo);
-  }
+    private void givenModel(WeatherInfo weatherInfo) {
+        models.add(weatherInfo);
+    }
 
-  private void givenSharedPreferenceForCelsius(final boolean celsiusPreferred) {
-    new Expectations() {{
-      PreferenceManager.getDefaultSharedPreferences(mContext);
-      mSharedPreferences.getBoolean(SettingsActivity.PREF_TEMPERATURE_UNITS, true);
-      result = celsiusPreferred;
-    }};
-  }
+    private void givenViewHolder(View view) {
+        givenViewsFound(view);
+        modelViewHolder = uut.onCreateViewHolder(mock(ViewGroup.class), 0);
+    }
 
-  private void givenResourceStrings() {
-    new Expectations() {{
-      WeatherLibApp.getInstance().getString(R.string.location_display_format);
-      result = "%1$s, %2$s";
-      WeatherLibApp.getInstance().getString(R.string.key_value_display_format);
-      result = "%1$s, %2$s";
-      WeatherLibApp.getInstance().getString(R.string.humidity);
-      result = "Humidity";
-    }};
-  }
+    private void givenViewsFound(final View view) {
+        new Expectations() {{
+            view.findViewById(R.id.secondary_temperature_text_view);
+            result = textView;
+            view.findViewById(R.id.preferred_temperature_text_view);
+            result = textView;
+        }};
+    }
 
-  private void givenDateTime(final WeatherInfo weatherInfo) {
-    new Expectations() {{
-      weatherInfo.getDateTime();
-      result = "2012-09-24 18:00:00";
-    }};
-  }
+    private void thenModelViewHolderIsNotNull() {
+        assertNotNull(modelViewHolder);
+    }
 
-  private void thenShouldBindModelDataToViewHolder(final WeatherInfo weatherInfo) {
-    new Verifications() {{
-      weatherInfo.getWeatherId();
-      weatherInfo.getCityName();
-      weatherInfo.getCountry();
-      weatherInfo.getHumidity();
-      weatherInfo.getDeg();
-      weatherInfo.getDescription();
-      weatherInfo.getTemperature();
-      weatherInfo.getSpeed();
-    }};
-  }
-
-  private void whenBindingViewHolder() {
-    uut.onBindViewHolder(mModelViewHolder, 0);
-  }
-
-  private void givenModel(WeatherInfo weatherInfo) {
-    mModels.add(weatherInfo);
-  }
-
-  private void givenViewHolder(View view) {
-    givenViewsFound(view);
-    mModelViewHolder = uut.onCreateViewHolder(mock(ViewGroup.class), 0);
-  }
-
-  private void givenViewsFound(final View view) {
-    new Expectations() {{
-      view.findViewById(R.id.item_image);
-      result = mock(ImageView.class);
-      view.findViewById(R.id.datetime_text_view);
-      result = mTextView;
-      view.findViewById(R.id.detail_location_name);
-      result = mTextView;
-      view.findViewById(R.id.day_textview);
-      result = mTextView;
-      view.findViewById(R.id.humidity_text_view);
-      result = mTextView;
-      view.findViewById(R.id.wind_speed_text_view);
-      result = mTextView;
-      view.findViewById(R.id.secondary_temperature_text_view);
-      result = mTextView;
-      view.findViewById(R.id.preferred_temperature_text_view);
-      result = mTextView;
-      view.findViewById(R.id.description_text_view);
-      result = mTextView;
-    }};
-  }
-
-  private void thenItemViewShouldListenToClicks(final View view) {
-    new Verifications() {{
-      view.setOnClickListener(withEqual(uut));
-    }};
-  }
-
-  private void thenModelViewHolderIsNotNull() {
-    assertNotNull(mModelViewHolder);
-  }
-
-  private void whenCreatingViewHolder() {
-    mModelViewHolder = uut.onCreateViewHolder(mock(ViewGroup.class), 0);
-  }
+    private void whenCreatingViewHolder() {
+        modelViewHolder = uut.onCreateViewHolder(mock(ViewGroup.class), 0);
+    }
 }

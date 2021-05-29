@@ -7,7 +7,6 @@ import android.net.NetworkInfo;
 import com.facebook.stetho.Stetho;
 import mockit.Expectations;
 import mockit.Mocked;
-import mockit.Tested;
 import mockit.integration.junit4.JMockit;
 import org.junit.After;
 import org.junit.Before;
@@ -26,51 +25,56 @@ import static org.mockito.Mockito.verify;
 
 @RunWith(JMockit.class) public class AnalyticsManagerTest {
 
-  @Tested private AnalyticsManager uut;
+  private AnalyticsManager uut;
 
-  @SuppressWarnings("unused") @Mocked private Stetho mStetho;
-  @SuppressWarnings("unused") @Mocked private ConnectivityManager mConnectivityManager;
-  @SuppressWarnings("unused") @Mocked private Configuration mConfiguration;
-  @SuppressWarnings("unused") @Mocked private Context mContext;
-  @SuppressWarnings("unused") @Mocked private NetworkInfo mNetworkInfo;
+  @SuppressWarnings("unused") @Mocked private Stetho stetho;
+  @SuppressWarnings("unused") @Mocked private ConnectivityManager connectivityManager;
+  @SuppressWarnings("unused") @Mocked private Configuration configuration;
+  @SuppressWarnings("unused") @Mocked private Context context;
+  @SuppressWarnings("unused") @Mocked private NetworkInfo networkInfo;
 
-  private boolean mHandlingOnScreen;
+  private boolean handlingOnScreen;
 
-  private AnalyticsBaseData mAnalyticsBaseData;
-  private String mOriginalAndroidVersion;
-  private String mOriginalAppVersion;
-  private AnalyticsObserver mSecondMockObserver;
-  private String mAction;
-  private String mScreen;
+  private AnalyticsBaseData analyticsBaseData;
+  private String originalAndroidVersion;
+  private String originalAppVersion;
+  private AnalyticsObserver secondMockObserver;
+  private String action;
+  private String screen;
 
   private AnalyticsObserver mAnalyticsTestObserver = new AnalyticsObserver() {
     @Override public void onScreen(String screenName, AnalyticsBaseData analyticsBaseData) {
-      mHandlingOnScreen = true;
-      mAnalyticsBaseData = analyticsBaseData;
-      mScreen = screenName;
+      handlingOnScreen = true;
+      AnalyticsManagerTest.this.analyticsBaseData = analyticsBaseData;
+      screen = screenName;
     }
 
     @Override public void onAction(AnalyticsEvent analyticsEvent, String screenName,
         AnalyticsBaseData analyticsBaseData) {
-      mScreen = screenName;
+      screen = screenName;
     }
   };
 
   @Before public void initWeatherApp() {
     new Expectations() {{
-      mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-      result = mConnectivityManager;
+      context.getSystemService(Context.CONNECTIVITY_SERVICE);
+      result = connectivityManager;
     }};
 
-    mOriginalAndroidVersion = AnalyticsManager.sAndroidVersion;
-    mOriginalAppVersion = AnalyticsManager.sAppVersion;
-    uut = new AnalyticsManager(mContext);
+    originalAndroidVersion = AnalyticsManager.BUILD_ANDROID_VERSION;
+    originalAppVersion = AnalyticsManager.BUILD_APP_VERSION;
+
+    if (originalAndroidVersion == null) {
+      AnalyticsManager.BUILD_ANDROID_VERSION = "";
+      AnalyticsManager.BUILD_APP_VERSION = "";
+    }
+    uut = new AnalyticsManager(context);
     uut.addObserver(mAnalyticsTestObserver);
   }
 
   @After public void resetValues() {
-    AnalyticsManager.sAndroidVersion = mOriginalAndroidVersion;
-    AnalyticsManager.sAppVersion = mOriginalAppVersion;
+    AnalyticsManager.BUILD_ANDROID_VERSION = originalAndroidVersion;
+    AnalyticsManager.BUILD_APP_VERSION = originalAppVersion;
   }
 
   @Test public void shouldContainBaseDataWithWifi(
@@ -167,12 +171,12 @@ import static org.mockito.Mockito.verify;
   }
 
   private void givenUut() {
-    uut = new AnalyticsManager(mContext);
+    uut = new AnalyticsManager(context);
     uut.addObserver(mAnalyticsTestObserver);
   }
 
   private void thenScreenNotEmpty() {
-    assertNotNull(mScreen);
+    assertNotNull(screen);
   }
 
   private void givenPreviousObserverRemoval() {
@@ -180,33 +184,33 @@ import static org.mockito.Mockito.verify;
   }
 
   private void thenOnActionNotified() {
-    assertTrue(mHandlingOnScreen);
+    assertTrue(handlingOnScreen);
   }
 
   private void thenOnScreenNotified() {
-    assertTrue(mHandlingOnScreen);
+    assertTrue(handlingOnScreen);
   }
 
   private void whenNotifyingOnAction() {
-    AnalyticsEvent analyticsEvent = new AnalyticsEvent(mAction, null);
+    AnalyticsEvent analyticsEvent = new AnalyticsEvent(action, null);
     uut.notifyOnAction(analyticsEvent);
   }
 
   private void givenAction(String action) {
-    mAction = action;
+    this.action = action;
   }
 
   private void givenAppVersion(String appVersion) {
-    AnalyticsManager.sAppVersion = appVersion;
+    AnalyticsManager.BUILD_APP_VERSION = appVersion;
   }
 
   private void givenAndroidVersion(String androidSdkVersion) {
-    AnalyticsManager.sAndroidVersion = androidSdkVersion;
+    AnalyticsManager.BUILD_ANDROID_VERSION = androidSdkVersion;
   }
 
   private void thenAnalyticsDataShouldContain(String key, String value) {
-    assertNotNull(mAnalyticsBaseData.data().containsKey(key));
-    assertEquals(value, mAnalyticsBaseData.data().get(key));
+    assertNotNull(analyticsBaseData.data().containsKey(key));
+    assertEquals(value, analyticsBaseData.data().get(key));
   }
 
   private void whenNotifyOnScreen(String screenName) {
@@ -215,32 +219,32 @@ import static org.mockito.Mockito.verify;
 
   private void givenIsMultipane(final boolean isMultipane) {
     new Expectations() {{
-      WeatherUtils.isXLargeTablet(mContext);
+      WeatherUtils.isXLargeTablet(context);
       result = isMultipane;
     }};
   }
 
   private void givenNetwork(final int connectivityManagerType) {
     new Expectations() {{
-      mNetworkInfo.getType();
+      networkInfo.getType();
       result = connectivityManagerType;
     }};
   }
 
   private void givenNullNetwork() {
     new Expectations() {{
-      mConnectivityManager.getActiveNetworkInfo();
+      connectivityManager.getActiveNetworkInfo();
       result = null;
     }};
   }
 
   private void thenSecondObserverNotifiedScreen() {
-    verify(mSecondMockObserver, times(1)).onScreen(anyString(), any(AnalyticsBaseData.class));
+    verify(secondMockObserver, times(1)).onScreen(anyString(), any(AnalyticsBaseData.class));
   }
 
   private void givenSecondObserver() {
-    mSecondMockObserver = mock(AnalyticsObserver.class);
-    uut.addObserver(mSecondMockObserver);
+    secondMockObserver = mock(AnalyticsObserver.class);
+    uut.addObserver(secondMockObserver);
   }
 
   private void givenObserver() {

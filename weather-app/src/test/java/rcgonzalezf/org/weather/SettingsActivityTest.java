@@ -18,6 +18,9 @@ import mockit.integration.junit4.JMockit;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockitoAnnotations;
+import org.rcgonzalezf.weather.WeatherLibApp;
+
 import rcgonzalezf.org.weather.common.analytics.AnalyticsManager;
 
 import static org.junit.Assert.assertEquals;
@@ -29,10 +32,14 @@ import static org.junit.Assert.assertEquals;
   @SuppressWarnings("unused") @Mocked private PreferenceActivity mPreferenceActivity;
   @SuppressWarnings("unused") @Mocked private AppCompatDelegate mAppCompatDelegate;
   @SuppressWarnings("unused") @Mocked private AnalyticsManager mAnalyticsManager;
+  @org.mockito.Mock
+  private WeatherApp weatherApp;
   private boolean mOnMenuItemSelected;
   private boolean mIsMultiPane;
 
   @Before public void setUp() {
+    MockitoAnnotations.initMocks(this);
+    WeatherLibApp.setAppInstance(weatherApp);
     uut = new SettingsActivity();
   }
 

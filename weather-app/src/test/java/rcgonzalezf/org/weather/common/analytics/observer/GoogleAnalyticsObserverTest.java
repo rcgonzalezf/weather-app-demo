@@ -95,13 +95,13 @@ import static rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog.Weat
 
   private void thenBuilderShouldSetCategory(final HitBuilders.EventBuilder eventBuilder) {
     new Verifications() {{
-      eventBuilder.setCategory(withEqual(mAnalyticsEvent.name));
+      eventBuilder.setCategory(withEqual(mAnalyticsEvent.getName()));
     }};
   }
 
   private void thenBuilderShouldSetAction(final HitBuilders.EventBuilder eventBuilder) {
     new Verifications() {{
-      eventBuilder.setAction(withEqual(mAnalyticsEvent.additionalValue));
+      eventBuilder.setAction(withEqual(mAnalyticsEvent.getAdditionalValue()));
     }};
   }
 
