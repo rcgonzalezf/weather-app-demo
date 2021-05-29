@@ -1,17 +1,15 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: "com.vanniktech.android.junit.jacoco"
 
 android {
-  compileSdkVersion 29
+  compileSdkVersion 30
   buildToolsVersion "$versions.build_tools"
 
   defaultConfig {
-    minSdkVersion 14
-    targetSdkVersion 29
-    versionCode 6
-    versionName "0.2.2"
+    minSdkVersion 26
+    targetSdkVersion 30
+    versionCode 7
+    versionName "0.2.3"
   }
   buildTypes {
     release {
@@ -61,6 +59,8 @@ dependencies {
   testImplementation 'nl.jqno.equalsverifier:equalsverifier:2.1.5'
   testImplementation 'org.meanbean:meanbean:2.0.3'
 }
+
+apply plugin: "com.vanniktech.android.junit.jacoco"
 
 junitJacoco {
   jacocoVersion = "$versions.jacoco"
