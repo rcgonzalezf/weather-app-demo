@@ -1,3 +1,14 @@
+plugins {
+    id "com.gradle.enterprise" version "3.6.1"
+}
+
+gradleEnterprise {
+    buildScan {
+        termsOfServiceUrl = "https://gradle.com/terms-of-service"
+        termsOfServiceAgree = "yes"
+    }
+}
+
 include ':weather-app:model'
 include ':weather-interface'
 include ':weather-library'
