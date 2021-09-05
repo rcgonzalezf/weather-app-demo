@@ -1,4 +1,4 @@
-package org.rcgonzalezf.util
+package org.rcgonzalezf.weather.util
 
 import okhttp3.OkHttpClient
 import org.mockito.Mockito.mock

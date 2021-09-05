@@ -1,4 +1,4 @@
-package com.rcgonzalezf.weather.model
+package org.rcgonzalezf.weather.model
 
 import org.junit.Test
 
