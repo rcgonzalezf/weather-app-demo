@@ -11,7 +11,7 @@ gradleEnterprise {
 
 rootProject.name = 'weather-app'
 
-include ':weather-app:model'
+include ':weather-model'
 include ':weather-interface'
 include ':weather-library'
 include ':weather-app'
