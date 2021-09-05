@@ -1,4 +1,4 @@
-package rcgonzalezf.org.weather.common.analytics
+package rcgonzalezf.org.weather.analytics.analytics
 
 interface AnalyticsObserver {
     fun onScreen(screenName: String, analyticsBaseData: AnalyticsBaseData)

@@ -1,9 +1,11 @@
-package rcgonzalezf.org.weather.common.analytics
+package rcgonzalezf.org.weather.analytics.analytics
 
-import rcgonzalezf.org.weather.WeatherApp
+import javax.inject.Inject
 
 open // for Mockito
-class Analytics(private val analyticsManager: AnalyticsManager = WeatherApp.analyticsManager) {
+class Analytics
+// FIXME default  = WeatherApp.analyticsManager
+@Inject constructor(private val analyticsManager: AnalyticsManager) {
     open fun trackOnScreen(screenName: String) {
         analyticsManager.notifyOnScreenLoad(screenName)
     }

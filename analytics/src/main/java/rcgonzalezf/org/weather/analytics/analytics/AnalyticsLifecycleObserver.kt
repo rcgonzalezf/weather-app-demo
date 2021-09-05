@@ -1,11 +1,15 @@
-package rcgonzalezf.org.weather.common.analytics
+package rcgonzalezf.org.weather.analytics.analytics
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
+import dagger.hilt.android.scopes.ActivityScoped
+import javax.inject.Inject
 
+@ActivityScoped
 open // for Mockito
-class AnalyticsLifecycleObserver(private val screenName: String, val analytics: Analytics)
+class AnalyticsLifecycleObserver
+    @Inject constructor(private val screenName: String, val analytics: Analytics)
     : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)

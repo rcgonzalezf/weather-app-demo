@@ -4,12 +4,14 @@ import androidx.annotation.VisibleForTesting
 import com.crittercism.app.Crittercism
 import com.facebook.stetho.Stetho
 import com.facebook.stetho.okhttp3.StethoInterceptor
+import dagger.hilt.android.HiltAndroidApp
 import okhttp3.OkHttpClient
 import org.rcgonzalezf.weather.WeatherLibApp
-import rcgonzalezf.org.weather.common.analytics.AnalyticsManager
-import rcgonzalezf.org.weather.common.analytics.observer.GoogleAnalyticsObserver
-import rcgonzalezf.org.weather.common.analytics.observer.LogcatAnalyticsObserver
+import rcgonzalezf.org.weather.analytics.analytics.AnalyticsManager
+import rcgonzalezf.org.weather.analytics.analytics.observer.GoogleAnalyticsObserver
+import rcgonzalezf.org.weather.analytics.analytics.observer.LogcatAnalyticsObserver
 
+@HiltAndroidApp
 open class WeatherApp : WeatherLibApp() {
 
     override fun onCreate() {
@@ -32,23 +34,24 @@ open class WeatherApp : WeatherLibApp() {
 
     override fun addAnalyticsObservers() {
         if (sIsDebugMode) {
-            analyticsManager.addObserver(LogcatAnalyticsObserver())
+            analyticsManager.addObserver(rcgonzalezf.org.weather.analytics.analytics.observer.LogcatAnalyticsObserver())
         }
-        analyticsManager.addObserver(GoogleAnalyticsObserver())
+        analyticsManager.addObserver(rcgonzalezf.org.weather.analytics.analytics.observer.GoogleAnalyticsObserver())
     }
 
     companion object {
         @JvmField
         @VisibleForTesting
         var sIsDebugMode = BuildConfig.DEBUG
-        private var sAnalyticsManagerInstance: AnalyticsManager? = null
+        private var sAnalyticsManagerInstance: rcgonzalezf.org.weather.analytics.analytics.AnalyticsManager? = null
         @JvmStatic
-        val analyticsManager: AnalyticsManager
+        val analyticsManager: rcgonzalezf.org.weather.analytics.analytics.AnalyticsManager
             get() {
                  if (sAnalyticsManagerInstance == null) {
-                     sAnalyticsManagerInstance = AnalyticsManager(getInstance())
+                     sAnalyticsManagerInstance =
+                         rcgonzalezf.org.weather.analytics.analytics.AnalyticsManager(getInstance())
                 }
-                return sAnalyticsManagerInstance as AnalyticsManager
+                return sAnalyticsManagerInstance as rcgonzalezf.org.weather.analytics.analytics.AnalyticsManager
             }
 
         fun getAppInstance() = getInstance()

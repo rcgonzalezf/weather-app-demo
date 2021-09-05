@@ -15,9 +15,9 @@ import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParamete
 import rcgonzalezf.org.weather.R
 import rcgonzalezf.org.weather.common.OnOfflineLoader
 import rcgonzalezf.org.weather.common.ToggleBehavior
-import rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog
-import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent
-import rcgonzalezf.org.weather.common.analytics.AnalyticsLifecycleObserver
+import rcgonzalezf.org.weather.analytics.analytics.AnalyticsDataCatalog
+import rcgonzalezf.org.weather.analytics.analytics.AnalyticsEvent
+import rcgonzalezf.org.weather.analytics.analytics.AnalyticsLifecycleObserver
 import rcgonzalezf.org.weather.location.CityFromLatLongRetriever
 import rcgonzalezf.org.weather.location.LocationSearch
 import rcgonzalezf.org.weather.utils.UrlEncoder
@@ -125,7 +125,7 @@ class WeatherListViewModel(
         }
     }
 
-    inner class WeatherListLocationSearch(val analytics: AnalyticsLifecycleObserver) : LocationSearch {
+    inner class WeatherListLocationSearch(val analytics: rcgonzalezf.org.weather.analytics.analytics.AnalyticsLifecycleObserver) : LocationSearch {
         override fun searchByLatLon(lat: Double, lon: Double) {
             toggleBehavior.toggle()
             val weatherRepository = serviceConfig.getWeatherRepository<
@@ -136,15 +136,21 @@ class WeatherListViewModel(
                         OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withLatLon(lat, lon).build(),
                         openWeatherApiCallback)
                 analytics.trackOnActionEvent(
-                        AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.LOCATION_SEARCH,
-                                "Geocoder Failure"))
+                    rcgonzalezf.org.weather.analytics.analytics.AnalyticsEvent(
+                        rcgonzalezf.org.weather.analytics.analytics.AnalyticsDataCatalog.WeatherListActivity.LOCATION_SEARCH,
+                        "Geocoder Failure"
+                    )
+                )
             } else {
                 weatherRepository.findWeather(
                         OpenWeatherApiRequestParameters.OpenWeatherApiRequestBuilder().withCityName(cityName).build(),
                         openWeatherApiCallback)
                 analytics.trackOnActionEvent(
-                        AnalyticsEvent(
-                                AnalyticsDataCatalog.WeatherListActivity.LOCATION_SEARCH, cityName))
+                    rcgonzalezf.org.weather.analytics.analytics.AnalyticsEvent(
+                        rcgonzalezf.org.weather.analytics.analytics.AnalyticsDataCatalog.WeatherListActivity.LOCATION_SEARCH,
+                        cityName
+                    )
+                )
                 updateCityNameForSwipeToRefresh(cityName)
             }
         }

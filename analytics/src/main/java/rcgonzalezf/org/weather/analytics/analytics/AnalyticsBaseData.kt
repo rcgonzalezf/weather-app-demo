@@ -1,4 +1,4 @@
-package rcgonzalezf.org.weather.common.analytics
+package rcgonzalezf.org.weather.analytics.analytics
 
 class AnalyticsBaseData {
     private val data: MutableMap<String, String> = mutableMapOf()

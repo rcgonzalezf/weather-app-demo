@@ -27,7 +27,7 @@ import org.rcgonzalezf.weather.openweather.OpenWeatherApiCallback
 import org.rcgonzalezf.weather.openweather.network.OpenWeatherApiRequestParameters
 import rcgonzalezf.org.weather.R
 import rcgonzalezf.org.weather.common.ToggleBehavior
-import rcgonzalezf.org.weather.common.analytics.AnalyticsLifecycleObserver
+import rcgonzalezf.org.weather.analytics.analytics.AnalyticsLifecycleObserver
 import rcgonzalezf.org.weather.list.WeatherListViewModel.Companion.FORECASTS
 import rcgonzalezf.org.weather.list.WeatherListViewModel.Companion.OFFLINE_FILE
 import rcgonzalezf.org.weather.location.CityFromLatLongRetriever
@@ -67,7 +67,7 @@ class WeatherListViewModelTest {
     lateinit var serviceConfig: ServiceConfig
 
     @Mock
-    lateinit var analytics: AnalyticsLifecycleObserver
+    lateinit var analytics: rcgonzalezf.org.weather.analytics.analytics.AnalyticsLifecycleObserver
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()

@@ -9,14 +9,17 @@ import org.mockito.MockitoAnnotations
 class AnalyticsLifecycleObserverTest {
 
     private val someScreenName: String = "someScreenName"
-    lateinit var uut:AnalyticsLifecycleObserver
+    lateinit var uut: rcgonzalezf.org.weather.analytics.analytics.AnalyticsLifecycleObserver
     @Mock
-    lateinit var analytics: Analytics
+    lateinit var analytics: rcgonzalezf.org.weather.analytics.analytics.Analytics
 
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        uut = AnalyticsLifecycleObserver(someScreenName, analytics)
+        uut = rcgonzalezf.org.weather.analytics.analytics.AnalyticsLifecycleObserver(
+            someScreenName,
+            analytics
+        )
     }
 
     @Test
@@ -35,7 +38,8 @@ class AnalyticsLifecycleObserverTest {
 
     @Test
     fun trackOnActionEvent() {
-        val analyticsEvent = AnalyticsEvent(someScreenName)
+        val analyticsEvent =
+            rcgonzalezf.org.weather.analytics.analytics.AnalyticsEvent(someScreenName)
         uut.trackOnActionEvent(analyticsEvent)
 
         verify(analytics).trackOnActionEvent(analyticsEvent)

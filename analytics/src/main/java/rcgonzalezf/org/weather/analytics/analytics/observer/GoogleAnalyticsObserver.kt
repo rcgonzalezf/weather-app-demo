@@ -1,4 +1,4 @@
-package rcgonzalezf.org.weather.common.analytics.observer
+package rcgonzalezf.org.weather.analytics.analytics.observer
 
 import com.google.android.gms.analytics.GoogleAnalytics
 import com.google.android.gms.analytics.HitBuilders
@@ -6,10 +6,10 @@ import com.google.android.gms.analytics.HitBuilders.ScreenViewBuilder
 import com.google.android.gms.analytics.Tracker
 import rcgonzalezf.org.weather.R
 import rcgonzalezf.org.weather.WeatherApp
-import rcgonzalezf.org.weather.common.analytics.AnalyticsBaseData
-import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent
-import rcgonzalezf.org.weather.common.analytics.AnalyticsManager
-import rcgonzalezf.org.weather.common.analytics.AnalyticsObserver
+import rcgonzalezf.org.weather.analytics.analytics.AnalyticsBaseData
+import rcgonzalezf.org.weather.analytics.analytics.AnalyticsEvent
+import rcgonzalezf.org.weather.analytics.analytics.AnalyticsManager
+import rcgonzalezf.org.weather.analytics.analytics.AnalyticsObserver
 
 class GoogleAnalyticsObserver : AnalyticsObserver {
     private var tracker: Tracker? = null
@@ -41,17 +41,21 @@ class GoogleAnalyticsObserver : AnalyticsObserver {
     }
 
     override fun onAction(analyticsEvent: AnalyticsEvent, screenName: String,
-                          analyticsBaseData: AnalyticsBaseData) {
+                          analyticsBaseData: AnalyticsBaseData
+    ) {
         val builder = HitBuilders.EventBuilder().setCategory(analyticsEvent.name)
         if (analyticsEvent.additionalValue != null) {
             builder.setAction(analyticsEvent.additionalValue)
         }
-        builder.setCustomDimension(OS_VERSION,
+        builder.setCustomDimension(
+            OS_VERSION,
                 analyticsBaseData.data()[AnalyticsManager.ANDROID_VERSION])
-        builder.setCustomDimension(APP_VERSION,
+        builder.setCustomDimension(
+            APP_VERSION,
                 analyticsBaseData.data()[AnalyticsManager.APP_VERSION])
         builder.setCustomDimension(NETWORK, analyticsBaseData.data()[AnalyticsManager.NETWORK])
-        builder.setCustomDimension(MULTIPANE,
+        builder.setCustomDimension(
+            MULTIPANE,
                 analyticsBaseData.data()[AnalyticsManager.MULTIPANE])
 
         tracker = defaultTracker

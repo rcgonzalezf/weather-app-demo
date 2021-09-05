@@ -16,6 +16,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
+import dagger.hilt.android.AndroidEntryPoint
 import org.rcgonzalezf.weather.common.listeners.OnUpdateWeatherListListener
 import org.rcgonzalezf.weather.common.models.WeatherInfo
 import org.rcgonzalezf.weather.common.models.WeatherViewModel
@@ -25,8 +26,8 @@ import rcgonzalezf.org.weather.adapters.ModelAdapter
 import rcgonzalezf.org.weather.adapters.ModelAdapter.OnItemClickListener
 import rcgonzalezf.org.weather.common.BaseActivity
 import rcgonzalezf.org.weather.common.ToggleBehavior
-import rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog
-import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent
+import rcgonzalezf.org.weather.analytics.analytics.AnalyticsDataCatalog
+import rcgonzalezf.org.weather.analytics.analytics.AnalyticsEvent
 import rcgonzalezf.org.weather.common.ext.toggleVisibility
 import rcgonzalezf.org.weather.databinding.WeatherListBinding
 import rcgonzalezf.org.weather.list.WeatherListViewModel
@@ -38,6 +39,7 @@ import rcgonzalezf.org.weather.location.LocationManager
 import rcgonzalezf.org.weather.utils.ToastUserNotifier
 import java.util.Locale
 
+@AndroidEntryPoint
 class WeatherListActivity : BaseActivity(),
         OnItemClickListener<WeatherViewModel>, ToggleBehavior, OnUpdateWeatherListListener {
 
@@ -76,14 +78,23 @@ class WeatherListActivity : BaseActivity(),
         // off line
         weatherListViewModel.offline.observe(this, Observer {
             val weatherInfoList = weatherListViewModel.weatherInfoList.value
-            val noNetwork = AnalyticsDataCatalog.WeatherListActivity.NO_NETWORK_SEARCH
+            val noNetwork = rcgonzalezf.org.weather.analytics.analytics.AnalyticsDataCatalog.WeatherListActivity.NO_NETWORK_SEARCH
             if (weatherInfoList != null && weatherInfoList.isNotEmpty()) {
                 notifyAdapter(weatherInfoList)
                 analyticsLifecycleObserver.trackOnActionEvent(
-                        AnalyticsEvent(noNetwork, weatherInfoList[0].cityName))
+                    rcgonzalezf.org.weather.analytics.analytics.AnalyticsEvent(
+                        noNetwork,
+                        weatherInfoList[0].cityName
+                    )
+                )
             } else {
                 Log.d(TAG, "No data even in offline mode :(")
-                analyticsLifecycleObserver.trackOnActionEvent(AnalyticsEvent(noNetwork, "EMPTY"))
+                analyticsLifecycleObserver.trackOnActionEvent(
+                    rcgonzalezf.org.weather.analytics.analytics.AnalyticsEvent(
+                        noNetwork,
+                        "EMPTY"
+                    )
+                )
                 //cancel swipe to refresh loading
                 onItemsLoadComplete()
             }
@@ -127,8 +138,11 @@ class WeatherListActivity : BaseActivity(),
     override fun updateList(weatherInfoList: List<WeatherInfo>) {
         val cityName = if (weatherInfoList.isEmpty()) "" else weatherInfoList[0].cityName
         analyticsLifecycleObserver.trackOnActionEvent(
-                AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.SEARCH_COMPLETED,
-                        "cityName: $cityName"))
+            rcgonzalezf.org.weather.analytics.analytics.AnalyticsEvent(
+                rcgonzalezf.org.weather.analytics.analytics.AnalyticsDataCatalog.WeatherListActivity.SEARCH_COMPLETED,
+                "cityName: $cityName"
+            )
+        )
         notifyAdapter(weatherInfoList)
     }
 
@@ -137,8 +151,11 @@ class WeatherListActivity : BaseActivity(),
         runOnUiThread { toggle() }
         Log.d(TAG, error)
         analyticsLifecycleObserver.trackOnActionEvent(
-                AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.SEARCH_COMPLETED,
-                        "error: $error"))
+            rcgonzalezf.org.weather.analytics.analytics.AnalyticsEvent(
+                rcgonzalezf.org.weather.analytics.analytics.AnalyticsDataCatalog.WeatherListActivity.SEARCH_COMPLETED,
+                "error: $error"
+            )
+        )
     }
 
     private fun setupRecyclerView() {
@@ -188,7 +205,12 @@ class WeatherListActivity : BaseActivity(),
     val cancelListener: DialogInterface.OnClickListener
         get() = DialogInterface.OnClickListener { dialog, _ ->
             analyticsLifecycleObserver
-                    .trackOnActionEvent(AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.MANUAL_SEARCH, "CANCEL"))
+                    .trackOnActionEvent(
+                        rcgonzalezf.org.weather.analytics.analytics.AnalyticsEvent(
+                            rcgonzalezf.org.weather.analytics.analytics.AnalyticsDataCatalog.WeatherListActivity.MANUAL_SEARCH,
+                            "CANCEL"
+                        )
+                    )
             dialog.cancel()
         }
 
@@ -196,7 +218,12 @@ class WeatherListActivity : BaseActivity(),
     fun getOkClickListener(userInput: CharSequence): DialogInterface.OnClickListener {
         return DialogInterface.OnClickListener { _, _ ->
             analyticsLifecycleObserver
-                    .trackOnActionEvent(AnalyticsEvent(AnalyticsDataCatalog.WeatherListActivity.MANUAL_SEARCH, userInput.toString()))
+                    .trackOnActionEvent(
+                        rcgonzalezf.org.weather.analytics.analytics.AnalyticsEvent(
+                            rcgonzalezf.org.weather.analytics.analytics.AnalyticsDataCatalog.WeatherListActivity.MANUAL_SEARCH,
+                            userInput.toString()
+                        )
+                    )
             weatherListViewModel.searchByManualInput(userInput)
         }
     }

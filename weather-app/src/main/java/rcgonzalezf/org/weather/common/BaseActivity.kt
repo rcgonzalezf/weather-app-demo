@@ -17,15 +17,17 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import rcgonzalezf.org.weather.R
 import rcgonzalezf.org.weather.SettingsActivity
-import rcgonzalezf.org.weather.common.analytics.Analytics
-import rcgonzalezf.org.weather.common.analytics.AnalyticsLifecycleObserver
+import rcgonzalezf.org.weather.analytics.analytics.Analytics
+import rcgonzalezf.org.weather.analytics.analytics.AnalyticsLifecycleObserver
 import rcgonzalezf.org.weather.databinding.WeatherBinding
+import javax.inject.Inject
 
 abstract class BaseActivity : AppCompatActivity(),
         ActivityCompat.OnRequestPermissionsResultCallback {
     private lateinit var drawerLayout: DrawerLayout
     protected lateinit var content: View
-    protected lateinit var analyticsLifecycleObserver: AnalyticsLifecycleObserver
+    @Inject
+    protected lateinit var analyticsLifecycleObserver: rcgonzalezf.org.weather.analytics.analytics.AnalyticsLifecycleObserver
     protected lateinit var weatherBinding: WeatherBinding
 
     public override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,8 +36,11 @@ abstract class BaseActivity : AppCompatActivity(),
         initToolbar()
         setupDrawerLayout()
         content = weatherBinding.content
-        analyticsLifecycleObserver = AnalyticsLifecycleObserver(this.javaClass.simpleName,
-                Analytics())
+        analyticsLifecycleObserver =
+            rcgonzalezf.org.weather.analytics.analytics.AnalyticsLifecycleObserver(
+                this.javaClass.simpleName,
+                rcgonzalezf.org.weather.analytics.analytics.Analytics()
+            )
         lifecycle.addObserver(analyticsLifecycleObserver)
     }
 

@@ -11,9 +11,10 @@ import android.preference.PreferenceManager
 import android.preference.SwitchPreference
 import android.view.MenuItem
 import androidx.core.app.NavUtils
-import rcgonzalezf.org.weather.common.analytics.Analytics
-import rcgonzalezf.org.weather.common.analytics.AnalyticsDataCatalog
-import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent
+import dagger.hilt.android.AndroidEntryPoint
+import rcgonzalezf.org.weather.analytics.analytics.Analytics
+import rcgonzalezf.org.weather.analytics.analytics.AnalyticsDataCatalog
+import rcgonzalezf.org.weather.analytics.analytics.AnalyticsEvent
 import rcgonzalezf.org.weather.utils.WeatherUtils.isXLargeTablet
 
 /**
@@ -27,6 +28,7 @@ import rcgonzalezf.org.weather.utils.WeatherUtils.isXLargeTablet
  * Android Design: Settings](http://developer.android.com/design/patterns/settings.html) for design guidelines and the [Settings
  * API Guide](http://developer.android.com/guide/topics/ui/settings.html) for more information on developing a Settings UI.
  */
+@AndroidEntryPoint
 class SettingsActivity : AppCompatPreferenceActivity() {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
@@ -108,13 +110,22 @@ class SettingsActivity : AppCompatPreferenceActivity() {
             val newBooleanValue = newValue == java.lang.Boolean.TRUE
             val fromValue = !newBooleanValue
             temperatureUnitsPreference.isChecked = newBooleanValue
-            Analytics().trackOnActionEvent(
-                    AnalyticsEvent(AnalyticsDataCatalog.SettingsActivity.TEMP_UNITS_TOGGLE, fromValue.toString()))
+            rcgonzalezf.org.weather.analytics.analytics.Analytics().trackOnActionEvent(
+                rcgonzalezf.org.weather.analytics.analytics.AnalyticsEvent(
+                    rcgonzalezf.org.weather.analytics.analytics.AnalyticsDataCatalog.SettingsActivity.TEMP_UNITS_TOGGLE,
+                    fromValue.toString()
+                )
+            )
             return newBooleanValue
         }
 
         override fun onPreferenceClick(preference: Preference): Boolean {
-            Analytics().trackOnActionEvent(AnalyticsEvent(AnalyticsDataCatalog.SettingsActivity.ON_NAME, null))
+            rcgonzalezf.org.weather.analytics.analytics.Analytics().trackOnActionEvent(
+                rcgonzalezf.org.weather.analytics.analytics.AnalyticsEvent(
+                    rcgonzalezf.org.weather.analytics.analytics.AnalyticsDataCatalog.SettingsActivity.ON_NAME,
+                    null
+                )
+            )
             return false
         }
     }

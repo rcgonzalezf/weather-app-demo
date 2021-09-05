@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatDelegate
-import rcgonzalezf.org.weather.common.analytics.Analytics
+import rcgonzalezf.org.weather.analytics.analytics.Analytics
 
 /**
  * A [android.preference.PreferenceActivity] which implements and proxies the necessary calls
@@ -91,6 +91,6 @@ abstract class AppCompatPreferenceActivity : PreferenceActivity() {
         }
 
     fun trackOnScreen() {
-        Analytics().trackOnScreen(this.javaClass.simpleName)
+        rcgonzalezf.org.weather.analytics.analytics.Analytics().trackOnScreen(this.javaClass.simpleName)
     }
 }

@@ -30,7 +30,7 @@ object WeatherUtils {
     @JvmStatic
     @JvmOverloads
     @VisibleForTesting
-    fun getDayName(context: Context, dateStr: String?, todayDate: Date = Date()): String? {
+    fun getDayName(context: Context, dateStr: String, todayDate: Date = Date()): String? {
         val dateFormat = SimpleDateFormat(DATE_FORMAT, Locale.getDefault())
         return try {
             val inputDate = dateFormat.parse(dateStr)

@@ -1,9 +1,9 @@
-package rcgonzalezf.org.weather.common.analytics.observer
+package rcgonzalezf.org.weather.analytics.analytics.observer
 
 import android.util.Log
-import rcgonzalezf.org.weather.common.analytics.AnalyticsBaseData
-import rcgonzalezf.org.weather.common.analytics.AnalyticsEvent
-import rcgonzalezf.org.weather.common.analytics.AnalyticsObserver
+import rcgonzalezf.org.weather.analytics.analytics.AnalyticsBaseData
+import rcgonzalezf.org.weather.analytics.analytics.AnalyticsEvent
+import rcgonzalezf.org.weather.analytics.analytics.AnalyticsObserver
 
 class LogcatAnalyticsObserver : AnalyticsObserver {
 
@@ -21,7 +21,8 @@ class LogcatAnalyticsObserver : AnalyticsObserver {
     }
 
     override fun onAction(analyticsEvent: AnalyticsEvent, screenName: String,
-                          analyticsBaseData: AnalyticsBaseData) {
+                          analyticsBaseData: AnalyticsBaseData
+    ) {
         val builder = "onAction: [ event:" +
                 " name=" + analyticsEvent.name +
                 " additionalValue=" + analyticsEvent.additionalValue +

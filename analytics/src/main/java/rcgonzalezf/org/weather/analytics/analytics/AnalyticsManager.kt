@@ -1,23 +1,24 @@
-package rcgonzalezf.org.weather.common.analytics
+package rcgonzalezf.org.weather.analytics.analytics
 
 import android.content.Context
 import android.net.ConnectivityManager
 import android.os.Build
 import androidx.annotation.VisibleForTesting
-import rcgonzalezf.org.weather.BuildConfig
-import rcgonzalezf.org.weather.utils.WeatherUtils.isXLargeTablet
 import java.util.HashSet
+import javax.inject.Inject
 
-open class AnalyticsManager(private val context: Context) {
-    private val analyticsObservers: MutableSet<AnalyticsObserver> = HashSet()
-    private val analyticsBaseData: AnalyticsBaseData = AnalyticsBaseData()
+open class AnalyticsManager @Inject constructor (private val context: Context,
+                                                 private val analyticsObservers: MutableSet<AnalyticsObserver> = HashSet(),
+                                                 private val analyticsBaseData: AnalyticsBaseData = AnalyticsBaseData().apply {
+                                                     data()[ANDROID_VERSION] = BUILD_ANDROID_VERSION
+                                                     // FIXME enable
+                                                     // data()[APP_VERSION] = BUILD_APP_VERSION
+                                                     //data()[MULTIPANE] = java.lang.Boolean.toString(isXLargeTablet(context))
+                                                 }) {
+
+
     private lateinit var screenName: String
 
-    init {
-        analyticsBaseData.data()[ANDROID_VERSION] = BUILD_ANDROID_VERSION
-        analyticsBaseData.data()[APP_VERSION] = BUILD_APP_VERSION
-        analyticsBaseData.data()[MULTIPANE] = java.lang.Boolean.toString(isMultipane)
-    }
 
     companion object {
         const val MOBILE = "Mobile"
@@ -33,17 +34,15 @@ open class AnalyticsManager(private val context: Context) {
         @VisibleForTesting
         var BUILD_ANDROID_VERSION = Build.VERSION.RELEASE
 
-        @JvmField
-        @VisibleForTesting
-        var BUILD_APP_VERSION = BuildConfig.VERSION_NAME
+        // FIXME enable
+//        @JvmField
+//        @VisibleForTesting
+//        var BUILD_APP_VERSION = BuildConfig.VERSION_NAME
     }
 
     fun addObserver(analyticsObserver: AnalyticsObserver) {
         analyticsObservers.add(analyticsObserver)
     }
-
-    private val isMultipane: Boolean
-        get() = isXLargeTablet(context)
 
     open fun notifyOnScreenLoad(screenName: String) {
         this.screenName = screenName
